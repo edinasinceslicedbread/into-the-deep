@@ -164,5 +164,9 @@ public class NickOpMode extends LinearOpMode {
 
             telemetry.update();
 
+<<<<<<< Updated upstream
+=======
+
+>>>>>>> Stashed changes
         }
     }}
