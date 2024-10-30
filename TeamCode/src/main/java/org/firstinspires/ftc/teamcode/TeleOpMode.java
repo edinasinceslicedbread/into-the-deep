@@ -17,19 +17,30 @@ public class TeleOpMode extends LinearOpMode {
     private DcMotor rightFrontDrive = null;
     private DcMotor rightBackDrive = null;
     private DcMotor scissorDrive = null;
-    private Servo   servo = null;
+    private Servo   clawServo = null;
 
     @Override
     public void runOpMode() {
 
         // Initialize the hardware variables. Note that the strings used here must correspond
         // to the names assigned during the robot configuration step on the DS or RC devices.
+
+        // drive motor hardware names
         leftFrontDrive  = hardwareMap.get(DcMotor.class, "leftFrontDrive");
         leftBackDrive  = hardwareMap.get(DcMotor.class, "leftBackDrive");
         rightFrontDrive = hardwareMap.get(DcMotor.class, "rightFrontDrive");
         rightBackDrive = hardwareMap.get(DcMotor.class, "rightBackDrive");
+
+        // scissor drive, claw server, and extend / retract
         scissorDrive = hardwareMap.get(DcMotor.class, "scissorDrive");
-        servo = hardwareMap.get(Servo.class, "clawServo");
+        clawServo = hardwareMap.get(Servo.class, "clawServo");
+
+        // motor directions
+        leftFrontDrive.setDirection(DcMotor.Direction.FORWARD);
+        leftBackDrive.setDirection(DcMotor.Direction.FORWARD);
+        rightFrontDrive.setDirection(DcMotor.Direction.REVERSE);
+        rightBackDrive.setDirection(DcMotor.Direction.REVERSE);
+
         double  position = 0;
 
         // Wait for the game to start (driver presses START)
@@ -74,28 +85,27 @@ public class TeleOpMode extends LinearOpMode {
                 rightBackPower = -Slowmax;
             }if (gamepad1.dpad_left) {
                 leftFrontPower  = -Slowmax;
-                rightFrontPower = -Slowmax;
-                leftBackPower   = Slowmax;
+                rightFrontPower = Slowmax;
+                leftBackPower   = -Slowmax;
                 rightBackPower  = Slowmax;
             } if (gamepad1.dpad_right) {
                 leftFrontPower  = Slowmax;
-                rightFrontPower = Slowmax;
-                leftBackPower   = -Slowmax;
+                rightFrontPower = -Slowmax;
+                leftBackPower   = Slowmax;
                 rightBackPower  = -Slowmax;
             }
 
-            /* drive directions */
+            /* right is up and left is down */
             double scissorDrivePower = 0;
             if (gamepad1.right_trigger > 0)
             {
-                scissorDrivePower = 0.25;
+                scissorDrivePower = -0.50;
             }
             if (gamepad1.left_trigger > 0)
             {
-                scissorDrivePower = -0.25;
+                scissorDrivePower = 0.25;
             }
             scissorDrive.setPower(scissorDrivePower);
-
 
             // Define class members
 
@@ -103,11 +113,12 @@ public class TeleOpMode extends LinearOpMode {
             {
                 position = 1.0;
             }
-            if (gamepad1.b = true)
+            if (gamepad1.a = true)
             {
                 position = 0.0;
             }
-            servo.setPosition(position);
+            clawServo.setPosition(position);
+
             // This is test code:
             //
             // Uncomment the following code to test your motor directions.
@@ -137,7 +148,6 @@ public class TeleOpMode extends LinearOpMode {
             telemetry.addData("Back  L/R", "%4.2f, %4.2f", leftBackPower, rightBackPower);
 
             telemetry.update();
-
 
         }
     }
