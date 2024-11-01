@@ -93,7 +93,7 @@ public class TeleOpMode extends LinearOpMode {
             // manage bumpers for toggling speed override
             // --------------------------------------------------------------------------------------------
 
-            toggleSpeedUp.update(gamepad1.right_bumper);
+            toggleSpeedUp.update(scissorLimitLo.getState());
             toggleSpeedDn.update(gamepad1.left_bumper);
             if (toggleSpeedUp.getOutput()) {
                 speedOverride = Math.min(speedOverride + 0.25, 1.0);
@@ -194,8 +194,8 @@ public class TeleOpMode extends LinearOpMode {
             // *******************************************************************************************
 
             // TODO: adjust max between 0.0 and 1.0
-            double scissorDriveUpMax = 0.50;
-            double scissorDriveDownMax = 0.25;
+            double scissorDriveUpMax = 1.0;
+            double scissorDriveDownMax = 1.0;
             double scissorDrivePower = 0;
             if (gamepad1.right_trigger > 0.1) {
                 scissorDrivePower = -gamepad1.right_trigger * scissorDriveUpMax;
@@ -208,13 +208,13 @@ public class TeleOpMode extends LinearOpMode {
             // *******************************************************************************************
 
             // TODO: adjust max between 0.0 and 1.0
-            double extensionDriveFwdMax = 0.50;
-            double extensionDriveBwdMax = 0.25;
+            double extensionDriveFwdMax = 1.0;
+            double extensionDriveBwdMax = 1.0;
             double extensionDrivePower = 0;
             if (gamepad1.right_stick_y < -0.1) {
-                extensionDrivePower = gamepad1.right_stick_y * scissorDriveUpMax;
+                extensionDrivePower = gamepad1.right_stick_y * extensionDriveFwdMax;
             } else if (gamepad1.right_stick_y > 0.1) {
-                extensionDrivePower = gamepad1.right_stick_y * scissorDriveDownMax;
+                extensionDrivePower = gamepad1.right_stick_y * extensionDriveBwdMax;
             }
 
             // *******************************************************************************************
@@ -233,7 +233,7 @@ public class TeleOpMode extends LinearOpMode {
 
             // Power to scissor lift, extension
             scissorDrive.setPower(scissorDrivePower);
-            scissorDrive.setPower(extensionDrivePower);
+            extensionDrive.setPower(extensionDrivePower);
 
             // *******************************************************************************************
             // SECTION X: Telemetry
