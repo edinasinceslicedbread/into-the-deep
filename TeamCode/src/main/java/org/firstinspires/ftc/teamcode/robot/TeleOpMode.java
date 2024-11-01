@@ -60,9 +60,9 @@ public class TeleOpMode extends LinearOpMode {
         // digital channels
         scissorLimitLo = hardwareMap.get(DigitalChannel.class, "scissorLimitLo");
         scissorLimitHi = hardwareMap.get(DigitalChannel.class, "scissorLimitHi");
-        extensionLimitBwd = hardwareMap.get(DigitalChannel.class, "extensionLimitBwd");
-        extensionLimitFwd = hardwareMap.get(DigitalChannel.class, "extensionLimitFwd");
-        clawServoHome = hardwareMap.get(DigitalChannel.class, "clawServoHome");
+        // extensionLimitBwd = hardwareMap.get(DigitalChannel.class, "extensionLimitBwd");
+        // extensionLimitFwd = hardwareMap.get(DigitalChannel.class, "extensionLimitFwd");
+        // clawServoHome = hardwareMap.get(DigitalChannel.class, "clawServoHome");
 
         // assign motor directions
         leftFrontDrive.setDirection(DcMotor.Direction.FORWARD);
@@ -70,6 +70,12 @@ public class TeleOpMode extends LinearOpMode {
         rightFrontDrive.setDirection(DcMotor.Direction.REVERSE);
         rightBackDrive.setDirection(DcMotor.Direction.REVERSE);
 
+        // set digital input mode
+        scissorLimitLo.setMode(DigitalChannel.Mode.INPUT);
+        scissorLimitHi.setMode(DigitalChannel.Mode.INPUT);
+        // extensionLimitBwd.setMode(DigitalChannel.Mode.INPUT);
+        // extensionLimitFwd.setMode(DigitalChannel.Mode.INPUT);
+        // clawServoHome .setMode(DigitalChannel.Mode.INPUT);
 
         // *******************************************************************************************
         // Wait for the game to start (driver presses START)
@@ -93,7 +99,7 @@ public class TeleOpMode extends LinearOpMode {
             // manage bumpers for toggling speed override
             // --------------------------------------------------------------------------------------------
 
-            toggleSpeedUp.update(scissorLimitLo.getState());
+            toggleSpeedUp.update(gamepad1.right_bumper);
             toggleSpeedDn.update(gamepad1.left_bumper);
             if (toggleSpeedUp.getOutput()) {
                 speedOverride = Math.min(speedOverride + 0.25, 1.0);
@@ -197,6 +203,10 @@ public class TeleOpMode extends LinearOpMode {
             double scissorDriveUpMax = 1.0;
             double scissorDriveDownMax = 1.0;
             double scissorDrivePower = 0;
+            double scissorPosition = scissorDrive.getCurrentPosition();
+            boolean scissorLo = scissorLimitLo.getState();
+            boolean scissorHi = scissorLimitLo.getState();
+
             if (gamepad1.right_trigger > 0.1) {
                 scissorDrivePower = -gamepad1.right_trigger * scissorDriveUpMax;
             } else if (gamepad1.left_trigger > 0.1) {
@@ -244,6 +254,7 @@ public class TeleOpMode extends LinearOpMode {
             telemetry.addLine(String.format("Override: [%4.2f]", speedOverride));
             telemetry.addLine(String.format("[%4.2f]----[%4.2f]", leftFrontPower, rightFrontPower));
             telemetry.addLine(String.format("[%4.2f]----[%4.2f]", leftBackPower, rightBackPower));
+            telemetry.addLine(String.format("Scissor: [%4.2f] [%b] [%b]", scissorPosition, scissorLo, scissorHi));
 
             // Update telemetry
             telemetry.update();
