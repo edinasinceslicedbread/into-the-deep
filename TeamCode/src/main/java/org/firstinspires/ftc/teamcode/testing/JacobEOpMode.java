@@ -27,9 +27,8 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.testing;
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -48,8 +47,8 @@ import com.qualcomm.robotcore.hardware.Servo;
  * Use Android Studio to Copy this Class, and Paste it into your team's code folder with a new name.
  * Remove or comment out the @Disabled line to add this OpMode to the Driver Station OpMode list
  */
-@TeleOp(name = "Concept: Lucas Scan Servo", group = "Concept")
-public class LucasOPMode extends LinearOpMode {
+@TeleOp(name = "ExtendRetractTest", group = "Concept")
+public class JacobEOpMode extends LinearOpMode {
 
     static final double INCREMENT   = 0.01;     // amount to slew servo each CYCLE_MS cycle
     static final int    CYCLE_MS    =   50;     // period of each cycle
@@ -60,7 +59,6 @@ public class LucasOPMode extends LinearOpMode {
     Servo   servo;
     double  position = (MAX_POS - MIN_POS) / 2; // Start at halfway position
     boolean rampUp = true;
-
 
     @Override
     public void runOpMode() {
@@ -74,41 +72,31 @@ public class LucasOPMode extends LinearOpMode {
         telemetry.update();
         waitForStart();
 
-
-        // Scan servo till stop pressed.
         while(opModeIsActive()){
 
-            // slew the servo, according to the rampUp (direction) variable.
-            if (rampUp) {
-                // Keep stepping up until we hit the max value.
-                position += INCREMENT ;
-                if (position >= MAX_POS ) {
-                    position = MAX_POS;
-                    rampUp = !rampUp;   // Switch ramp direction
-                }
+            // Scan servo till stop pressed.
+            if (gamepad1.y = true)
+            {
+                position = 1.0;
             }
-            else {
-                // Keep stepping down until we hit the min value.
-                position -= INCREMENT ;
-                if (position <= MIN_POS ) {
-                    position = MIN_POS;
-                    rampUp = !rampUp;  // Switch ramp direction
-                }
+            if (gamepad1.b = true)
+            {
+                position = 0.0;
             }
 
             // Display the current value
             telemetry.addData("Servo Position", "%5.2f", position);
-            telemetry.addData(">", "Press Stop to end test." );
+            telemetry.addData(">", "This program will stop once it is finished running." );
             telemetry.update();
 
             // Set the servo to the new position and pause;
             servo.setPosition(position);
             sleep(CYCLE_MS);
             idle();
-        }
 
-        // Signal done;
-        telemetry.addData(">", "Done");
-        telemetry.update();
+            // Signal done;
+            telemetry.addData(">", "Done");
+            telemetry.update();
+         }
     }
 }
