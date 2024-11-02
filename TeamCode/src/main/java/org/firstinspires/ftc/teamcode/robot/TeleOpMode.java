@@ -65,17 +65,15 @@ public class TeleOpMode extends LinearOpMode {
         // extensionLimitFwd = hardwareMap.get(DigitalChannel.class, "extensionLimitFwd");
         // clawServoHome = hardwareMap.get(DigitalChannel.class, "clawServoHome");
 
-        // assign motor directions
+        // assign wheel motor directions
         leftFrontDrive.setDirection(DcMotor.Direction.FORWARD);
         leftBackDrive.setDirection(DcMotor.Direction.FORWARD);
         rightFrontDrive.setDirection(DcMotor.Direction.REVERSE);
         rightBackDrive.setDirection(DcMotor.Direction.REVERSE);
-        scissorDrive.setDirection(DcMotor.Direction.REVERSE);
 
-        // set digital input mode
-        // extensionLimitBwd.setMode(DigitalChannel.Mode.INPUT);
-        // extensionLimitFwd.setMode(DigitalChannel.Mode.INPUT);
-        // clawServoHome .setMode(DigitalChannel.Mode.INPUT);
+        // assign scissor and extension directions
+        scissorDrive.setDirection(DcMotor.Direction.FORWARD);
+        extensionDrive.setDirection(DcMotor.Direction.FORWARD);
 
         // *******************************************************************************************
         // Wait for the game to start (driver presses START)
@@ -99,8 +97,8 @@ public class TeleOpMode extends LinearOpMode {
             // manage bumpers for toggling speed override
             // --------------------------------------------------------------------------------------------
 
-            toggleSpeedUp.update(gamepad1.right_bumper);
-            toggleSpeedDn.update(gamepad1.left_bumper);
+            toggleSpeedUp.update(gamepad1.b);
+            toggleSpeedDn.update(gamepad1.x);
             if (toggleSpeedUp.getOutput()) {
                 speedOverride = Math.min(speedOverride + 0.25, 1.0);
             }
@@ -200,16 +198,16 @@ public class TeleOpMode extends LinearOpMode {
             // *******************************************************************************************
 
             // TODO: adjust max between 0.0 and 1.0
-            double scissorDriveUpMax = 1.0;
-            double scissorDriveDownMax = 1.0;
-            double scissorDrivePower = 0;
+            double scissorDriveUpMax = 0.50;
+            double scissorDriveDownMax = 0.50;
+            double scissorDrivePower = 0.0;
             double scissorPosition = scissorDrive.getCurrentPosition();
             boolean scissorLo = scissorLimitLo.isPressed();
             boolean scissorHi = scissorLimitHi.isPressed();
 
-            if (gamepad1.right_trigger > 0.1 && !scissorHi) {
+            if (gamepad1.right_trigger > 0.1) {
                 scissorDrivePower = gamepad1.right_trigger * scissorDriveUpMax;
-            } else if (gamepad1.left_trigger > 0.1 && !scissorLo) {
+            } else if (gamepad1.left_trigger > 0.1) {
                 scissorDrivePower = -gamepad1.left_trigger * scissorDriveDownMax;
             }
 
@@ -221,10 +219,10 @@ public class TeleOpMode extends LinearOpMode {
             double extensionDriveFwdMax = 1.0;
             double extensionDriveBwdMax = 1.0;
             double extensionDrivePower = 0;
-            if (gamepad1.right_stick_y < -0.1) {
-                extensionDrivePower = gamepad1.right_stick_y * extensionDriveFwdMax;
-            } else if (gamepad1.right_stick_y > 0.1) {
-                extensionDrivePower = gamepad1.right_stick_y * extensionDriveBwdMax;
+            if (gamepad1.right_bumper) {
+                extensionDrivePower = extensionDriveFwdMax;
+            } else if (gamepad1.left_bumper) {
+                extensionDrivePower = -extensionDriveBwdMax;
             }
 
             // *******************************************************************************************
