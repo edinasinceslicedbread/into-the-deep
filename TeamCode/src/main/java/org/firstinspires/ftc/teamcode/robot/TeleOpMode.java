@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.OneShotTrigger;
@@ -28,8 +29,8 @@ public class TeleOpMode extends LinearOpMode {
     private Servo clawServo = null;
 
     // digital switches
-    private DigitalChannel scissorLimitLo = null;
-    private DigitalChannel scissorLimitHi = null;
+    private TouchSensor scissorLimitLo = null;
+    private TouchSensor scissorLimitHi = null;
     private DigitalChannel extensionLimitBwd = null;
     private DigitalChannel extensionLimitFwd = null;
     private DigitalChannel clawServoHome = null;
@@ -58,8 +59,8 @@ public class TeleOpMode extends LinearOpMode {
         clawServo = hardwareMap.get(Servo.class, "clawServo");
 
         // digital channels
-        scissorLimitLo = hardwareMap.get(DigitalChannel.class, "scissorLimitLo");
-        scissorLimitHi = hardwareMap.get(DigitalChannel.class, "scissorLimitHi");
+        scissorLimitLo = hardwareMap.get(TouchSensor.class, "scissorLimitLo");
+        scissorLimitHi = hardwareMap.get(TouchSensor.class, "scissorLimitHi");
         // extensionLimitBwd = hardwareMap.get(DigitalChannel.class, "extensionLimitBwd");
         // extensionLimitFwd = hardwareMap.get(DigitalChannel.class, "extensionLimitFwd");
         // clawServoHome = hardwareMap.get(DigitalChannel.class, "clawServoHome");
@@ -69,10 +70,9 @@ public class TeleOpMode extends LinearOpMode {
         leftBackDrive.setDirection(DcMotor.Direction.FORWARD);
         rightFrontDrive.setDirection(DcMotor.Direction.REVERSE);
         rightBackDrive.setDirection(DcMotor.Direction.REVERSE);
+        scissorDrive.setDirection(DcMotor.Direction.REVERSE);
 
         // set digital input mode
-        scissorLimitLo.setMode(DigitalChannel.Mode.INPUT);
-        scissorLimitHi.setMode(DigitalChannel.Mode.INPUT);
         // extensionLimitBwd.setMode(DigitalChannel.Mode.INPUT);
         // extensionLimitFwd.setMode(DigitalChannel.Mode.INPUT);
         // clawServoHome .setMode(DigitalChannel.Mode.INPUT);
@@ -204,13 +204,13 @@ public class TeleOpMode extends LinearOpMode {
             double scissorDriveDownMax = 1.0;
             double scissorDrivePower = 0;
             double scissorPosition = scissorDrive.getCurrentPosition();
-            boolean scissorLo = scissorLimitLo.getState();
-            boolean scissorHi = scissorLimitLo.getState();
+            boolean scissorLo = scissorLimitLo.isPressed();
+            boolean scissorHi = scissorLimitHi.isPressed();
 
-            if (gamepad1.right_trigger > 0.1) {
-                scissorDrivePower = -gamepad1.right_trigger * scissorDriveUpMax;
-            } else if (gamepad1.left_trigger > 0.1) {
-                scissorDrivePower = gamepad1.left_trigger * scissorDriveDownMax;
+            if (gamepad1.right_trigger > 0.1 && !scissorHi) {
+                scissorDrivePower = gamepad1.right_trigger * scissorDriveUpMax;
+            } else if (gamepad1.left_trigger > 0.1 && !scissorLo) {
+                scissorDrivePower = -gamepad1.left_trigger * scissorDriveDownMax;
             }
 
             // *******************************************************************************************
