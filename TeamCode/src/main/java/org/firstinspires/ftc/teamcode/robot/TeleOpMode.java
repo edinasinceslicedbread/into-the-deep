@@ -146,27 +146,27 @@ public class TeleOpMode extends LinearOpMode {
             if (gamepad1.dpad_up && gamepad1.dpad_right) {
                 // Move diagonally forward-right
                 leftFrontPower = precisionMax;    // Front left wheel spins forward
-                rightFrontPower = 0;                    // Front right wheel stops
-                leftBackPower = 0;                    // Back left wheel stops
+                rightFrontPower = 0;              // Front right wheel stops
+                leftBackPower = 0;                // Back left wheel stops
                 rightBackPower = precisionMax;    // Back right wheel spins forward
             } else if (gamepad1.dpad_up && gamepad1.dpad_left) {
                 // Move diagonally forward-left
-                leftFrontPower = 0;                    // Front left wheel stops
+                leftFrontPower = 0;                // Front left wheel stops
                 rightFrontPower = precisionMax;    // Front right wheel spins forward
-                leftBackPower = precisionMax;    // Back left wheel spins forward
-                rightBackPower = 0;                    // Back right wheel stops
+                leftBackPower = precisionMax;      // Back left wheel spins forward
+                rightBackPower = 0;                // Back right wheel stops
             } else if (gamepad1.dpad_down && gamepad1.dpad_right) {
                 // Move diagonally backward-right
-                leftFrontPower = -precisionMax;   // Front left wheel spins backward
-                rightFrontPower = 0;                    // Front right wheel stops
-                leftBackPower = 0;                    // Back left wheel stops
-                rightBackPower = -precisionMax;   // Back right wheel spins backward
+                leftFrontPower = -precisionMax;    // Front left wheel spins backward
+                rightFrontPower = 0;               // Front right wheel stops
+                leftBackPower = 0;                 // Back left wheel stops
+                rightBackPower = -precisionMax;    // Back right wheel spins backward
             } else if (gamepad1.dpad_down && gamepad1.dpad_left) {
                 // Move diagonally backward-left
-                leftFrontPower = 0;                    // Front left wheel stops
+                leftFrontPower = 0;                // Front left wheel stops
                 rightFrontPower = -precisionMax;   // Front right wheel spins backward
-                leftBackPower = -precisionMax;   // Back left wheel spins backward
-                rightBackPower = 0;                    // Back right wheel stops
+                leftBackPower = -precisionMax;     // Back left wheel spins backward
+                rightBackPower = 0;                // Back right wheel stops
             } else if (gamepad1.dpad_up) {
                 // Move forward
                 leftFrontPower = precisionMax;
@@ -181,16 +181,16 @@ public class TeleOpMode extends LinearOpMode {
                 rightBackPower = -precisionMax;
             } else if (gamepad1.dpad_left) {
                 // Move left
-                leftFrontPower = precisionMax;    // Front left wheel spins forward
-                rightFrontPower = -precisionMax;   // Front right wheel spins backward
+                leftFrontPower = precisionMax;   // Front left wheel spins forward
+                rightFrontPower = -precisionMax; // Front right wheel spins backward
                 leftBackPower = -precisionMax;   // Back left wheel spins backward
-                rightBackPower = precisionMax;    // Back right wheel spins forward
+                rightBackPower = precisionMax;   // Back right wheel spins forward
             } else if (gamepad1.dpad_right) {
                 // Move right
-                leftFrontPower = -precisionMax;   // Front left wheel spins backward
-                rightFrontPower = precisionMax;    // Front right wheel spins forward
+                leftFrontPower = -precisionMax;  // Front left wheel spins backward
+                rightFrontPower = precisionMax;  // Front right wheel spins forward
                 leftBackPower = precisionMax;    // Back left wheel spins forward
-                rightBackPower = -precisionMax;   // Back right wheel spins backward
+                rightBackPower = -precisionMax;  // Back right wheel spins backward
             }
 
             // *******************************************************************************************
