@@ -34,7 +34,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-@TeleOp(name = "Test: Drive Motors - Joysticks", group = "Testing")
+@TeleOp(name = "Test: Drive Motors - Joysticks", group = "Test")
 // @Disabled
 public class TestDriveMotorsOpMode extends LinearOpMode {
 

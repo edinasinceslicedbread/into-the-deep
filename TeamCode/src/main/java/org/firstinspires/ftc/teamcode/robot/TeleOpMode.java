@@ -73,9 +73,9 @@ public class TeleOpMode extends LinearOpMode {
             // turbo mode speed overrides with left and right stick buttons
             // --------------------------------------------------------------------------------------------
 
+            double turboOverrideLeftStick = 0.5;
+            double turboOverrideRightStick = 0.5;
             // max wheel speed override
-            double turboOverrideLeftStick = 0.50;
-            double turboOverrideRightStick = 0.50;
             if (gamepad1.left_stick_button) {
                 turboOverrideLeftStick = 1.0;
             }
@@ -89,9 +89,9 @@ public class TeleOpMode extends LinearOpMode {
             double max;
 
             // POV Mode uses left joystick to go forward & strafe, and right joystick to rotate.
-            double axial = -gamepad1.left_stick_y * turboOverrideRightStick;  // Note: pushing stick forward gives negative value
+            double axial = -gamepad1.left_stick_y * turboOverrideLeftStick;  // Note: pushing stick forward gives negative value
             double lateral = gamepad1.left_stick_x * turboOverrideLeftStick;
-            double yaw = gamepad1.right_stick_x * turboOverrideLeftStick;
+            double yaw = gamepad1.right_stick_x * turboOverrideRightStick;
 
             // Combine the joystick requests for each axis-motion to determine each wheel's power.
             // Set up a variable for each drive wheel to save the power level for telemetry.
@@ -225,11 +225,11 @@ public class TeleOpMode extends LinearOpMode {
 
             // Show the elapsed game time and wheel power.
             telemetry.addData("Run Time", runtime.toString());
-            telemetry.addLine(String.format("Stick Override: L[%s] R[%s]", FormatPower(turboOverrideLeftStick), FormatPower(turboOverrideRightStick)));
-            telemetry.addLine(String.format("[%s]----[%s]", FormatPower(leftFrontPower), FormatPower(rightFrontPower)));
-            telemetry.addLine(String.format("[%s]----[%s]", FormatPower(leftBackPower), FormatPower(rightBackPower)));
-            telemetry.addLine(String.format("Scissor Lift: [%s]", FormatPower(scissorPosition)));
-            telemetry.addLine(String.format("Claw Extension: [%s]", FormatPower(extensionPosition)));
+            telemetry.addLine(String.format("Stick Override: L[%4.2f] R[%4.2f]", turboOverrideLeftStick, turboOverrideRightStick));
+            telemetry.addLine(String.format("[%s]----[%s]", FormatPower(leftFrontPower, "%4.2f"), FormatPower(rightFrontPower, "%4.2f")));
+            telemetry.addLine(String.format("[%s]----[%s]", FormatPower(leftBackPower, "%4.2f"), FormatPower(rightBackPower, "%4.2f")));
+            telemetry.addLine(String.format("Scissor Lift: [%.0f]", scissorPosition));
+            telemetry.addLine(String.format("Claw Extension: [%.0f]", extensionPosition));
 
             // Update telemetry
             telemetry.update();
@@ -237,15 +237,15 @@ public class TeleOpMode extends LinearOpMode {
         }
     }
 
-    private String FormatPower(double leftFrontPower) {
-        String power = String.format("[%8.2f]", leftFrontPower);
-        String direction = " ";
+    private String FormatPower(double leftFrontPower, String formatString) {
+        String power = String.format(formatString, Math.abs(leftFrontPower));
+        String direction = "";
         if (leftFrontPower > 0.01) {
-            direction = "\u2191"; // Up arrow
+            direction = "\u25B2"; // Up arrow
         } else if (leftFrontPower < -0.01) {
-            direction = "\u2193"; // Down arrow
+            direction = "\u25BC"; // Down arrow
         } else {
-            direction = " "; // No movement
+            direction = "\uFE00"; // No movement
         }
         return direction + power;
     }

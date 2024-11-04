@@ -43,6 +43,8 @@ public class TestGamepadsOpMode extends LinearOpMode {
         // Run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
             // Gamepad 1
+            telemetry.addData("Gamepad 1 - Left Stick Btn", gamepad1.left_stick_button);
+            telemetry.addData("Gamepad 1 - Right Stick Btn", gamepad1.right_stick_button);
             telemetry.addData("Gamepad 1 - Left Stick X", gamepad1.left_stick_x);
             telemetry.addData("Gamepad 1 - Left Stick Y", gamepad1.left_stick_y);
             telemetry.addData("Gamepad 1 - Right Stick X", gamepad1.right_stick_x);
@@ -61,8 +63,10 @@ public class TestGamepadsOpMode extends LinearOpMode {
             telemetry.addData("Gamepad 1 - Dpad Right", gamepad1.dpad_right);
             telemetry.addData("Gamepad 1 - Start", gamepad1.start);
             telemetry.addData("Gamepad 1 - Back", gamepad1.back);
-            telemetry.addData("Gamepad 1 - Mode", gamepad1.guide);
+            telemetry.addData("Gamepad 1 - Guide", gamepad1.guide);
             // Gamepad 2
+            telemetry.addData("Gamepad 2 - Left Stick Btn", gamepad2.left_stick_button);
+            telemetry.addData("Gamepad 2 - Right Stick Btn", gamepad2.right_stick_button);
             telemetry.addData("Gamepad 2 - Left Stick X", gamepad2.left_stick_x);
             telemetry.addData("Gamepad 2 - Left Stick Y", gamepad2.left_stick_y);
             telemetry.addData("Gamepad 2 - Right Stick X", gamepad2.right_stick_x);
@@ -81,7 +85,7 @@ public class TestGamepadsOpMode extends LinearOpMode {
             telemetry.addData("Gamepad 2 - Dpad Right", gamepad2.dpad_right);
             telemetry.addData("Gamepad 2 - Start", gamepad2.start);
             telemetry.addData("Gamepad 2 - Back", gamepad2.back);
-            telemetry.addData("Gamepad 2 - Mode", gamepad2.guide);
+            telemetry.addData("Gamepad 2 - Guide", gamepad2.guide);
             telemetry.update();
         }
     }
