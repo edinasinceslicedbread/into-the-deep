@@ -16,7 +16,7 @@ public class RisingEdgeTrigger {
         previousInput = currentInput;
     }
     // Method to get the current output state
-    public boolean getOutput() {
+    public boolean wasTriggered() {
         return output;
     }
     public static void main(String[] args) {
@@ -33,7 +33,7 @@ public class RisingEdgeTrigger {
             // Update the trigger with the current input
             trigger.update(input);
             // Print the output state
-            System.out.println("Cycle " + i + ": Output = " + trigger.getOutput());
+            System.out.println("Cycle " + i + ": Output = " + trigger.wasTriggered());
         }
     }
 }

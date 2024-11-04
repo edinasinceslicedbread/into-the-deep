@@ -6,9 +6,26 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.RisingEdgeTrigger;
+
 
 @TeleOp(name = "Robot: Into the Deep", group = "Robot")
 public class TeleOpMode extends LinearOpMode {
+
+    // scissor lift constants
+    static final double SCISSOR_MIN_POS = 1000;    // Minimum scissor lift encoder position
+    static final double SCISSOR_MAX_POS = 10000;     // Maximum scissor lift encoder position
+
+    // claw extension constants
+    static final double EXTENSION_MIN_POS = -3000;  // Minimum claw extension encoder position
+    static final double EXTENSION_MAX_POS = 5000;   // Maximum claw extension encoder position
+
+    // claw gripper constants
+    static final double CLAW_INCREMENT = 0.01;  // amount to slew servo each CYCLE_MS cycle
+    static final int CYCLE_MS = 50;             // period of each cycle
+    static final double CLAW_MIN_POS = 0.0;     // Minimum rotational position
+    static final double CLAW_START_POS = 0.0;   // Starting rotational position
+    static final double CLAW_MAX_POS = 1.0;     // Maximum rotational position
 
     // Declare OpMode members for each of the 4 motors.
     private ElapsedTime runtime = new ElapsedTime();
@@ -23,6 +40,11 @@ public class TeleOpMode extends LinearOpMode {
     private DcMotor scissorDrive = null;
     private DcMotor extensionDrive = null;
     private Servo clawServo = null;
+
+    private RisingEdgeTrigger homingTrigger = new RisingEdgeTrigger();
+
+    // outside the while loop, set initial claw servo position
+    double clawServoPosition = CLAW_START_POS; // Start at min position
 
     @Override
     public void runOpMode() {
@@ -67,7 +89,16 @@ public class TeleOpMode extends LinearOpMode {
         while (opModeIsActive()) {
 
             // *******************************************************************************************
-            // SECTION 1: Main Joystick Robot Driving
+            // SECTION 1: toggle homing mode to be able to set the zero position of scissor and extension
+            // *******************************************************************************************
+            boolean homingModeActive = false;
+            homingTrigger.update(gamepad1.back && gamepad1.start);
+            if (homingTrigger.wasTriggered()) {
+                homingModeActive = !homingModeActive;
+            }
+
+            // *******************************************************************************************
+            // SECTION 2: Main Joystick Robot Driving
             // *******************************************************************************************
 
             // turbo mode speed overrides with left and right stick buttons
@@ -93,6 +124,26 @@ public class TeleOpMode extends LinearOpMode {
             double lateral = gamepad1.left_stick_x * turboOverrideLeftStick;
             double yaw = gamepad1.right_stick_x * turboOverrideRightStick;
 
+            // D-Pad overrides for the same joystick functions as above
+            // --------------------------------------------------------------------------------------------
+            // TODO: adjust max speed between 0.0 and 1.0
+            double precisionMax = 0.25;
+            if (!(gamepad1.dpad_up && gamepad1.dpad_down && gamepad1.dpad_left && gamepad1.dpad_right)) {
+                if (gamepad1.dpad_up || gamepad2.dpad_up) {
+                    axial = precisionMax;
+                } else if (gamepad1.dpad_down || gamepad2.dpad_down) {
+                    axial = -precisionMax;
+                } else if (gamepad1.dpad_left || gamepad2.dpad_left) {
+                    lateral = -precisionMax;
+                } else if (gamepad1.dpad_right || gamepad2.dpad_right) {
+                    lateral = precisionMax;
+                } else if (gamepad1.x || gamepad2.x) {
+                    yaw = -precisionMax;
+                } else if (gamepad1.b || gamepad2.b) {
+                    yaw = precisionMax;
+                }
+            }
+
             // Combine the joystick requests for each axis-motion to determine each wheel's power.
             // Set up a variable for each drive wheel to save the power level for telemetry.
             double leftFrontPower = axial + lateral + yaw;
@@ -114,96 +165,126 @@ public class TeleOpMode extends LinearOpMode {
             }
 
             // *******************************************************************************************
-            // SECTION 2: D-Pad Precision Robot Driving
+            // SECTION 3: D-Pad Precision Robot Driving
             // *******************************************************************************************
 
-            // TODO: adjust max speed between 0.0 and 1.0
-            double precisionMax = 0.25;
-
-            if (gamepad1.dpad_up && gamepad1.dpad_right) {
-                // Move diagonally forward-right
-                leftFrontPower = precisionMax;    // Front left wheel spins forward
-                rightFrontPower = 0;              // Front right wheel stops
-                leftBackPower = 0;                // Back left wheel stops
-                rightBackPower = precisionMax;    // Back right wheel spins forward
-            } else if (gamepad1.dpad_up && gamepad1.dpad_left) {
-                // Move diagonally forward-left
-                leftFrontPower = 0;                // Front left wheel stops
-                rightFrontPower = precisionMax;    // Front right wheel spins forward
-                leftBackPower = precisionMax;      // Back left wheel spins forward
-                rightBackPower = 0;                // Back right wheel stops
-            } else if (gamepad1.dpad_down && gamepad1.dpad_right) {
-                // Move diagonally backward-right
-                leftFrontPower = -precisionMax;    // Front left wheel spins backward
-                rightFrontPower = 0;               // Front right wheel stops
-                leftBackPower = 0;                 // Back left wheel stops
-                rightBackPower = -precisionMax;    // Back right wheel spins backward
-            } else if (gamepad1.dpad_down && gamepad1.dpad_left) {
-                // Move diagonally backward-left
-                leftFrontPower = 0;                // Front left wheel stops
-                rightFrontPower = -precisionMax;   // Front right wheel spins backward
-                leftBackPower = -precisionMax;     // Back left wheel spins backward
-                rightBackPower = 0;                // Back right wheel stops
-            } else if (gamepad1.dpad_up) {
-                // Move forward
-                leftFrontPower = precisionMax;
-                rightFrontPower = precisionMax;
-                leftBackPower = precisionMax;
-                rightBackPower = precisionMax;
-            } else if (gamepad1.dpad_down) {
-                // Move backward
-                leftFrontPower = -precisionMax;
-                rightFrontPower = -precisionMax;
-                leftBackPower = -precisionMax;
-                rightBackPower = -precisionMax;
-            } else if (gamepad1.dpad_left) {
-                // Move left
-                leftFrontPower = precisionMax;   // Front left wheel spins forward
-                rightFrontPower = -precisionMax; // Front right wheel spins backward
-                leftBackPower = -precisionMax;   // Back left wheel spins backward
-                rightBackPower = precisionMax;   // Back right wheel spins forward
-            } else if (gamepad1.dpad_right) {
-                // Move right
-                leftFrontPower = -precisionMax;  // Front left wheel spins backward
-                rightFrontPower = precisionMax;  // Front right wheel spins forward
-                leftBackPower = precisionMax;    // Back left wheel spins forward
-                rightBackPower = -precisionMax;  // Back right wheel spins backward
+            // TODO: commented out for now because using the overrides above instead
+            if (false && !(gamepad1.dpad_up && gamepad1.dpad_down && gamepad1.dpad_left && gamepad1.dpad_right)) {
+                if (gamepad1.dpad_up && gamepad1.dpad_right) {
+                    // Move diagonally forward-right
+                    leftFrontPower = precisionMax;    // Front left wheel spins forward
+                    rightFrontPower = 0;              // Front right wheel stops
+                    leftBackPower = 0;                // Back left wheel stops
+                    rightBackPower = precisionMax;    // Back right wheel spins forward
+                } else if (gamepad1.dpad_up && gamepad1.dpad_left) {
+                    // Move diagonally forward-left
+                    leftFrontPower = 0;                // Front left wheel stops
+                    rightFrontPower = precisionMax;    // Front right wheel spins forward
+                    leftBackPower = precisionMax;      // Back left wheel spins forward
+                    rightBackPower = 0;                // Back right wheel stops
+                } else if (gamepad1.dpad_down && gamepad1.dpad_right) {
+                    // Move diagonally backward-right
+                    leftFrontPower = -precisionMax;    // Front left wheel spins backward
+                    rightFrontPower = 0;               // Front right wheel stops
+                    leftBackPower = 0;                 // Back left wheel stops
+                    rightBackPower = -precisionMax;    // Back right wheel spins backward
+                } else if (gamepad1.dpad_down && gamepad1.dpad_left) {
+                    // Move diagonally backward-left
+                    leftFrontPower = 0;                // Front left wheel stops
+                    rightFrontPower = -precisionMax;   // Front right wheel spins backward
+                    leftBackPower = -precisionMax;     // Back left wheel spins backward
+                    rightBackPower = 0;                // Back right wheel stops
+                } else if (gamepad1.dpad_up) {
+                    // Move forward
+                    leftFrontPower = precisionMax;
+                    rightFrontPower = precisionMax;
+                    leftBackPower = precisionMax;
+                    rightBackPower = precisionMax;
+                } else if (gamepad1.dpad_down) {
+                    // Move backward
+                    leftFrontPower = -precisionMax;
+                    rightFrontPower = -precisionMax;
+                    leftBackPower = -precisionMax;
+                    rightBackPower = -precisionMax;
+                } else if (gamepad1.dpad_left) {
+                    // Move left
+                    leftFrontPower = precisionMax;   // Front left wheel spins forward
+                    rightFrontPower = -precisionMax; // Front right wheel spins backward
+                    leftBackPower = -precisionMax;   // Back left wheel spins backward
+                    rightBackPower = precisionMax;   // Back right wheel spins forward
+                } else if (gamepad1.dpad_right) {
+                    // Move right
+                    leftFrontPower = -precisionMax;  // Front left wheel spins backward
+                    rightFrontPower = precisionMax;  // Front right wheel spins forward
+                    leftBackPower = precisionMax;    // Back left wheel spins forward
+                    rightBackPower = -precisionMax;  // Back right wheel spins backward
+                }
             }
 
             // *******************************************************************************************
-            // SECTION 3: Raise and Lower Scissor Lift
+            // SECTION 4: Raise and Lower Scissor Lift
             // *******************************************************************************************
 
             // TODO: adjust max between 0.0 and 1.0
-            double scissorDriveUpMax = 0.50;
-            double scissorDriveDownMax = 0.50;
+            double scissorUpOverride = 1.0;
+            double scissorDownOverride = 0.75;
             double scissorDrivePower = 0.0;
             double scissorPosition = scissorDrive.getCurrentPosition();
 
+            // Gamepad 1 triggers
             if (gamepad1.right_trigger > 0.1) {
-                scissorDrivePower = gamepad1.right_trigger * scissorDriveUpMax;
+                scissorDrivePower = gamepad1.right_trigger * scissorUpOverride;
             } else if (gamepad1.left_trigger > 0.1) {
-                scissorDrivePower = -gamepad1.left_trigger * scissorDriveDownMax;
+                scissorDrivePower = -gamepad1.left_trigger * scissorDownOverride;
+            }
+
+            // Gamepad 2 triggers
+            if (gamepad2.right_trigger > 0.1) {
+                scissorDrivePower = gamepad1.right_trigger * scissorUpOverride;
+            } else if (gamepad2.left_trigger > 0.1) {
+                scissorDrivePower = -gamepad1.left_trigger * scissorDownOverride;
             }
 
             // *******************************************************************************************
-            // SECTION 4: Extend and Retract Claw
+            // SECTION 5: Extend and Retract Claw
             // *******************************************************************************************
 
             // TODO: adjust max between 0.0 and 1.0
-            double extensionDriveFwdMax = 1.0;
-            double extensionDriveBwdMax = 1.0;
+            double extensionFwdPowerMax = 1.0;
+            double extensionBwdPowerMax = 1.0;
             double extensionDrivePower = 0;
             double extensionPosition = extensionDrive.getCurrentPosition();
+
+            // Gamepad 1
             if (gamepad1.right_bumper) {
-                extensionDrivePower = extensionDriveFwdMax;
+                extensionDrivePower = extensionFwdPowerMax;
             } else if (gamepad1.left_bumper) {
-                extensionDrivePower = -extensionDriveBwdMax;
+                extensionDrivePower = -extensionBwdPowerMax;
+            }
+
+            // Gamepad 2
+            if (gamepad2.right_bumper) {
+                extensionDrivePower = extensionFwdPowerMax;
+            } else if (gamepad2.left_bumper) {
+                extensionDrivePower = -extensionBwdPowerMax;
             }
 
             // *******************************************************************************************
             // SECTION 5: Open and Close Claw
             // *******************************************************************************************
+            if (gamepad1.y || gamepad2.y) {
+                // Keep stepping up until we hit the max value.
+                clawServoPosition += CLAW_INCREMENT;
+                if (clawServoPosition >= CLAW_MAX_POS) {
+                    clawServoPosition = CLAW_MAX_POS;
+                }
+            } else if (gamepad1.a || gamepad2.a) {
+                // Keep stepping down until we hit the min value.
+                clawServoPosition -= CLAW_INCREMENT;
+                if (clawServoPosition <= CLAW_MIN_POS) {
+                    clawServoPosition = CLAW_MIN_POS;
+                }
+            }
 
             // *******************************************************************************************
             // SECTION X: Write Outputs
@@ -218,6 +299,7 @@ public class TeleOpMode extends LinearOpMode {
             // Power to scissor lift, extension
             scissorDrive.setPower(scissorDrivePower);
             extensionDrive.setPower(extensionDrivePower);
+            clawServo.setPosition(clawServoPosition);
 
             // *******************************************************************************************
             // SECTION X: Telemetry
@@ -225,27 +307,40 @@ public class TeleOpMode extends LinearOpMode {
 
             // Show the elapsed game time and wheel power.
             telemetry.addData("Run Time", runtime.toString());
+            telemetry.addData("Run Mode", homingModeActive ? "!!! HOMING MODE !!!" : "SAFE MODE - LIMITS ACTIVE");
             telemetry.addLine(String.format("Stick Override: L[%4.2f] R[%4.2f]", turboOverrideLeftStick, turboOverrideRightStick));
-            telemetry.addLine(String.format("[%s]----[%s]", FormatPower(leftFrontPower, "%4.2f"), FormatPower(rightFrontPower, "%4.2f")));
-            telemetry.addLine(String.format("[%s]----[%s]", FormatPower(leftBackPower, "%4.2f"), FormatPower(rightBackPower, "%4.2f")));
-            telemetry.addLine(String.format("Scissor Lift: [%.0f]", scissorPosition));
-            telemetry.addLine(String.format("Claw Extension: [%.0f]", extensionPosition));
+            telemetry.addLine(String.format("[%s]----[%s]", MotorPower(leftFrontPower), MotorPower(rightFrontPower)));
+            telemetry.addLine(String.format("[%s]----[%s]", MotorPower(leftBackPower), MotorPower(rightBackPower)));
+            telemetry.addLine(String.format("Scissor Lift: [%s] [%.0f]", MotorPower(scissorDrivePower), scissorPosition));
+            telemetry.addLine(String.format("Claw Extension: [%s] [%.0f]", MotorPower(scissorDrivePower), extensionPosition));
+            telemetry.addLine(String.format("Claw Servo Position: [%4.2f]", clawServoPosition));
 
             // Update telemetry
             telemetry.update();
 
+            // idle time for servo
+            sleep(CYCLE_MS);
+            idle();
+
         }
     }
 
-    private String FormatPower(double leftFrontPower, String formatString) {
-        String power = String.format(formatString, Math.abs(leftFrontPower));
+    private String MotorPower(double leftFrontPower) {
+
+        // \u25A0: Square
+        // \u25B2: Up arrow
+        // \u25BC: Down arrow
+        // \u25B6: Right triangle
+        // \u25C0: Left triangle
+
+        String power = String.format("%4.2f", Math.abs(leftFrontPower));
         String direction = "";
         if (leftFrontPower > 0.01) {
             direction = "\u25B2"; // Up arrow
         } else if (leftFrontPower < -0.01) {
             direction = "\u25BC"; // Down arrow
         } else {
-            direction = "\uFE00"; // No movement
+            direction = "\u25A0"; // No movement
         }
         return direction + power;
     }
