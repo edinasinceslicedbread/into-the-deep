@@ -3,15 +3,11 @@ package org.firstinspires.ftc.teamcode.robot;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.teamcode.OneShotTrigger;
 
-
-@TeleOp(name = "TeleOp: Into the Deep", group = "Robot")
+@TeleOp(name = "Robot: Into the Deep", group = "Robot")
 public class TeleOpMode extends LinearOpMode {
 
     // Declare OpMode members for each of the 4 motors.
@@ -27,17 +23,6 @@ public class TeleOpMode extends LinearOpMode {
     private DcMotor scissorDrive = null;
     private DcMotor extensionDrive = null;
     private Servo clawServo = null;
-
-    // digital switches
-    private TouchSensor scissorLimitLo = null;
-    private TouchSensor scissorLimitHi = null;
-    private DigitalChannel extensionLimitBwd = null;
-    private DigitalChannel extensionLimitFwd = null;
-    private DigitalChannel clawServoHome = null;
-
-    // button triggers to adjust speed override up and down
-    private OneShotTrigger toggleSpeedUp = new OneShotTrigger();
-    private OneShotTrigger toggleSpeedDn = new OneShotTrigger();
 
     @Override
     public void runOpMode() {
@@ -58,22 +43,16 @@ public class TeleOpMode extends LinearOpMode {
         extensionDrive = hardwareMap.get(DcMotor.class, "extensionDrive");
         clawServo = hardwareMap.get(Servo.class, "clawServo");
 
-        // digital channels
-        scissorLimitLo = hardwareMap.get(TouchSensor.class, "scissorLimitLo");
-        scissorLimitHi = hardwareMap.get(TouchSensor.class, "scissorLimitHi");
-        // extensionLimitBwd = hardwareMap.get(DigitalChannel.class, "extensionLimitBwd");
-        // extensionLimitFwd = hardwareMap.get(DigitalChannel.class, "extensionLimitFwd");
-        // clawServoHome = hardwareMap.get(DigitalChannel.class, "clawServoHome");
-
         // assign wheel motor directions
         leftFrontDrive.setDirection(DcMotor.Direction.FORWARD);
         leftBackDrive.setDirection(DcMotor.Direction.FORWARD);
         rightFrontDrive.setDirection(DcMotor.Direction.REVERSE);
         rightBackDrive.setDirection(DcMotor.Direction.REVERSE);
 
-        // assign scissor and extension directions
+        // assign scissor, extension, and claw directions
         scissorDrive.setDirection(DcMotor.Direction.FORWARD);
         extensionDrive.setDirection(DcMotor.Direction.FORWARD);
+        clawServo.setDirection(Servo.Direction.FORWARD);
 
         // *******************************************************************************************
         // Wait for the game to start (driver presses START)
@@ -84,9 +63,6 @@ public class TeleOpMode extends LinearOpMode {
         waitForStart();
         runtime.reset();
 
-        // max wheel speed override
-        double speedOverride = 0.25;
-
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
 
@@ -94,27 +70,28 @@ public class TeleOpMode extends LinearOpMode {
             // SECTION 1: Main Joystick Robot Driving
             // *******************************************************************************************
 
-            // manage bumpers for toggling speed override
+            // turbo mode speed overrides with left and right stick buttons
             // --------------------------------------------------------------------------------------------
 
-            toggleSpeedUp.update(gamepad1.b);
-            toggleSpeedDn.update(gamepad1.x);
-            if (toggleSpeedUp.getOutput()) {
-                speedOverride = Math.min(speedOverride + 0.25, 1.0);
+            // max wheel speed override
+            double turboOverrideLeftStick = 0.50;
+            double turboOverrideRightStick = 0.50;
+            if (gamepad1.left_stick_button) {
+                turboOverrideLeftStick = 1.0;
             }
-            if (toggleSpeedDn.getOutput()) {
-                speedOverride = Math.max(speedOverride - 0.25, 0.25);
+            if (gamepad1.right_stick_button) {
+                turboOverrideRightStick = 1.0;
             }
 
-            // start of example code from external
+            // start of code from ftc robot controller external examples
             // --------------------------------------------------------------------------------------------
 
             double max;
 
             // POV Mode uses left joystick to go forward & strafe, and right joystick to rotate.
-            double axial = -gamepad1.left_stick_y * speedOverride;  // Note: pushing stick forward gives negative value
-            double lateral = gamepad1.left_stick_x * speedOverride;
-            double yaw = gamepad1.right_stick_x * speedOverride;
+            double axial = -gamepad1.left_stick_y * turboOverrideRightStick;  // Note: pushing stick forward gives negative value
+            double lateral = gamepad1.left_stick_x * turboOverrideLeftStick;
+            double yaw = gamepad1.right_stick_x * turboOverrideLeftStick;
 
             // Combine the joystick requests for each axis-motion to determine each wheel's power.
             // Set up a variable for each drive wheel to save the power level for telemetry.
@@ -202,8 +179,6 @@ public class TeleOpMode extends LinearOpMode {
             double scissorDriveDownMax = 0.50;
             double scissorDrivePower = 0.0;
             double scissorPosition = scissorDrive.getCurrentPosition();
-            boolean scissorLo = scissorLimitLo.isPressed();
-            boolean scissorHi = scissorLimitHi.isPressed();
 
             if (gamepad1.right_trigger > 0.1) {
                 scissorDrivePower = gamepad1.right_trigger * scissorDriveUpMax;
@@ -219,6 +194,7 @@ public class TeleOpMode extends LinearOpMode {
             double extensionDriveFwdMax = 1.0;
             double extensionDriveBwdMax = 1.0;
             double extensionDrivePower = 0;
+            double extensionPosition = extensionDrive.getCurrentPosition();
             if (gamepad1.right_bumper) {
                 extensionDrivePower = extensionDriveFwdMax;
             } else if (gamepad1.left_bumper) {
@@ -248,16 +224,30 @@ public class TeleOpMode extends LinearOpMode {
             // *******************************************************************************************
 
             // Show the elapsed game time and wheel power.
-            telemetry.addData("Status", "Run Time: " + runtime.toString());
-            telemetry.addLine(String.format("Override: [%4.2f]", speedOverride));
-            telemetry.addLine(String.format("[%4.2f]----[%4.2f]", leftFrontPower, rightFrontPower));
-            telemetry.addLine(String.format("[%4.2f]----[%4.2f]", leftBackPower, rightBackPower));
-            telemetry.addLine(String.format("Scissor: [%4.2f] [%b] [%b]", scissorPosition, scissorLo, scissorHi));
+            telemetry.addData("Run Time", runtime.toString());
+            telemetry.addLine(String.format("Stick Override: L[%s] R[%s]", FormatPower(turboOverrideLeftStick), FormatPower(turboOverrideRightStick)));
+            telemetry.addLine(String.format("[%s]----[%s]", FormatPower(leftFrontPower), FormatPower(rightFrontPower)));
+            telemetry.addLine(String.format("[%s]----[%s]", FormatPower(leftBackPower), FormatPower(rightBackPower)));
+            telemetry.addLine(String.format("Scissor Lift: [%s]", FormatPower(scissorPosition)));
+            telemetry.addLine(String.format("Claw Extension: [%s]", FormatPower(extensionPosition)));
 
             // Update telemetry
             telemetry.update();
 
         }
+    }
+
+    private String FormatPower(double leftFrontPower) {
+        String power = String.format("[%8.2f]", leftFrontPower);
+        String direction = " ";
+        if (leftFrontPower > 0.01) {
+            direction = "\u2191"; // Up arrow
+        } else if (leftFrontPower < -0.01) {
+            direction = "\u2193"; // Down arrow
+        } else {
+            direction = " "; // No movement
+        }
+        return direction + power;
     }
 }
 

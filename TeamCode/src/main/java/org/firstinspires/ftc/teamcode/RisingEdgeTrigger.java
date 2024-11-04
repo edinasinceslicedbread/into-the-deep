@@ -1,6 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
-public class OneShotTrigger {
+public class RisingEdgeTrigger {
     private boolean previousInput = false;
     private boolean output = false;
     // Method to update the trigger state
@@ -20,7 +20,7 @@ public class OneShotTrigger {
         return output;
     }
     public static void main(String[] args) {
-        OneShotTrigger trigger = new OneShotTrigger();
+        RisingEdgeTrigger trigger = new RisingEdgeTrigger();
         boolean input = false;
         // Simulate a while loop
         for (int i = 0; i < 10; i++) {

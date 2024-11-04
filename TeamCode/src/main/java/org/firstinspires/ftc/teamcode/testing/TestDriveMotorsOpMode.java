@@ -34,9 +34,9 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-@TeleOp(name = "Testing: Drive Motor Directions", group = "Testing")
+@TeleOp(name = "Test: Drive Motors - Joysticks", group = "Testing")
 // @Disabled
-public class DriveMotorTestOpMode extends LinearOpMode {
+public class TestDriveMotorsOpMode extends LinearOpMode {
 
     // Declare OpMode members for each of the 4 motors.
     private ElapsedTime runtime = new ElapsedTime();
@@ -107,11 +107,11 @@ public class DriveMotorTestOpMode extends LinearOpMode {
             // Once the correct motors move in the correct direction re-comment this code.
 
             /* hold both bumpers to run the test mode */
-            if (gamepad1.left_bumper && gamepad1.right_bumper) {
-                leftFrontPower = gamepad1.x ? 1.0 : 0.0;  // X gamepad
-                leftBackPower = gamepad1.a ? 1.0 : 0.0;  // A gamepad
-                rightFrontPower = gamepad1.y ? 1.0 : 0.0;  // Y gamepad
-                rightBackPower = gamepad1.b ? 1.0 : 0.0;  // B gamepad
+            if (gamepad1.left_bumper || gamepad1.right_bumper) {
+                leftFrontPower = gamepad1.x ? 1.0 : 0.0;    // X gamepad
+                leftBackPower = gamepad1.a ? 1.0 : 0.0;     // A gamepad
+                rightFrontPower = gamepad1.y ? 1.0 : 0.0;   // Y gamepad
+                rightBackPower = gamepad1.b ? 1.0 : 0.0;    // B gamepad
             }
 
             // Send calculated power to wheels
