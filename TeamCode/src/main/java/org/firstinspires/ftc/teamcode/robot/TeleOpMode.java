@@ -21,10 +21,8 @@ public class TeleOpMode extends LinearOpMode {
     static final double EXTENSION_MAX_POS = 5000;   // Maximum claw extension encoder position
 
     // claw gripper constants
-    static final double CLAW_INCREMENT = 0.01;  // amount to slew servo each CYCLE_MS cycle
     static final int CYCLE_MS = 50;             // period of each cycle
     static final double CLAW_MIN_POS = 0.0;     // Minimum rotational position
-    static final double CLAW_START_POS = 0.0;   // Starting rotational position
     static final double CLAW_MAX_POS = 1.0;     // Maximum rotational position
 
     // Declare OpMode members for each of the 4 motors.
@@ -92,7 +90,7 @@ public class TeleOpMode extends LinearOpMode {
             // SECTION 1: toggle homing mode to be able to set the zero position of scissor and extension
             // *******************************************************************************************
             boolean homingModeActive = false;
-            homingTrigger.update(gamepad1.back && gamepad1.start);
+            homingTrigger.update(gamepad1.back);
             if (homingTrigger.wasTriggered()) {
                 homingModeActive = !homingModeActive;
             }
@@ -137,10 +135,6 @@ public class TeleOpMode extends LinearOpMode {
                     lateral = -precisionMax;
                 } else if (gamepad1.dpad_right || gamepad2.dpad_right) {
                     lateral = precisionMax;
-                } else if (gamepad1.x || gamepad2.x) {
-                    yaw = -precisionMax;
-                } else if (gamepad1.b || gamepad2.b) {
-                    yaw = precisionMax;
                 }
             }
 
@@ -165,64 +159,7 @@ public class TeleOpMode extends LinearOpMode {
             }
 
             // *******************************************************************************************
-            // SECTION 3: D-Pad Precision Robot Driving
-            // *******************************************************************************************
-
-            // TODO: commented out for now because using the overrides above instead
-            if (false && !(gamepad1.dpad_up && gamepad1.dpad_down && gamepad1.dpad_left && gamepad1.dpad_right)) {
-                if (gamepad1.dpad_up && gamepad1.dpad_right) {
-                    // Move diagonally forward-right
-                    leftFrontPower = precisionMax;    // Front left wheel spins forward
-                    rightFrontPower = 0;              // Front right wheel stops
-                    leftBackPower = 0;                // Back left wheel stops
-                    rightBackPower = precisionMax;    // Back right wheel spins forward
-                } else if (gamepad1.dpad_up && gamepad1.dpad_left) {
-                    // Move diagonally forward-left
-                    leftFrontPower = 0;                // Front left wheel stops
-                    rightFrontPower = precisionMax;    // Front right wheel spins forward
-                    leftBackPower = precisionMax;      // Back left wheel spins forward
-                    rightBackPower = 0;                // Back right wheel stops
-                } else if (gamepad1.dpad_down && gamepad1.dpad_right) {
-                    // Move diagonally backward-right
-                    leftFrontPower = -precisionMax;    // Front left wheel spins backward
-                    rightFrontPower = 0;               // Front right wheel stops
-                    leftBackPower = 0;                 // Back left wheel stops
-                    rightBackPower = -precisionMax;    // Back right wheel spins backward
-                } else if (gamepad1.dpad_down && gamepad1.dpad_left) {
-                    // Move diagonally backward-left
-                    leftFrontPower = 0;                // Front left wheel stops
-                    rightFrontPower = -precisionMax;   // Front right wheel spins backward
-                    leftBackPower = -precisionMax;     // Back left wheel spins backward
-                    rightBackPower = 0;                // Back right wheel stops
-                } else if (gamepad1.dpad_up) {
-                    // Move forward
-                    leftFrontPower = precisionMax;
-                    rightFrontPower = precisionMax;
-                    leftBackPower = precisionMax;
-                    rightBackPower = precisionMax;
-                } else if (gamepad1.dpad_down) {
-                    // Move backward
-                    leftFrontPower = -precisionMax;
-                    rightFrontPower = -precisionMax;
-                    leftBackPower = -precisionMax;
-                    rightBackPower = -precisionMax;
-                } else if (gamepad1.dpad_left) {
-                    // Move left
-                    leftFrontPower = precisionMax;   // Front left wheel spins forward
-                    rightFrontPower = -precisionMax; // Front right wheel spins backward
-                    leftBackPower = -precisionMax;   // Back left wheel spins backward
-                    rightBackPower = precisionMax;   // Back right wheel spins forward
-                } else if (gamepad1.dpad_right) {
-                    // Move right
-                    leftFrontPower = -precisionMax;  // Front left wheel spins backward
-                    rightFrontPower = precisionMax;  // Front right wheel spins forward
-                    leftBackPower = precisionMax;    // Back left wheel spins forward
-                    rightBackPower = -precisionMax;  // Back right wheel spins backward
-                }
-            }
-
-            // *******************************************************************************************
-            // SECTION 4: Raise and Lower Scissor Lift
+            // SECTION 3: Raise and Lower Scissor Lift
             // *******************************************************************************************
 
             // TODO: adjust max between 0.0 and 1.0
@@ -246,7 +183,7 @@ public class TeleOpMode extends LinearOpMode {
             }
 
             // *******************************************************************************************
-            // SECTION 5: Extend and Retract Claw
+            // SECTION 4: Extend and Retract Claw
             // *******************************************************************************************
 
             // TODO: adjust max between 0.0 and 1.0
@@ -272,15 +209,15 @@ public class TeleOpMode extends LinearOpMode {
             // *******************************************************************************************
             // SECTION 5: Open and Close Claw
             // *******************************************************************************************
-            if (gamepad1.y || gamepad2.y) {
+            if (gamepad1.y || gamepad2.y || gamepad1.b || gamepad2.b) {
                 // Keep stepping up until we hit the max value.
-                clawServoPosition += CLAW_INCREMENT;
+                clawServoPosition += 0.05;
                 if (clawServoPosition >= CLAW_MAX_POS) {
                     clawServoPosition = CLAW_MAX_POS;
                 }
-            } else if (gamepad1.a || gamepad2.a) {
+            } else if (gamepad1.a || gamepad2.a || gamepad1.x || gamepad2.x) {
                 // Keep stepping down until we hit the min value.
-                clawServoPosition -= CLAW_INCREMENT;
+                clawServoPosition -= 0.05;
                 if (clawServoPosition <= CLAW_MIN_POS) {
                     clawServoPosition = CLAW_MIN_POS;
                 }
