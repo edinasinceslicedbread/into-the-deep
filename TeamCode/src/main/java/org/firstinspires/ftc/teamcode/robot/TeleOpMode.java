@@ -43,9 +43,6 @@ public class TeleOpMode extends LinearOpMode {
 
     private RisingEdgeTrigger homingTrigger = new RisingEdgeTrigger();
 
-    // outside the while loop, set initial claw servo position
-    double clawServoPosition = CLAW_START_POS; // Start at min position
-
     @Override
     public void runOpMode() {
 
@@ -85,6 +82,9 @@ public class TeleOpMode extends LinearOpMode {
         waitForStart();
         runtime.reset();
 
+        // outside the while loop, set initial claw servo position
+        double clawServoPosition = (CLAW_MAX_POS - CLAW_MIN_POS) / 2.0; // Start at half position
+
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
 
@@ -104,14 +104,14 @@ public class TeleOpMode extends LinearOpMode {
             // turbo mode speed overrides with left and right stick buttons
             // --------------------------------------------------------------------------------------------
 
-            double turboOverrideLeftStick = 0.5;
-            double turboOverrideRightStick = 0.5;
+            double turboOverrideLeftStick = 0.25;
+            double turboOverrideRightStick = 0.25;
             // max wheel speed override
             if (gamepad1.left_stick_button) {
-                turboOverrideLeftStick = 1.0;
+                turboOverrideLeftStick = 0.5;
             }
             if (gamepad1.right_stick_button) {
-                turboOverrideRightStick = 1.0;
+                turboOverrideRightStick = 0.5;
             }
 
             // start of code from ftc robot controller external examples
@@ -240,9 +240,9 @@ public class TeleOpMode extends LinearOpMode {
 
             // Gamepad 2 triggers
             if (gamepad2.right_trigger > 0.1) {
-                scissorDrivePower = gamepad1.right_trigger * scissorUpOverride;
+                scissorDrivePower = gamepad2.right_trigger * scissorUpOverride;
             } else if (gamepad2.left_trigger > 0.1) {
-                scissorDrivePower = -gamepad1.left_trigger * scissorDownOverride;
+                scissorDrivePower = -gamepad2.left_trigger * scissorDownOverride;
             }
 
             // *******************************************************************************************
@@ -311,8 +311,8 @@ public class TeleOpMode extends LinearOpMode {
             telemetry.addLine(String.format("Stick Override: L[%4.2f] R[%4.2f]", turboOverrideLeftStick, turboOverrideRightStick));
             telemetry.addLine(String.format("[%s]----[%s]", MotorPower(leftFrontPower), MotorPower(rightFrontPower)));
             telemetry.addLine(String.format("[%s]----[%s]", MotorPower(leftBackPower), MotorPower(rightBackPower)));
-            telemetry.addLine(String.format("Scissor Lift: [%s] [%.0f]", MotorPower(scissorDrivePower), scissorPosition));
-            telemetry.addLine(String.format("Claw Extension: [%s] [%.0f]", MotorPower(scissorDrivePower), extensionPosition));
+            telemetry.addLine(String.format("Scissor Lift: [%s] [%8.0f]", MotorPower(scissorDrivePower), scissorPosition));
+            telemetry.addLine(String.format("Claw Extension: [%s] [%8.0f]", MotorPower(extensionDrivePower), extensionPosition));
             telemetry.addLine(String.format("Claw Servo Position: [%4.2f]", clawServoPosition));
 
             // Update telemetry
@@ -340,7 +340,7 @@ public class TeleOpMode extends LinearOpMode {
         } else if (leftFrontPower < -0.01) {
             direction = "\u25BC"; // Down arrow
         } else {
-            direction = "\u25A0"; // No movement
+            direction = "\u25A0 "; // No movement
         }
         return direction + power;
     }

@@ -72,9 +72,9 @@ public class TestDriveMotorsOpMode extends LinearOpMode {
             double max;
 
             // POV Mode uses left joystick to go forward & strafe, and right joystick to rotate.
-            double axial = -gamepad1.left_stick_y;  // Note: pushing stick forward gives negative value
-            double lateral = gamepad1.left_stick_x;
-            double yaw = gamepad1.right_stick_x;
+            double axial = -gamepad1.left_stick_y * 0.25;  // Note: pushing stick forward gives negative value
+            double lateral = gamepad1.left_stick_x * 0.25;
+            double yaw = gamepad1.right_stick_x * 0.25;
 
             // Combine the joystick requests for each axis-motion to determine each wheel's power.
             // Set up a variable for each drive wheel to save the power level for telemetry.
@@ -108,10 +108,10 @@ public class TestDriveMotorsOpMode extends LinearOpMode {
 
             /* hold both bumpers to run the test mode */
             if (gamepad1.left_bumper || gamepad1.right_bumper) {
-                leftFrontPower = gamepad1.x ? 1.0 : 0.0;    // X gamepad
-                leftBackPower = gamepad1.a ? 1.0 : 0.0;     // A gamepad
-                rightFrontPower = gamepad1.y ? 1.0 : 0.0;   // Y gamepad
-                rightBackPower = gamepad1.b ? 1.0 : 0.0;    // B gamepad
+                leftFrontPower = gamepad1.x ? 0.25 : 0.0;    // X gamepad
+                leftBackPower = gamepad1.a ? 0.25 : 0.0;     // A gamepad
+                rightFrontPower = gamepad1.y ? 0.25 : 0.0;   // Y gamepad
+                rightBackPower = gamepad1.b ? 0.25 : 0.0;    // B gamepad
             }
 
             // Send calculated power to wheels
