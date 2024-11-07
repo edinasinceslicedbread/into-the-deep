@@ -3,7 +3,9 @@ package org.firstinspires.ftc.teamcode.robot;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.RisingEdgeTrigger;
@@ -39,6 +41,13 @@ public class TeleOpMode extends LinearOpMode {
     private DcMotor extensionDrive = null;
     private Servo clawServo = null;
 
+    // digital limit switches
+    // TODO: uncomment if touch sensors are added
+    // private TouchSensor scissorLimitLo = null;
+    // private TouchSensor scissorLimitHi = null;
+    // private TouchSensor extensionLimitBwd = null;
+    // private TouchSensor extensionLimitFwd = null;
+
     private RisingEdgeTrigger homingTrigger = new RisingEdgeTrigger();
 
     @Override
@@ -60,6 +69,13 @@ public class TeleOpMode extends LinearOpMode {
         extensionDrive = hardwareMap.get(DcMotor.class, "extensionDrive");
         clawServo = hardwareMap.get(Servo.class, "clawServo");
 
+        // digital limit switches
+        // TODO: uncomment if touch sensors are added
+        // scissorLimitLo = hardwareMap.get(DigitalChannel.class, "scissorLimitLo");
+        // scissorLimitHi = hardwareMap.get(DigitalChannel.class, "scissorLimitHi");
+        // extensionLimitBwd = hardwareMap.get(DigitalChannel.class, "extensionLimitBwd");
+        // extensionLimitFwd = hardwareMap.get(DigitalChannel.class, "extensionLimitFwd");
+
         // assign wheel motor directions
         leftFrontDrive.setDirection(DcMotor.Direction.FORWARD);
         leftBackDrive.setDirection(DcMotor.Direction.FORWARD);
@@ -71,6 +87,12 @@ public class TeleOpMode extends LinearOpMode {
         extensionDrive.setDirection(DcMotor.Direction.REVERSE);
         clawServo.setDirection(Servo.Direction.FORWARD);
 
+        // outside the while loop, set initial claw servo position
+        double clawServoPosition = (CLAW_MAX_POS - CLAW_MIN_POS) / 2.0; // Start at half position
+
+        // outside the while loop, set homing mode false
+        boolean homingModeActive = false;
+
         // *******************************************************************************************
         // Wait for the game to start (driver presses START)
         // *******************************************************************************************
@@ -80,16 +102,12 @@ public class TeleOpMode extends LinearOpMode {
         waitForStart();
         runtime.reset();
 
-        // outside the while loop, set initial claw servo position
-        double clawServoPosition = (CLAW_MAX_POS - CLAW_MIN_POS) / 2.0; // Start at half position
-
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
 
             // *******************************************************************************************
             // SECTION 1: toggle homing mode to be able to set the zero position of scissor and extension
             // *******************************************************************************************
-            boolean homingModeActive = false;
             homingTrigger.update(gamepad1.back);
             if (homingTrigger.wasTriggered()) {
                 homingModeActive = !homingModeActive;
@@ -102,14 +120,14 @@ public class TeleOpMode extends LinearOpMode {
             // turbo mode speed overrides with left and right stick buttons
             // --------------------------------------------------------------------------------------------
 
-            double turboOverrideLeftStick = 0.25;
-            double turboOverrideRightStick = 0.25;
+            double turboOverrideLeftStick = 0.35;
+            double turboOverrideRightStick = 0.35;
             // max wheel speed override
-            if (gamepad1.left_stick_button) {
-                turboOverrideLeftStick = 0.5;
+            if (gamepad1.left_stick_button || gamepad2.left_stick_button) {
+                turboOverrideLeftStick = 0.70;
             }
-            if (gamepad1.right_stick_button) {
-                turboOverrideRightStick = 0.5;
+            if (gamepad1.right_stick_button || gamepad2.right_stick_button) {
+                turboOverrideRightStick = 0.70;
             }
 
             // start of code from ftc robot controller external examples
@@ -118,9 +136,31 @@ public class TeleOpMode extends LinearOpMode {
             double max;
 
             // POV Mode uses left joystick to go forward & strafe, and right joystick to rotate.
-            double axial = -gamepad1.left_stick_y * turboOverrideLeftStick;  // Note: pushing stick forward gives negative value
-            double lateral = gamepad1.left_stick_x * turboOverrideLeftStick;
-            double yaw = gamepad1.right_stick_x * turboOverrideRightStick;
+            double axial = 0;
+            double lateral = 0;
+            double yaw = 0;
+
+            // gamepad 1
+            if (Math.abs(gamepad1.left_stick_y) > 0.1) {
+                axial = -gamepad1.left_stick_y * turboOverrideLeftStick;  // Note: pushing stick forward gives negative value
+            }
+            if (Math.abs(gamepad1.left_stick_x) > 0.1) {
+                lateral = gamepad1.left_stick_x * turboOverrideLeftStick;
+            }
+            if (Math.abs(gamepad1.right_stick_x) > 0.1) {
+                yaw = gamepad1.right_stick_x * turboOverrideRightStick;
+            }
+
+            // gamepad 2
+            if (Math.abs(gamepad2.left_stick_y) > 0.1) {
+                axial = -gamepad2.left_stick_y * turboOverrideLeftStick;  // Note: pushing stick forward gives negative value
+            }
+            if (Math.abs(gamepad2.left_stick_x) > 0.1) {
+                lateral = gamepad2.left_stick_x * turboOverrideLeftStick;
+            }
+            if (Math.abs(gamepad2.right_stick_x) > 0.1) {
+                yaw = gamepad2.right_stick_x * turboOverrideRightStick;
+            }
 
             // D-Pad overrides for the same joystick functions as above
             // --------------------------------------------------------------------------------------------
@@ -129,11 +169,14 @@ public class TeleOpMode extends LinearOpMode {
             if (!(gamepad1.dpad_up && gamepad1.dpad_down && gamepad1.dpad_left && gamepad1.dpad_right)) {
                 if (gamepad1.dpad_up || gamepad2.dpad_up) {
                     axial = precisionMax;
-                } else if (gamepad1.dpad_down || gamepad2.dpad_down) {
+                }
+                if (gamepad1.dpad_down || gamepad2.dpad_down) {
                     axial = -precisionMax;
-                } else if (gamepad1.dpad_left || gamepad2.dpad_left) {
+                }
+                if (gamepad1.dpad_left || gamepad2.dpad_left) {
                     lateral = -precisionMax;
-                } else if (gamepad1.dpad_right || gamepad2.dpad_right) {
+                }
+                if (gamepad1.dpad_right || gamepad2.dpad_right) {
                     lateral = precisionMax;
                 }
             }
