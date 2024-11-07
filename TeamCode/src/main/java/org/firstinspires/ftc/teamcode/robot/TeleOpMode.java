@@ -68,7 +68,7 @@ public class TeleOpMode extends LinearOpMode {
 
         // assign scissor, extension, and claw directions
         scissorDrive.setDirection(DcMotor.Direction.FORWARD);
-        extensionDrive.setDirection(DcMotor.Direction.FORWARD);
+        extensionDrive.setDirection(DcMotor.Direction.REVERSE);
         clawServo.setDirection(Servo.Direction.FORWARD);
 
         // *******************************************************************************************
