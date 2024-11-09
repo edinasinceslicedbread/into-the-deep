@@ -120,14 +120,14 @@ public class TeleOpMode extends LinearOpMode {
             // turbo mode speed overrides with left and right stick buttons
             // --------------------------------------------------------------------------------------------
 
-            double turboOverrideLeftStick = 0.35;
-            double turboOverrideRightStick = 0.35;
+            double turboOverrideLeftStick = 0.25;
+            double turboOverrideRightStick = 0.25;
             // max wheel speed override
             if (gamepad1.left_stick_button || gamepad2.left_stick_button) {
-                turboOverrideLeftStick = 0.70;
+                turboOverrideLeftStick = 0.60;
             }
             if (gamepad1.right_stick_button || gamepad2.right_stick_button) {
-                turboOverrideRightStick = 0.70;
+                turboOverrideRightStick = 0.60;
             }
 
             // start of code from ftc robot controller external examples
@@ -165,7 +165,7 @@ public class TeleOpMode extends LinearOpMode {
             // D-Pad overrides for the same joystick functions as above
             // --------------------------------------------------------------------------------------------
             // TODO: adjust max speed between 0.0 and 1.0
-            double precisionMax = 0.25;
+            double precisionMax = 0.20;
             if (!(gamepad1.dpad_up && gamepad1.dpad_down && gamepad1.dpad_left && gamepad1.dpad_right)) {
                 if (gamepad1.dpad_up || gamepad2.dpad_up) {
                     axial = precisionMax;
@@ -230,8 +230,8 @@ public class TeleOpMode extends LinearOpMode {
             // *******************************************************************************************
 
             // TODO: adjust max between 0.0 and 1.0
-            double extensionFwdPowerMax = 1.0;
-            double extensionBwdPowerMax = 1.0;
+            double extensionFwdPowerMax = 0.75;
+            double extensionBwdPowerMax = 0.75;
             double extensionDrivePower = 0;
             double extensionPosition = extensionDrive.getCurrentPosition();
 
