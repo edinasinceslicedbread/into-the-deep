@@ -48,8 +48,6 @@ public class TeleOpMode extends LinearOpMode {
     // private TouchSensor extensionLimitBwd = null;
     // private TouchSensor extensionLimitFwd = null;
 
-    private RisingEdgeTrigger homingTrigger = new RisingEdgeTrigger();
-
     @Override
     public void runOpMode() {
 
@@ -91,7 +89,7 @@ public class TeleOpMode extends LinearOpMode {
         double clawServoPosition = (CLAW_MAX_POS - CLAW_MIN_POS) / 2.0; // Start at half position
 
         // outside the while loop, set homing mode false
-        boolean homingModeActive = false;
+        double driveDirectionFactor = 1.0;
 
         // *******************************************************************************************
         // Wait for the game to start (driver presses START)
@@ -108,10 +106,12 @@ public class TeleOpMode extends LinearOpMode {
             // *******************************************************************************************
             // SECTION 1: toggle homing mode to be able to set the zero position of scissor and extension
             // *******************************************************************************************
-            homingTrigger.update(gamepad1.back);
-            if (homingTrigger.wasTriggered()) {
-                homingModeActive = !homingModeActive;
+            if (gamepad1.back || gamepad2.back) {
+                driveDirectionFactor = -1.0;
+            } else if (gamepad1.start || gamepad2.start) {
+                driveDirectionFactor = 1.0;
             }
+
 
             // *******************************************************************************************
             // SECTION 2: Main Joystick Robot Driving
@@ -142,24 +142,24 @@ public class TeleOpMode extends LinearOpMode {
 
             // gamepad 1
             if (Math.abs(gamepad1.left_stick_y) > 0.1) {
-                axial = -gamepad1.left_stick_y * turboOverrideLeftStick;  // Note: pushing stick forward gives negative value
+                axial = -gamepad1.left_stick_y * turboOverrideLeftStick * driveDirectionFactor;  // Note: pushing stick forward gives negative value
             }
             if (Math.abs(gamepad1.left_stick_x) > 0.1) {
-                lateral = gamepad1.left_stick_x * turboOverrideLeftStick;
+                lateral = gamepad1.left_stick_x * turboOverrideLeftStick * driveDirectionFactor;
             }
             if (Math.abs(gamepad1.right_stick_x) > 0.1) {
-                yaw = gamepad1.right_stick_x * turboOverrideRightStick;
+                yaw = gamepad1.right_stick_x * turboOverrideRightStick * driveDirectionFactor;
             }
 
             // gamepad 2
             if (Math.abs(gamepad2.left_stick_y) > 0.1) {
-                axial = -gamepad2.left_stick_y * turboOverrideLeftStick;  // Note: pushing stick forward gives negative value
+                axial = -gamepad2.left_stick_y * turboOverrideLeftStick * driveDirectionFactor;  // Note: pushing stick forward gives negative value
             }
             if (Math.abs(gamepad2.left_stick_x) > 0.1) {
-                lateral = gamepad2.left_stick_x * turboOverrideLeftStick;
+                lateral = gamepad2.left_stick_x * turboOverrideLeftStick * driveDirectionFactor;
             }
             if (Math.abs(gamepad2.right_stick_x) > 0.1) {
-                yaw = gamepad2.right_stick_x * turboOverrideRightStick;
+                yaw = gamepad2.right_stick_x * turboOverrideRightStick * driveDirectionFactor;
             }
 
             // D-Pad overrides for the same joystick functions as above
@@ -168,16 +168,16 @@ public class TeleOpMode extends LinearOpMode {
             double precisionMax = 0.20;
             if (!(gamepad1.dpad_up && gamepad1.dpad_down && gamepad1.dpad_left && gamepad1.dpad_right)) {
                 if (gamepad1.dpad_up || gamepad2.dpad_up) {
-                    axial = precisionMax;
+                    axial = precisionMax * driveDirectionFactor;
                 }
                 if (gamepad1.dpad_down || gamepad2.dpad_down) {
-                    axial = -precisionMax;
+                    axial = -precisionMax * driveDirectionFactor;
                 }
                 if (gamepad1.dpad_left || gamepad2.dpad_left) {
-                    lateral = -precisionMax;
+                    lateral = -precisionMax * driveDirectionFactor;
                 }
                 if (gamepad1.dpad_right || gamepad2.dpad_right) {
-                    lateral = precisionMax;
+                    lateral = precisionMax * driveDirectionFactor;
                 }
             }
 
@@ -287,7 +287,7 @@ public class TeleOpMode extends LinearOpMode {
 
             // Show the elapsed game time and wheel power.
             telemetry.addData("Run Time", runtime.toString());
-            telemetry.addData("Run Mode", homingModeActive ? "!!! HOMING MODE !!!" : "SAFE MODE - LIMITS ACTIVE");
+            telemetry.addData("Run Mode", driveDirectionFactor < 0 ? "!!! PUSHER MODE !!!" : "*** CLAW MODE ***");
             telemetry.addLine(String.format("Stick Override: L[%4.2f] R[%4.2f]", turboOverrideLeftStick, turboOverrideRightStick));
             telemetry.addLine(String.format("[%s]----[%s]", MotorPower(leftFrontPower), MotorPower(rightFrontPower)));
             telemetry.addLine(String.format("[%s]----[%s]", MotorPower(leftBackPower), MotorPower(rightBackPower)));

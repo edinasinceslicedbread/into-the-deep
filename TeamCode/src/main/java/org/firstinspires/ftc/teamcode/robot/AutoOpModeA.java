@@ -113,9 +113,6 @@ public class AutoOpModeA extends LinearOpMode {
 
     }
 
-        scissorDrive.setPower(0.3);
-        sleep(200);
-
     private String MotorPower(double leftFrontPower) {
 
         // \u25A0: Square
