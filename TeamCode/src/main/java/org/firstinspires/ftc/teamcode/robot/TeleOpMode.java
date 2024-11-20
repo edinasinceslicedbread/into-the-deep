@@ -43,7 +43,7 @@ public class TeleOpMode extends LinearOpMode {
 
     // digital limit switches
     // TODO: uncomment if touch sensors are added
-    // private TouchSensor scissorLimitLo = null;
+    private TouchSensor scissorLimitLo = null;
     // private TouchSensor scissorLimitHi = null;
     // private TouchSensor extensionLimitBwd = null;
     // private TouchSensor extensionLimitFwd = null;
@@ -69,7 +69,7 @@ public class TeleOpMode extends LinearOpMode {
 
         // digital limit switches
         // TODO: uncomment if touch sensors are added
-        // scissorLimitLo = hardwareMap.get(DigitalChannel.class, "scissorLimitLo");
+        scissorLimitLo = hardwareMap.get(TouchSensor.class, "scissorLimitLo");
         // scissorLimitHi = hardwareMap.get(DigitalChannel.class, "scissorLimitHi");
         // extensionLimitBwd = hardwareMap.get(DigitalChannel.class, "extensionLimitBwd");
         // extensionLimitFwd = hardwareMap.get(DigitalChannel.class, "extensionLimitFwd");
@@ -210,18 +210,19 @@ public class TeleOpMode extends LinearOpMode {
             double scissorDownOverride = 0.75;
             double scissorDrivePower = 0.0;
             double scissorPosition = scissorDrive.getCurrentPosition();
+            boolean scissorLimitLowOn = scissorLimitLo.isPressed();
 
             // Gamepad 1 triggers
             if (gamepad1.right_trigger > 0.1) {
                 scissorDrivePower = gamepad1.right_trigger * scissorUpOverride;
-            } else if (gamepad1.left_trigger > 0.1) {
+            } else if (gamepad1.left_trigger > 0.1 && scissorLimitLowOn == false) {
                 scissorDrivePower = -gamepad1.left_trigger * scissorDownOverride;
             }
 
             // Gamepad 2 triggers
             if (gamepad2.right_trigger > 0.1) {
                 scissorDrivePower = gamepad2.right_trigger * scissorUpOverride;
-            } else if (gamepad2.left_trigger > 0.1) {
+            } else if (gamepad2.left_trigger > 0.1 && scissorLimitLowOn == false) {
                 scissorDrivePower = -gamepad2.left_trigger * scissorDownOverride;
             }
 

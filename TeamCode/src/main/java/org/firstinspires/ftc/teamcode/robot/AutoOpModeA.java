@@ -88,9 +88,6 @@ public class AutoOpModeA extends LinearOpMode {
         // outside the while loop, set initial claw servo position
         double clawServoPosition = (CLAW_MAX_POS - CLAW_MIN_POS) / 2.0; // Start at half position
 
-        // outside the while loop, set homing mode false
-        boolean homingModeActive = false;
-
         // *******************************************************************************************
         // Wait for the game to start (driver presses START)
         // *******************************************************************************************
@@ -113,24 +110,6 @@ public class AutoOpModeA extends LinearOpMode {
 
     }
 
-    private String MotorPower(double leftFrontPower) {
 
-        // \u25A0: Square
-        // \u25B2: Up arrow
-        // \u25BC: Down arrow
-        // \u25B6: Right triangle
-        // \u25C0: Left triangle
-
-        String power = String.format("%4.2f", Math.abs(leftFrontPower));
-        String direction = "";
-        if (leftFrontPower > 0.01) {
-            direction = "\u25B2"; // Up arrow
-        } else if (leftFrontPower < -0.01) {
-            direction = "\u25BC"; // Down arrow
-        } else {
-            direction = "\u25A0 "; // No movement
-        }
-        return direction + power;
-    }
 }
 
