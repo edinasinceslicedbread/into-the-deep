@@ -3,7 +3,6 @@ package org.firstinspires.ftc.teamcode.robot;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -42,11 +41,7 @@ public class TeleOpMode extends LinearOpMode {
     private Servo clawServo = null;
 
     // digital limit switches
-    // TODO: uncomment if touch sensors are added
     private TouchSensor scissorLimitLo = null;
-    // private TouchSensor scissorLimitHi = null;
-    // private TouchSensor extensionLimitBwd = null;
-    // private TouchSensor extensionLimitFwd = null;
 
     @Override
     public void runOpMode() {
@@ -68,11 +63,7 @@ public class TeleOpMode extends LinearOpMode {
         clawServo = hardwareMap.get(Servo.class, "clawServo");
 
         // digital limit switches
-        // TODO: uncomment if touch sensors are added
         scissorLimitLo = hardwareMap.get(TouchSensor.class, "scissorLimitLo");
-        // scissorLimitHi = hardwareMap.get(DigitalChannel.class, "scissorLimitHi");
-        // extensionLimitBwd = hardwareMap.get(DigitalChannel.class, "extensionLimitBwd");
-        // extensionLimitFwd = hardwareMap.get(DigitalChannel.class, "extensionLimitFwd");
 
         // assign wheel motor directions
         leftFrontDrive.setDirection(DcMotor.Direction.FORWARD);
@@ -205,24 +196,26 @@ public class TeleOpMode extends LinearOpMode {
             // SECTION 3: Raise and Lower Scissor Lift
             // *******************************************************************************************
 
-            // TODO: adjust max between 0.0 and 1.0
+            // TODO: adjust max speeds between 0.0 and 1.0
             double scissorUpOverride = 1.0;
             double scissorDownOverride = 0.75;
             double scissorDrivePower = 0.0;
-            double scissorPosition = scissorDrive.getCurrentPosition();
-            boolean scissorLimitLowOn = scissorLimitLo.isPressed();
+
+            // read encoder feedback position and limit switch status
+            double scissorEncoderCounts = scissorDrive.getCurrentPosition();
+            boolean scissorLimitLoOn = scissorLimitLo.isPressed();
 
             // Gamepad 1 triggers
             if (gamepad1.right_trigger > 0.1) {
                 scissorDrivePower = gamepad1.right_trigger * scissorUpOverride;
-            } else if (gamepad1.left_trigger > 0.1 && scissorLimitLowOn == false) {
+            } else if (gamepad1.left_trigger > 0.1 && scissorLimitLoOn == false) {
                 scissorDrivePower = -gamepad1.left_trigger * scissorDownOverride;
             }
 
             // Gamepad 2 triggers
             if (gamepad2.right_trigger > 0.1) {
                 scissorDrivePower = gamepad2.right_trigger * scissorUpOverride;
-            } else if (gamepad2.left_trigger > 0.1 && scissorLimitLowOn == false) {
+            } else if (gamepad2.left_trigger > 0.1 && scissorLimitLoOn == false) {
                 scissorDrivePower = -gamepad2.left_trigger * scissorDownOverride;
             }
 
@@ -230,23 +223,29 @@ public class TeleOpMode extends LinearOpMode {
             // SECTION 4: Extend and Retract Claw
             // *******************************************************************************************
 
-            // TODO: adjust max between 0.0 and 1.0
+            // TODO: adjust max speeds between 0.0 and 1.0
             double extensionFwdPowerMax = 0.75;
             double extensionBwdPowerMax = 0.75;
             double extensionDrivePower = 0;
-            double extensionPosition = extensionDrive.getCurrentPosition();
+
+            // read encoder feedback position
+            double extensionEncoderCounts = extensionDrive.getCurrentPosition();
+
+            // TODO: adjust extension encoder count limits
+            boolean extensionPastLimitMin = (extensionEncoderCounts <= -1000);
+            boolean extensionPastlimitMax = (extensionEncoderCounts >= 1000);
 
             // Gamepad 1
-            if (gamepad1.right_bumper) {
+            if (gamepad1.right_bumper && extensionPastlimitMax == false) {
                 extensionDrivePower = extensionFwdPowerMax;
-            } else if (gamepad1.left_bumper) {
+            } else if (gamepad1.left_bumper && extensionPastLimitMin == false) {
                 extensionDrivePower = -extensionBwdPowerMax;
             }
 
             // Gamepad 2
-            if (gamepad2.right_bumper) {
+            if (gamepad2.right_bumper && extensionPastlimitMax == false) {
                 extensionDrivePower = extensionFwdPowerMax;
-            } else if (gamepad2.left_bumper) {
+            } else if (gamepad2.left_bumper && extensionPastLimitMin == false) {
                 extensionDrivePower = -extensionBwdPowerMax;
             }
 
@@ -268,7 +267,7 @@ public class TeleOpMode extends LinearOpMode {
             }
 
             // *******************************************************************************************
-            // SECTION X: Write Outputs
+            // SECTION 6: Write Outputs
             // *******************************************************************************************
 
             // Send calculated power to wheels
@@ -283,7 +282,7 @@ public class TeleOpMode extends LinearOpMode {
             clawServo.setPosition(clawServoPosition);
 
             // *******************************************************************************************
-            // SECTION X: Telemetry
+            // SECTION 7: Telemetry
             // *******************************************************************************************
 
             // Show the elapsed game time and wheel power.
@@ -292,8 +291,8 @@ public class TeleOpMode extends LinearOpMode {
             telemetry.addLine(String.format("Stick Override: L[%4.2f] R[%4.2f]", turboOverrideLeftStick, turboOverrideRightStick));
             telemetry.addLine(String.format("[%s]----[%s]", MotorPower(leftFrontPower), MotorPower(rightFrontPower)));
             telemetry.addLine(String.format("[%s]----[%s]", MotorPower(leftBackPower), MotorPower(rightBackPower)));
-            telemetry.addLine(String.format("Scissor Lift: [%s] [%8.0f]", MotorPower(scissorDrivePower), scissorPosition));
-            telemetry.addLine(String.format("Claw Extension: [%s] [%8.0f]", MotorPower(extensionDrivePower), extensionPosition));
+            telemetry.addLine(String.format("Scissor Lift: [%s] [%8.0f]", MotorPower(scissorDrivePower), scissorEncoderCounts));
+            telemetry.addLine(String.format("Claw Extension: [%s] [%8.0f]", MotorPower(extensionDrivePower), extensionEncoderCounts));
             telemetry.addLine(String.format("Claw Servo Position: [%4.2f]", clawServoPosition));
 
             // Update telemetry
