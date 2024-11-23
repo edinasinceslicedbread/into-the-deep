@@ -23,8 +23,8 @@ public class TeleOpMode extends LinearOpMode {
 
     // claw gripper constants
     static final int CYCLE_MS = 50;             // period of each cycle
-    static final double CLAW_MIN_POS = 0.0;     // Minimum rotational position
-    static final double CLAW_MAX_POS = 1.0;     // Maximum rotational position
+    static final double CLAW_MIN_POS = 0.15;     // Minimum rotational position
+    static final double CLAW_MAX_POS = 0.85;     // Maximum rotational position
 
     // Declare OpMode members for each of the 4 motors.
     private ElapsedTime runtime = new ElapsedTime();
@@ -77,7 +77,7 @@ public class TeleOpMode extends LinearOpMode {
         clawServo.setDirection(Servo.Direction.FORWARD);
 
         // outside the while loop, set initial claw servo position
-        double clawServoPosition = (CLAW_MAX_POS - CLAW_MIN_POS) / 2.0; // Start at half position
+        double clawServoPosition = CLAW_MIN_POS; // Start at half position
 
         // outside the while loop, set homing mode false
         double driveDirectionFactor = 1.0;
@@ -232,18 +232,23 @@ public class TeleOpMode extends LinearOpMode {
             double extensionEncoderCounts = extensionDrive.getCurrentPosition();
 
             // TODO: adjust extension encoder count limits
-            boolean extensionPastLimitMin = (extensionEncoderCounts <= -1000);
-            boolean extensionPastlimitMax = (extensionEncoderCounts >= 1000);
+            boolean extensionPastLimitMax = (extensionEncoderCounts >= 7800);
+            boolean extensionPastLimitSlow = (extensionEncoderCounts <= 700);
+            boolean extensionPastLimitMin = (extensionEncoderCounts <= -5800);
+
+            if (extensionPastLimitSlow) {
+                extensionBwdPowerMax = 0.50;
+            }
 
             // Gamepad 1
-            if (gamepad1.right_bumper && extensionPastlimitMax == false) {
+            if (gamepad1.right_bumper && extensionPastLimitMax == false) {
                 extensionDrivePower = extensionFwdPowerMax;
             } else if (gamepad1.left_bumper && extensionPastLimitMin == false) {
                 extensionDrivePower = -extensionBwdPowerMax;
             }
 
             // Gamepad 2
-            if (gamepad2.right_bumper && extensionPastlimitMax == false) {
+            if (gamepad2.right_bumper && extensionPastLimitMax == false) {
                 extensionDrivePower = extensionFwdPowerMax;
             } else if (gamepad2.left_bumper && extensionPastLimitMin == false) {
                 extensionDrivePower = -extensionBwdPowerMax;
@@ -291,7 +296,7 @@ public class TeleOpMode extends LinearOpMode {
             telemetry.addLine(String.format("Stick Override: L[%4.2f] R[%4.2f]", turboOverrideLeftStick, turboOverrideRightStick));
             telemetry.addLine(String.format("[%s]----[%s]", MotorPower(leftFrontPower), MotorPower(rightFrontPower)));
             telemetry.addLine(String.format("[%s]----[%s]", MotorPower(leftBackPower), MotorPower(rightBackPower)));
-            telemetry.addLine(String.format("Scissor Lift: [%s] [%8.0f]", MotorPower(scissorDrivePower), scissorEncoderCounts));
+            telemetry.addLine(String.format("Scissor Lift: [%s] [%8.0f] [%s]", MotorPower(scissorDrivePower), scissorEncoderCounts, scissorLimitLoOn));
             telemetry.addLine(String.format("Claw Extension: [%s] [%8.0f]", MotorPower(extensionDrivePower), extensionEncoderCounts));
             telemetry.addLine(String.format("Claw Servo Position: [%4.2f]", clawServoPosition));
 
