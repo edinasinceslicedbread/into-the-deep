@@ -104,25 +104,39 @@ public class AutoOpModeB extends LinearOpMode {
         //************************************************************************************************
         //TODO; Redo program. 1Pick Up Block 2Use top chasis for angle 3scissor lift 4drive forward and drop block in to basket while staying parralel to wall.
         //TODO; Scissor lift and clamp claw at start - add back and forth for top after turn.
+
+        // close claw
         clawServo.setPosition(1.0);
         sleep(2000);
-       scissorDrive.setPower(1.0);
-        sleep(2500);
+
+        // raise scissor lift
+        scissorDrive.setPower(1.0);
+        sleep(2500);            // TOTO: raise lift time
         scissorDrive.setPower(0.0);
         sleep(1000);
+
+        // retract claw backward
         extensionDrive.setPower(-1.0);
-        sleep(1400);
+        sleep(1400);            // TODO: retract time
         extensionDrive.setPower(0.0);
+        sleep(1000);
+
+        // drive robot forward
         leftFrontDrive.setPower(0.3);
         rightFrontDrive.setPower(0.3);
         leftBackDrive.setPower(0.3);
         rightBackDrive.setPower(0.3);
-        sleep(2000);
+        sleep(2000);            // TOTO: drive forward time
         leftFrontDrive.setPower(0.0);
         rightFrontDrive.setPower(0.0);
         leftBackDrive.setPower(0.0);
         rightBackDrive.setPower(0.0);
         sleep(1000);
+
+        // open claw
         clawServo.setPosition(0.0);
+        sleep(5000);
+
+
     }
 }
