@@ -9,7 +9,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.RisingEdgeTrigger;
 
 
-@Autonomous(name = "AutoTestA", group = "Auto")
+@Autonomous(name = "Auto Mode C", group = "Auto")
 public class AutoOpModeC extends LinearOpMode {
 
     // scissor lift constants
@@ -117,8 +117,18 @@ public class AutoOpModeC extends LinearOpMode {
         rightFrontDrive.setPower(0);
         rightBackDrive.setPower(0);
         leftBackDrive.setPower(0);
+        // raise scissor
+        scissorDrive.setPower(0.5);
 
-        
+        sleep(2000);
+
+        extensionDrive.setPower(-0.25);
+
+        sleep(1000);
+
+        clawServo.setPosition(0);
+
+
     }
 
 
