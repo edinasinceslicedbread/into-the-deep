@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.robot;
+package org.firstinspires.ftc.teamcode.testing;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -9,8 +9,8 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.RisingEdgeTrigger;
 
 
-@Autonomous(name = "Auto Mode B", group = "Auto")
-public class AutoOpModeB extends LinearOpMode {
+@Autonomous(name = "TestTemplate", group = "Test")
+public class TestTemplate extends LinearOpMode {
 
     // scissor lift constants
     static final double SCISSOR_MIN_POS = 1000;    // Minimum scissor lift encoder position
