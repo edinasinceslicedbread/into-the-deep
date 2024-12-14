@@ -4,6 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.RisingEdgeTrigger;
@@ -40,11 +41,7 @@ public class TestTemplate extends LinearOpMode {
     private Servo clawServo = null;
 
     // digital limit switches
-    // TODO: uncomment if touch sensors are added
-    // private TouchSensor scissorLimitLo = null;
-    // private TouchSensor scissorLimitHi = null;
-    // private TouchSensor extensionLimitBwd = null;
-    // private TouchSensor extensionLimitFwd = null;
+    private TouchSensor scissorLimitLo = null;
 
     private RisingEdgeTrigger homingTrigger = new RisingEdgeTrigger();
 
@@ -88,9 +85,6 @@ public class TestTemplate extends LinearOpMode {
         // outside the while loop, set initial claw servo position
         double clawServoPosition = (CLAW_MAX_POS - CLAW_MIN_POS) / 2.0; // Start at half position
 
-        // outside the while loop, set homing mode false
-        boolean homingModeActive = false;
-
         // *******************************************************************************************
         // Wait for the game to start (driver presses START)
         // *******************************************************************************************
@@ -99,43 +93,8 @@ public class TestTemplate extends LinearOpMode {
 
         waitForStart();
         runtime.reset();
-        //************************************************************************************************
-        //Autonomous Test Code B
-        //************************************************************************************************
-        //TODO; Redo program. 1Pick Up Block 2Use top chasis for angle 3scissor lift 4drive forward and drop block in to basket while staying parralel to wall.
-        //TODO; Scissor lift and clamp claw at start - add back and forth for top after turn.
 
-        // close claw
-        clawServo.setPosition(1.0);
-        sleep(2000);
 
-        // raise scissor lift
-        scissorDrive.setPower(1.0);
-        sleep(2500);            // TOTO: raise lift time
-        scissorDrive.setPower(0.0);
-        sleep(1000);
-
-        // retract claw backward
-        extensionDrive.setPower(-1.0);
-        sleep(2100);            // TODO: retract time
-        extensionDrive.setPower(0.0);
-        sleep(1000);
-
-        // drive robot forward
-        leftFrontDrive.setPower(0.3);
-        rightFrontDrive.setPower(0.3);
-        leftBackDrive.setPower(0.3);
-        rightBackDrive.setPower(0.3);
-        sleep(2000);            // TOTO: drive forward time
-        leftFrontDrive.setPower(0.0);
-        rightFrontDrive.setPower(0.0);
-        leftBackDrive.setPower(0.0);
-        rightBackDrive.setPower(0.0);
-        sleep(1000);
-
-        // open claw
-        clawServo.setPosition(0.0);
-        sleep(5000);
 
 
     }

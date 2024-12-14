@@ -21,8 +21,8 @@ public class TeleOpModeB extends LinearOpMode {
 
     // claw gripper constants
     static final int CYCLE_MS = 50;             // period of each cycle
-    static final double CLAW_MIN_POS = 0.15;     // Minimum rotational position
-    static final double CLAW_MAX_POS = 0.85;     // Maximum rotational position
+    static final double CLAW_MIN_POS = 0.0;     // Minimum rotational position
+    static final double CLAW_MAX_POS = 1.0;     // Maximum rotational position
 
     // Declare OpMode members for each of the 4 motors.
     private ElapsedTime runtime = new ElapsedTime();
