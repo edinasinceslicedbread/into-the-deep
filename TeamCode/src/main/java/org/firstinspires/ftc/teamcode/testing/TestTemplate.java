@@ -10,21 +10,10 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.RisingEdgeTrigger;
 
 
-@Autonomous(name = "TestTemplate", group = "Test")
+@Autonomous(name = "TestTemplate", group = "Testing")
 public class TestTemplate extends LinearOpMode {
 
-    // scissor lift constants
-    static final double SCISSOR_MIN_POS = 1000;    // Minimum scissor lift encoder position
-    static final double SCISSOR_MAX_POS = 10000;     // Maximum scissor lift encoder position
-
-    // claw extension constants
-    static final double EXTENSION_MIN_POS = -3000;  // Minimum claw extension encoder position
-    static final double EXTENSION_MAX_POS = 5000;   // Maximum claw extension encoder position
-
-    // claw gripper constants
     static final int CYCLE_MS = 50;             // period of each cycle
-    static final double CLAW_MIN_POS = 0.0;     // Minimum rotational position
-    static final double CLAW_MAX_POS = 1.0;     // Maximum rotational position
 
     // Declare OpMode members for each of the 4 motors.
     private ElapsedTime runtime = new ElapsedTime();
@@ -35,23 +24,23 @@ public class TestTemplate extends LinearOpMode {
     private DcMotor leftBackDrive = null;
     private DcMotor rightBackDrive = null;
 
-    // scissor lift drive, extension drive, and claw servo
+    // scissor lift drive, shoulder, elbow and claw
     private DcMotor scissorDrive = null;
-    private DcMotor extensionDrive = null;
+    private Servo shoulderServo = null;
+    private Servo elbowServo = null;
     private Servo clawServo = null;
 
     // digital limit switches
     private TouchSensor scissorLimitLo = null;
 
-    private RisingEdgeTrigger homingTrigger = new RisingEdgeTrigger();
+    // rising edge triggers example
+    private RisingEdgeTrigger buttonTriggerA = new RisingEdgeTrigger();
 
     @Override
     public void runOpMode() {
 
-        // *******************************************************************************************
         // Initialize the hardware variables. Note that the strings used here must correspond
         // to the names assigned during the robot configuration step on the DS or RC devices.
-        // *******************************************************************************************
 
         // main wheel drive motor hardware names
         leftFrontDrive = hardwareMap.get(DcMotor.class, "leftFrontDrive");
@@ -61,15 +50,9 @@ public class TestTemplate extends LinearOpMode {
 
         // scissor drive, claw server, and extend / retract
         scissorDrive = hardwareMap.get(DcMotor.class, "scissorDrive");
-        extensionDrive = hardwareMap.get(DcMotor.class, "extensionDrive");
+        shoulderServo = hardwareMap.get(Servo.class, "shoulderServo");
+        elbowServo = hardwareMap.get(Servo.class, "elbowServo");
         clawServo = hardwareMap.get(Servo.class, "clawServo");
-
-        // digital limit switches
-        // TODO: uncomment if touch sensors are added
-        // scissorLimitLo = hardwareMap.get(DigitalChannel.class, "scissorLimitLo");
-        // scissorLimitHi = hardwareMap.get(DigitalChannel.class, "scissorLimitHi");
-        // extensionLimitBwd = hardwareMap.get(DigitalChannel.class, "extensionLimitBwd");
-        // extensionLimitFwd = hardwareMap.get(DigitalChannel.class, "extensionLimitFwd");
 
         // assign wheel motor directions
         leftFrontDrive.setDirection(DcMotor.Direction.FORWARD);
@@ -79,23 +62,35 @@ public class TestTemplate extends LinearOpMode {
 
         // assign scissor, extension, and claw directions
         scissorDrive.setDirection(DcMotor.Direction.FORWARD);
-        extensionDrive.setDirection(DcMotor.Direction.REVERSE);
+        shoulderServo.setDirection(Servo.Direction.FORWARD);
+        elbowServo.setDirection(Servo.Direction.FORWARD);
         clawServo.setDirection(Servo.Direction.FORWARD);
 
-        // outside the while loop, set initial claw servo position
-        double clawServoPosition = (CLAW_MAX_POS - CLAW_MIN_POS) / 2.0; // Start at half position
-
-        // *******************************************************************************************
-        // Wait for the game to start (driver presses START)
-        // *******************************************************************************************
+        // update some telemetry
         telemetry.addData("Status", "Initialized");
         telemetry.update();
 
+        // Wait for the game to start (driver presses START)
         waitForStart();
         runtime.reset();
 
+        // run until the end of the match (driver presses STOP)
+        while (opModeIsActive()) {
 
+            // Update telemetry
+            telemetry.update();
 
+            // put logic here
+
+            // update telemetry data
+            telemetry.addData("Run Time", runtime.toString());
+            telemetry.update();
+
+            // idle time for servo
+            sleep(CYCLE_MS);
+            idle();
+
+        }
 
     }
 }
