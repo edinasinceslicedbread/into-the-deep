@@ -77,10 +77,8 @@ public class TestTemplate extends LinearOpMode {
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
 
-            // Update telemetry
-            telemetry.update();
-
             // put logic here
+
 
             // update telemetry data
             telemetry.addData("Run Time", runtime.toString());
