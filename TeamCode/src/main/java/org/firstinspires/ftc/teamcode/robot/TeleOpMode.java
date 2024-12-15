@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.robot;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.ColorRangeSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.TouchSensor;
@@ -43,6 +44,9 @@ public class TeleOpMode extends LinearOpMode {
     // digital limit switches
     private TouchSensor scissorLimitLo = null;
 
+    //color sensors
+    private ColorRangeSensor colorSensor;
+
     @Override
     public void runOpMode() {
 
@@ -64,6 +68,8 @@ public class TeleOpMode extends LinearOpMode {
 
         // digital limit switches
         scissorLimitLo = hardwareMap.get(TouchSensor.class, "scissorLimitLo");
+        colorSensor = hardwareMap.get(ColorRangeSensor.class,"ColorSensor1");
+
 
         // assign wheel motor directions
         leftFrontDrive.setDirection(DcMotor.Direction.FORWARD);
@@ -93,7 +99,10 @@ public class TeleOpMode extends LinearOpMode {
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
-
+            //Color Sensor Define
+            int blue = colorSensor.blue();
+            int red = colorSensor.red();
+            int green = colorSensor.green();
             // *******************************************************************************************
             // SECTION 1: toggle homing mode to be able to set the zero position of scissor and extension
             // *******************************************************************************************
@@ -198,7 +207,7 @@ public class TeleOpMode extends LinearOpMode {
 
             // TODO: adjust max speeds between 0.0 and 1.0
             double scissorUpOverride = 1.0;
-            double scissorDownOverride = 0.75;
+            double scissorDownOverride = 0.80;
             double scissorDrivePower = 0.0;
 
             // read encoder feedback position and limit switch status
@@ -285,7 +294,6 @@ public class TeleOpMode extends LinearOpMode {
             scissorDrive.setPower(scissorDrivePower);
             extensionDrive.setPower(extensionDrivePower);
             clawServo.setPosition(clawServoPosition);
-
             // *******************************************************************************************
             // SECTION 7: Telemetry
             // *******************************************************************************************
@@ -299,7 +307,8 @@ public class TeleOpMode extends LinearOpMode {
             telemetry.addLine(String.format("Scissor Lift: [%s] [%8.0f] [%s]", MotorPower(scissorDrivePower), scissorEncoderCounts, scissorLimitLoOn));
             telemetry.addLine(String.format("Claw Extension: [%s] [%8.0f]", MotorPower(extensionDrivePower), extensionEncoderCounts));
             telemetry.addLine(String.format("Claw Servo Position: [%4.2f]", clawServoPosition));
-
+            telemetry.addLine(String.format("red=%d, green=%d, blue=%d",red,green,blue));
+            telemetry.addLine(String.format(
             // Update telemetry
             telemetry.update();
 
