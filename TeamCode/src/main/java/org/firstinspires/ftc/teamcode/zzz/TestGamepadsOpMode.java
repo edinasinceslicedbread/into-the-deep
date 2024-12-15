@@ -32,7 +32,7 @@ package org.firstinspires.ftc.teamcode.zzz;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-@TeleOp(name = "Test: Gamepad 1 & 2 Buttons", group = "Test")
+@TeleOp(name = "Test: Gamepad 1 & 2 Buttons", group = "z")
 public class TestGamepadsOpMode extends LinearOpMode {
     @Override
     public void runOpMode() {
