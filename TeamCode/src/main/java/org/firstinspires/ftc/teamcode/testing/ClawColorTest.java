@@ -1,8 +1,8 @@
 package org.firstinspires.ftc.teamcode.testing;
 
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.ColorRangeSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.TouchSensor;
@@ -12,7 +12,7 @@ import org.firstinspires.ftc.teamcode.RisingEdgeTrigger;
 
 
 @TeleOp(name = "ClawTestTemplate", group = "Testing")
-public class ClawOpenCloseTest extends LinearOpMode {
+public class ClawColorTest extends LinearOpMode {
 
     static final int CYCLE_MS = 50;             // period of each cycle
 
@@ -37,6 +37,9 @@ public class ClawOpenCloseTest extends LinearOpMode {
     // rising edge triggers example
     private RisingEdgeTrigger buttonTriggerA = new RisingEdgeTrigger();
 
+    //color sensors
+    private ColorRangeSensor colorSensor;
+
     @Override
     public void runOpMode() {
 
@@ -49,11 +52,12 @@ public class ClawOpenCloseTest extends LinearOpMode {
         leftBackDrive = hardwareMap.get(DcMotor.class, "leftBackDrive");
         rightBackDrive = hardwareMap.get(DcMotor.class, "rightBackDrive");
 
-        // scissor drive, claw server, and extend / retract
+        // scissor drive, claw server, color sensor, and extend / retract
         scissorDrive = hardwareMap.get(DcMotor.class, "scissorDrive");
         shoulderServo = hardwareMap.get(Servo.class, "shoulderServo");
         elbowServo = hardwareMap.get(Servo.class, "elbowServo");
         clawServo = hardwareMap.get(Servo.class, "clawServo");
+        colorSensor = hardwareMap.get(ColorRangeSensor.class,"clawColorSensor");
 
         // assign wheel motor directions
         leftFrontDrive.setDirection(DcMotor.Direction.FORWARD);
@@ -79,17 +83,28 @@ public class ClawOpenCloseTest extends LinearOpMode {
         while (opModeIsActive()) {
 
             // put logic here
-            if (gamepad1.a == false)
+            int blue = colorSensor.blue();
+            int red = colorSensor.red();
+            int green = colorSensor.green();
+            double color = 0;
+            // blue is 1, red is 2, blue is 3
+            if (blue > red && blue > green)
+            {
+                color = 1;
+            }
+
+            if (gamepad1.a == true)
             {
                 clawServo.setPosition(0.30);
             }
-            else if (gamepad1.a == true)
+            else if (gamepad1.y == true)
             {
                 clawServo.setPosition(0.05);
             }
 
             // update telemetry data
             telemetry.addData("Run Time", runtime.toString());
+            telemetry.addLine(String.format("red=%d, green=%d, blue=%d",red,green,blue));
             telemetry.update();
 
             // idle time for servo
