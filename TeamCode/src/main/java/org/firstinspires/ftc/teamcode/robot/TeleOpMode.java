@@ -308,7 +308,7 @@ public class TeleOpMode extends LinearOpMode {
             telemetry.addLine(String.format("Claw Extension: [%s] [%8.0f]", MotorPower(extensionDrivePower), extensionEncoderCounts));
             telemetry.addLine(String.format("Claw Servo Position: [%4.2f]", clawServoPosition));
             telemetry.addLine(String.format("red=%d, green=%d, blue=%d",red,green,blue));
-            telemetry.addLine(String.format(
+
             // Update telemetry
             telemetry.update();
 
