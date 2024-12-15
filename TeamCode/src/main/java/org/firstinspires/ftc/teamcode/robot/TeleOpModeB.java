@@ -2,17 +2,14 @@ package org.firstinspires.ftc.teamcode.robot;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.ColorRangeSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.teamcode.RisingEdgeTrigger;
 
-
-@TeleOp(name = "Robot: Into the Deep", group = "Robot")
-public class TeleOpMode extends LinearOpMode {
+@TeleOp(name = "Robot: Into the Deep B", group = "Robot")
+public class TeleOpModeB extends LinearOpMode {
 
     // scissor lift constants
     static final double SCISSOR_MIN_POS = 1000;    // Minimum scissor lift encoder position
@@ -24,8 +21,8 @@ public class TeleOpMode extends LinearOpMode {
 
     // claw gripper constants
     static final int CYCLE_MS = 50;             // period of each cycle
-    static final double CLAW_MIN_POS = 0.15;     // Minimum rotational position
-    static final double CLAW_MAX_POS = 0.85;     // Maximum rotational position
+    static final double CLAW_MIN_POS = 0.0;     // Minimum rotational position
+    static final double CLAW_MAX_POS = 1.0;     // Maximum rotational position
 
     // Declare OpMode members for each of the 4 motors.
     private ElapsedTime runtime = new ElapsedTime();
@@ -43,9 +40,6 @@ public class TeleOpMode extends LinearOpMode {
 
     // digital limit switches
     private TouchSensor scissorLimitLo = null;
-
-    //color sensors
-    private ColorRangeSensor colorSensor;
 
     @Override
     public void runOpMode() {
@@ -68,8 +62,6 @@ public class TeleOpMode extends LinearOpMode {
 
         // digital limit switches
         scissorLimitLo = hardwareMap.get(TouchSensor.class, "scissorLimitLo");
-        colorSensor = hardwareMap.get(ColorRangeSensor.class,"ColorSensor1");
-
 
         // assign wheel motor directions
         leftFrontDrive.setDirection(DcMotor.Direction.FORWARD);
@@ -99,10 +91,7 @@ public class TeleOpMode extends LinearOpMode {
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
-            //Color Sensor Define
-            int blue = colorSensor.blue();
-            int red = colorSensor.red();
-            int green = colorSensor.green();
+
             // *******************************************************************************************
             // SECTION 1: toggle homing mode to be able to set the zero position of scissor and extension
             // *******************************************************************************************
@@ -148,7 +137,7 @@ public class TeleOpMode extends LinearOpMode {
                 lateral = gamepad1.left_stick_x * turboOverrideLeftStick * driveDirectionFactor;
             }
             if (Math.abs(gamepad1.right_stick_x) > 0.1) {
-                yaw = gamepad1.right_stick_x * turboOverrideRightStick * driveDirectionFactor;
+                yaw = gamepad1.right_stick_x * turboOverrideRightStick; // * driveDirectionFactor;
             }
 
             // gamepad 2
@@ -159,7 +148,7 @@ public class TeleOpMode extends LinearOpMode {
                 lateral = gamepad2.left_stick_x * turboOverrideLeftStick * driveDirectionFactor;
             }
             if (Math.abs(gamepad2.right_stick_x) > 0.1) {
-                yaw = gamepad2.right_stick_x * turboOverrideRightStick * driveDirectionFactor;
+                yaw = gamepad2.right_stick_x * turboOverrideRightStick; // * driveDirectionFactor;
             }
 
             // D-Pad overrides for the same joystick functions as above
@@ -205,26 +194,30 @@ public class TeleOpMode extends LinearOpMode {
             // SECTION 3: Raise and Lower Scissor Lift
             // *******************************************************************************************
 
-            // TODO: adjust max speeds between 0.0 and 1.0
-            double scissorUpOverride = 1.0;
-            double scissorDownOverride = 0.80;
-            double scissorDrivePower = 0.0;
-
             // read encoder feedback position and limit switch status
             double scissorEncoderCounts = scissorDrive.getCurrentPosition();
             boolean scissorLimitLoOn = scissorLimitLo.isPressed();
+            boolean scissorLimitHiOn = (scissorEncoderCounts >= 10100);
+
+            double extensionEncoderCounts = extensionDrive.getCurrentPosition();
+            boolean extensionPastScissorLimit = (extensionEncoderCounts <= -2000);
+
+            // TODO: adjust max speeds between 0.0 and 1.0
+            double scissorUpOverride = 1.0;
+            double scissorDownOverride = 0.75;
+            double scissorDrivePower = 0.0;
 
             // Gamepad 1 triggers
-            if (gamepad1.right_trigger > 0.1) {
+            if (gamepad1.right_trigger > 0.1 && scissorLimitHiOn == false) {
                 scissorDrivePower = gamepad1.right_trigger * scissorUpOverride;
-            } else if (gamepad1.left_trigger > 0.1 && scissorLimitLoOn == false) {
+            } else if (gamepad1.left_trigger > 0.1 && scissorLimitLoOn == false && extensionPastScissorLimit == false) {
                 scissorDrivePower = -gamepad1.left_trigger * scissorDownOverride;
             }
 
             // Gamepad 2 triggers
-            if (gamepad2.right_trigger > 0.1) {
+            if (gamepad2.right_trigger > 0.1 && scissorLimitHiOn == false) {
                 scissorDrivePower = gamepad2.right_trigger * scissorUpOverride;
-            } else if (gamepad2.left_trigger > 0.1 && scissorLimitLoOn == false) {
+            } else if (gamepad2.left_trigger > 0.1 && scissorLimitLoOn == false && extensionPastScissorLimit == false) {
                 scissorDrivePower = -gamepad2.left_trigger * scissorDownOverride;
             }
 
@@ -232,21 +225,18 @@ public class TeleOpMode extends LinearOpMode {
             // SECTION 4: Extend and Retract Claw
             // *******************************************************************************************
 
-            // TODO: adjust max speeds between 0.0 and 1.0
-            double extensionFwdPowerMax = 0.75;
-            double extensionBwdPowerMax = 0.75;
-            double extensionDrivePower = 0;
-
-            // read encoder feedback position
-            double extensionEncoderCounts = extensionDrive.getCurrentPosition();
-
             // TODO: adjust extension encoder count limits
             boolean extensionPastLimitMax = (extensionEncoderCounts >= 7800);
             boolean extensionPastLimitSlow = (extensionEncoderCounts <= 700);
             boolean extensionPastLimitMin = (extensionEncoderCounts <= -5800);
 
+            // TODO: adjust max speeds between 0.0 and 1.0
+            double extensionFwdPowerMax = 1.0;
+            double extensionBwdPowerMax = 1.0;
+            double extensionDrivePower = 0;
+
             if (extensionPastLimitSlow) {
-                extensionBwdPowerMax = 0.50;
+                extensionBwdPowerMax = 0.75;
             }
 
             // Gamepad 1
@@ -294,6 +284,7 @@ public class TeleOpMode extends LinearOpMode {
             scissorDrive.setPower(scissorDrivePower);
             extensionDrive.setPower(extensionDrivePower);
             clawServo.setPosition(clawServoPosition);
+
             // *******************************************************************************************
             // SECTION 7: Telemetry
             // *******************************************************************************************
@@ -307,7 +298,6 @@ public class TeleOpMode extends LinearOpMode {
             telemetry.addLine(String.format("Scissor Lift: [%s] [%8.0f] [%s]", MotorPower(scissorDrivePower), scissorEncoderCounts, scissorLimitLoOn));
             telemetry.addLine(String.format("Claw Extension: [%s] [%8.0f]", MotorPower(extensionDrivePower), extensionEncoderCounts));
             telemetry.addLine(String.format("Claw Servo Position: [%4.2f]", clawServoPosition));
-            telemetry.addLine(String.format("red=%d, green=%d, blue=%d",red,green,blue));
 
             // Update telemetry
             telemetry.update();

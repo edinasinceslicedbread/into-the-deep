@@ -117,7 +117,7 @@ public class AutoOpModeB extends LinearOpMode {
 
         // retract claw backward
         extensionDrive.setPower(-1.0);
-        sleep(1400);            // TODO: retract time
+        sleep(2100);            // TODO: retract time
         extensionDrive.setPower(0.0);
         sleep(1000);
 
