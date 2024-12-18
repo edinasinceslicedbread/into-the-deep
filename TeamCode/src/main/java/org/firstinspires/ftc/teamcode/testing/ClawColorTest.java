@@ -11,7 +11,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.RisingEdgeTrigger;
 
 
-@TeleOp(name = "ClawTestTemplate", group = "Testing")
+@TeleOp(name = "ClawColorTest", group = "Testing")
 public class ClawColorTest extends LinearOpMode {
 
     static final int CYCLE_MS = 50;             // period of each cycle
@@ -86,11 +86,21 @@ public class ClawColorTest extends LinearOpMode {
             int blue = colorSensor.blue();
             int red = colorSensor.red();
             int green = colorSensor.green();
+
             double color = 0;
             // blue is 1, red is 2, blue is 3
-            if (blue > red && blue > green)
+            // All number data for the if statement can be replaced with a different value for a set value depending on distance from block.
+            if (blue > red && blue > green && blue > 25)
             {
                 color = 1;
+            }
+            if (red > green && red > blue && red > 40)
+            {
+                color = 2;
+            }
+            if (red > 60 && green > 50 && blue < 40)
+            {
+                color = 4;
             }
 
             if (gamepad1.a == true)
@@ -105,6 +115,24 @@ public class ClawColorTest extends LinearOpMode {
             // update telemetry data
             telemetry.addData("Run Time", runtime.toString());
             telemetry.addLine(String.format("red=%d, green=%d, blue=%d",red,green,blue));
+            telemetry.addData("Color", color);
+
+            if (color == 1)
+            {
+                telemetry.addData("Blue", true);
+            }
+            if (color == 2)
+            {
+                telemetry.addData("Red", true);
+            }
+            if (color == 3)
+            {
+                telemetry.addData("Green", true);
+            }
+            if (color == 4)
+            {
+                telemetry.addData("Yellow", true);
+            }
             telemetry.update();
 
             // idle time for servo
@@ -112,6 +140,5 @@ public class ClawColorTest extends LinearOpMode {
             idle();
 
         }
-
     }
 }
