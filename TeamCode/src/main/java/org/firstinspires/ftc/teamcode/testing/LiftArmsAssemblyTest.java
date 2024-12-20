@@ -56,8 +56,8 @@ public class LiftArmsAssemblyTest extends LinearOpMode {
         waitForStart();
         runtime.reset();
 
-        double shoulderPosition = 0;
-        double elbowPosition = 0;
+        double shoulderPosition = 0.02;
+        double elbowPosition = 0.02;
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
