@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode.testing;
 
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -12,7 +11,7 @@ import org.firstinspires.ftc.teamcode.RisingEdgeTrigger;
 
 
 @TeleOp(name = "Chassis Encoder Test", group = "Testing")
-public class ChassisEncoderTest extends LinearOpMode {
+public class ChassisEncoderAssemblyTest extends LinearOpMode {
 
     static final int CYCLE_MS = 50;             // period of each cycle
 

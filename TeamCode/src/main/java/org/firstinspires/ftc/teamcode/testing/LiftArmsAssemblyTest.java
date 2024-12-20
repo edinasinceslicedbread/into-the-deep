@@ -29,6 +29,8 @@ public class LiftArmsAssemblyTest extends LinearOpMode {
     // rising edge triggers example
     private RisingEdgeTrigger shoulderTriggerUp = new RisingEdgeTrigger();
     private RisingEdgeTrigger shoulderTriggerDown = new RisingEdgeTrigger();
+    private RisingEdgeTrigger elbowTriggerUp = new RisingEdgeTrigger();
+    private RisingEdgeTrigger elbowTriggerDown = new RisingEdgeTrigger();
 
     @Override
     public void runOpMode() {
@@ -43,7 +45,7 @@ public class LiftArmsAssemblyTest extends LinearOpMode {
 
         // assign scissor, extension, and claw directions
         scissorDrive.setDirection(DcMotor.Direction.FORWARD);
-        shoulderServo.setDirection(Servo.Direction.FORWARD);
+        shoulderServo.setDirection(Servo.Direction.REVERSE);
         elbowServo.setDirection(Servo.Direction.FORWARD);
 
         // update some telemetry
@@ -55,6 +57,7 @@ public class LiftArmsAssemblyTest extends LinearOpMode {
         runtime.reset();
 
         double shoulderPosition = 0;
+        double elbowPosition = 0;
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
@@ -72,6 +75,19 @@ public class LiftArmsAssemblyTest extends LinearOpMode {
                 shoulderPosition = shoulderPosition - 0.05;
             }
             shoulderServo.setPosition(shoulderPosition);
+
+            elbowTriggerUp.update(gamepad1.x);
+            elbowTriggerDown.update(gamepad1.b);
+            if (elbowTriggerUp.wasTriggered()) {
+                elbowPosition = elbowPosition + 0.05;
+            }
+            elbowServo.setPosition(elbowPosition);
+
+
+            if (elbowTriggerDown.wasTriggered()) {
+                elbowPosition = elbowPosition - 0.05;
+            }
+            elbowServo.setPosition(elbowPosition);
 
             // update telemetry data
             telemetry.addData("Run Time", runtime.toString());

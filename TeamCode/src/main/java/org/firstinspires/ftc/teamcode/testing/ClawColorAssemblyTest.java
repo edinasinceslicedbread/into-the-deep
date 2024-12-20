@@ -12,7 +12,7 @@ import org.firstinspires.ftc.teamcode.RisingEdgeTrigger;
 
 
 @TeleOp(name = "ClawColorTest", group = "Testing")
-public class ClawColorTest extends LinearOpMode {
+public class ClawColorAssemblyTest extends LinearOpMode {
 
     static final int CYCLE_MS = 50;             // period of each cycle
 
