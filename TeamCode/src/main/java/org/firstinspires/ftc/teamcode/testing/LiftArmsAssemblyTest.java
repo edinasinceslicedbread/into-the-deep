@@ -100,6 +100,7 @@ public class LiftArmsAssemblyTest extends LinearOpMode {
             // update telemetry data
             telemetry.addData("Run Time", runtime.toString());
             telemetry.addData("Shoulder", shoulderPosition);
+            telemetry.addData("Elbow", elbowPosition);
             telemetry.update();
 
         }
