@@ -66,26 +66,26 @@ public class LiftArmsAssemblyTest extends LinearOpMode {
             shoulderTriggerUp.update(gamepad1.y);
             shoulderTriggerDown.update(gamepad1.a);
             if (shoulderTriggerUp.wasTriggered()) {
-                shoulderPosition = shoulderPosition + 0.05;
+                shoulderPosition = shoulderPosition + 0.01;
             }
             shoulderServo.setPosition(shoulderPosition);
 
 
             if (shoulderTriggerDown.wasTriggered()) {
-                shoulderPosition = shoulderPosition - 0.05;
+                shoulderPosition = shoulderPosition - 0.01;
             }
             shoulderServo.setPosition(shoulderPosition);
 
             elbowTriggerUp.update(gamepad1.x);
             elbowTriggerDown.update(gamepad1.b);
             if (elbowTriggerUp.wasTriggered()) {
-                elbowPosition = elbowPosition + 0.05;
+                elbowPosition = elbowPosition + 0.01;
             }
             elbowServo.setPosition(elbowPosition);
 
 
             if (elbowTriggerDown.wasTriggered()) {
-                elbowPosition = elbowPosition - 0.05;
+                elbowPosition = elbowPosition - 0.01;
             }
             elbowServo.setPosition(elbowPosition);
 
