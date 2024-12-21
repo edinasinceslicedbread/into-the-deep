@@ -4,7 +4,6 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.RisingEdgeTrigger;
@@ -19,12 +18,8 @@ public class LiftArmsAssemblyTest extends LinearOpMode {
 
 
     // scissor lift drive, shoulder, elbow and claw
-    private DcMotor scissorDrive = null;
-    private Servo shoulderServo = null;
     private Servo elbowServo = null;
-
-    // digital limit switches
-    private TouchSensor scissorLimitLo = null;
+    private DcMotor shoulderDrive = null;
 
     // rising edge triggers example
     private RisingEdgeTrigger shoulderTriggerUp = new RisingEdgeTrigger();
@@ -39,14 +34,10 @@ public class LiftArmsAssemblyTest extends LinearOpMode {
         // to the names assigned during the robot configuration step on the DS or RC devices.
 
         // scissor drive, claw server, and extend / retract
-        scissorDrive = hardwareMap.get(DcMotor.class, "scissorDrive");
-        shoulderServo = hardwareMap.get(Servo.class, "shoulderServo");
         elbowServo = hardwareMap.get(Servo.class, "elbowServo");
 
         // assign scissor, extension, and claw directions
-        scissorDrive.setDirection(DcMotor.Direction.FORWARD);
-        shoulderServo.setDirection(Servo.Direction.REVERSE);
-        elbowServo.setDirection(Servo.Direction.FORWARD);
+        shoulderMotor.setDirection(DcMotor.Direction.FORWARD);
 
         // update some telemetry
         telemetry.addData("Status", "Initialized");
@@ -56,29 +47,16 @@ public class LiftArmsAssemblyTest extends LinearOpMode {
         waitForStart();
         runtime.reset();
 
-        double shoulderPosition = 0.02;
         double elbowPosition = 0.02;
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
 
             // put logic here
-            shoulderTriggerUp.update(gamepad1.y);
-            shoulderTriggerDown.update(gamepad1.a);
-            if (shoulderTriggerUp.wasTriggered()) {
-                if (shoulderPosition > 0 && shoulderPosition < 1) {
-                    shoulderPosition = shoulderPosition + 0.01;
-                }
-            }
-            shoulderServo.setPosition(shoulderPosition);
+            int shoulderPosition = shoulderDrive.getCurrentPosition();
+            shoulderDrive.setPower(gamepad1.left_stick_x * 0.10);
 
 
-            if (shoulderTriggerDown.wasTriggered()) {
-                if (shoulderPosition > 0 && shoulderPosition < 1) {
-                    shoulderPosition = shoulderPosition - 0.01;
-                }
-            }
-            shoulderServo.setPosition(shoulderPosition);
 
             elbowTriggerUp.update(gamepad1.x);
             elbowTriggerDown.update(gamepad1.b);
