@@ -14,6 +14,9 @@ import org.firstinspires.ftc.teamcode.RisingEdgeTrigger;
 @TeleOp(name = "LiftArms Tuning Shoulder", group = "Tuning")
 public class LiftArmsTuningShoulder extends LinearOpMode {
 
+    int jogDistance = 100;
+    int jogIncrement = 10;
+
     // Declare OpMode members for each of the 4 motors.
     private ElapsedTime runtime = new ElapsedTime();
 
@@ -21,8 +24,7 @@ public class LiftArmsTuningShoulder extends LinearOpMode {
     private DcMotorEx shoulderDrive = null;
 
     // rising edge triggers to jog the motor
-    private RisingEdgeTrigger shoulderTrigForward = new RisingEdgeTrigger();
-    private RisingEdgeTrigger shoulderTrigBackward = new RisingEdgeTrigger();
+    private RisingEdgeTrigger shoulderTrigDpad = new RisingEdgeTrigger();
 
     private RisingEdgeTrigger coefficientTrigP = new RisingEdgeTrigger();
     private RisingEdgeTrigger coefficientTrigI = new RisingEdgeTrigger();
@@ -34,8 +36,6 @@ public class LiftArmsTuningShoulder extends LinearOpMode {
 
         // Initialize the hardware variables. Note that the strings used here must correspond
         // to the names assigned during the robot configuration step on the DS or RC devices.
-
-        int POSITION_INCREMENT = 100;
 
         shoulderDrive = hardwareMap.get(DcMotorEx.class, "shoulderDrive");
         shoulderDrive.setDirection(DcMotorEx.Direction.FORWARD);
@@ -68,13 +68,12 @@ public class LiftArmsTuningShoulder extends LinearOpMode {
             actualCoefficients = shoulderDrive.getPIDFCoefficients(DcMotor.RunMode.RUN_TO_POSITION);
 
             // shoulder servo section
-            shoulderTrigForward.update(gamepad1.dpad_up);
-            shoulderTrigBackward.update(gamepad1.dpad_down);
-            if (shoulderTrigForward.wasTriggered()) {
-                shoulderTarget = shoulderTarget + POSITION_INCREMENT;
-            }
-            if (shoulderTrigBackward.wasTriggered()) {
-                shoulderTarget = shoulderTarget - POSITION_INCREMENT;
+            shoulderTrigDpad.update(gamepad1.dpad_up || gamepad1.dpad_up || gamepad1.dpad_right || gamepad1.dpad_left);
+            if (shoulderTrigDpad.wasTriggered()) {
+                if (gamepad1.dpad_up) shoulderTarget += jogDistance;
+                if (gamepad1.dpad_down) shoulderTarget -= jogDistance;
+                if (gamepad1.dpad_right) jogDistance += jogIncrement;
+                if (gamepad1.dpad_left) jogDistance -= jogIncrement;
             }
 
             // write outputs
@@ -86,46 +85,54 @@ public class LiftArmsTuningShoulder extends LinearOpMode {
 
             // position
             coefficientTrigP.update(gamepad1.x);
-            if (coefficientTrigP.wasTriggered() && gamepad1.right_bumper) {
-                targetCoefficients.p += 0.1;
-                shoulderDrive.setPIDFCoefficients(DcMotor.RunMode.RUN_TO_POSITION, targetCoefficients);
-            }
-            if (coefficientTrigP.wasTriggered() && gamepad1.left_bumper) {
-                targetCoefficients.p -= 0.1;
-                shoulderDrive.setPIDFCoefficients(DcMotor.RunMode.RUN_TO_POSITION, targetCoefficients);
+            if (coefficientTrigP.wasTriggered()) {
+                if (gamepad1.right_bumper) {
+                    targetCoefficients.p += 0.1;
+                    shoulderDrive.setPIDFCoefficients(DcMotor.RunMode.RUN_TO_POSITION, targetCoefficients);
+                }
+                if (gamepad1.left_bumper) {
+                    targetCoefficients.p -= 0.1;
+                    shoulderDrive.setPIDFCoefficients(DcMotor.RunMode.RUN_TO_POSITION, targetCoefficients);
+                }
             }
 
             // integral
             coefficientTrigI.update(gamepad1.y);
-            if (coefficientTrigI.wasTriggered() && gamepad1.right_bumper) {
-                targetCoefficients.i += 0.1;
-                shoulderDrive.setPIDFCoefficients(DcMotor.RunMode.RUN_TO_POSITION, targetCoefficients);
-            }
-            if (coefficientTrigI.wasTriggered() && gamepad1.left_bumper) {
-                targetCoefficients.i -= 0.1;
-                shoulderDrive.setPIDFCoefficients(DcMotor.RunMode.RUN_TO_POSITION, targetCoefficients);
+            if (coefficientTrigI.wasTriggered()) {
+                if (gamepad1.right_bumper) {
+                    targetCoefficients.i += 0.1;
+                    shoulderDrive.setPIDFCoefficients(DcMotor.RunMode.RUN_TO_POSITION, targetCoefficients);
+                }
+                if (gamepad1.left_bumper) {
+                    targetCoefficients.i -= 0.1;
+                    shoulderDrive.setPIDFCoefficients(DcMotor.RunMode.RUN_TO_POSITION, targetCoefficients);
+                }
             }
 
             // derivative
             coefficientTrigD.update(gamepad1.b);
-            if (coefficientTrigD.wasTriggered() && gamepad1.right_bumper) {
-                targetCoefficients.d += 0.1;
-                shoulderDrive.setPIDFCoefficients(DcMotor.RunMode.RUN_TO_POSITION, targetCoefficients);
-            }
-            if (coefficientTrigD.wasTriggered() && gamepad1.left_bumper) {
-                targetCoefficients.d -= 0.1;
-                shoulderDrive.setPIDFCoefficients(DcMotor.RunMode.RUN_TO_POSITION, targetCoefficients);
+            if (coefficientTrigD.wasTriggered()) {
+                if (gamepad1.right_bumper) {
+                    targetCoefficients.d += 0.1;
+                    shoulderDrive.setPIDFCoefficients(DcMotor.RunMode.RUN_TO_POSITION, targetCoefficients);
+                }
+                if (gamepad1.left_bumper) {
+                    targetCoefficients.d -= 0.1;
+                    shoulderDrive.setPIDFCoefficients(DcMotor.RunMode.RUN_TO_POSITION, targetCoefficients);
+                }
             }
 
             // feed forward
             coefficientTrigF.update(gamepad1.a);
-            if (coefficientTrigF.wasTriggered() && gamepad1.right_bumper) {
-                targetCoefficients.f += 0.1;
-                shoulderDrive.setPIDFCoefficients(DcMotor.RunMode.RUN_TO_POSITION, targetCoefficients);
-            }
-            if (coefficientTrigF.wasTriggered() && gamepad1.left_bumper) {
-                targetCoefficients.f -= 0.1;
-                shoulderDrive.setPIDFCoefficients(DcMotor.RunMode.RUN_TO_POSITION, targetCoefficients);
+            if (coefficientTrigF.wasTriggered()) {
+                if (gamepad1.right_bumper) {
+                    targetCoefficients.f += 0.1;
+                    shoulderDrive.setPIDFCoefficients(DcMotor.RunMode.RUN_TO_POSITION, targetCoefficients);
+                }
+                if (gamepad1.left_bumper) {
+                    targetCoefficients.f -= 0.1;
+                    shoulderDrive.setPIDFCoefficients(DcMotor.RunMode.RUN_TO_POSITION, targetCoefficients);
+                }
             }
 
             // *********************************************************************
@@ -137,6 +144,7 @@ public class LiftArmsTuningShoulder extends LinearOpMode {
             telemetry.addLine(String.format("Current (Amps): %d", shoulderCurrent));
             telemetry.addLine(String.format("Coefficients (PID) [%4.2f] [%4.2f] [%4.2f]", actualCoefficients.p, actualCoefficients.i, actualCoefficients.d));
             telemetry.addLine(String.format("Feed Forward: [%4.2f]", actualCoefficients.f));
+            telemetry.addLine(String.format("Jog Distance: [%d]", jogDistance));
             telemetry.update();
 
         }
