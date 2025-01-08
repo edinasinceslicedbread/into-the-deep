@@ -2,10 +2,14 @@ package org.firstinspires.ftc.teamcode.robot;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.ColorRangeSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
+
+import org.firstinspires.ftc.teamcode.RisingEdgeTrigger;
 
 
 @TeleOp(name = "Robot: Into the Deep B", group = "Robot")
@@ -35,11 +39,17 @@ public class TeleOpModeC extends LinearOpMode {
 
     // scissor lift drive, extension drive, and claw servo
     private DcMotor scissorDrive = null;
-    private DcMotor extensionDrive = null;
     private Servo clawServo = null;
+    private DcMotorEx elbowMotor = null;
+    private DcMotor shoulderDrive = null;
+    private ColorRangeSensor colorSensor;
+    a
+    private RisingEdgeTrigger elbowTriggerUp = new RisingEdgeTrigger();
+    private RisingEdgeTrigger elbowTriggerDown = new RisingEdgeTrigger();
 
     // digital limit switches
     private TouchSensor scissorLimitLo = null;
+
 
     @Override
     public void runOpMode() {
@@ -57,8 +67,10 @@ public class TeleOpModeC extends LinearOpMode {
 
         // scissor drive, claw server, and extend / retract
         scissorDrive = hardwareMap.get(DcMotor.class, "scissorDrive");
-        extensionDrive = hardwareMap.get(DcMotor.class, "extensionDrive");
+        shoulderDrive = hardwareMap.get(DcMotor.class, "shoulderDrive");
+        elbowMotor = hardwareMap.get(DcMotorEx.class, "elbowDrive");
         clawServo = hardwareMap.get(Servo.class, "clawServo");
+        colorSensor = hardwareMap.get(ColorRangeSensor.class, "clawColorSensor");
 
         // digital limit switches
         scissorLimitLo = hardwareMap.get(TouchSensor.class, "scissorLimitLo");
@@ -71,8 +83,6 @@ public class TeleOpModeC extends LinearOpMode {
 
         // assign scissor, extension, and claw directions
         scissorDrive.setDirection(DcMotor.Direction.FORWARD);
-        extensionDrive.setDirection(DcMotor.Direction.REVERSE);
-        clawServo.setDirection(Servo.Direction.FORWARD);
 
         // outside the while loop, set initial claw servo position
         double clawServoPosition = CLAW_MIN_POS; // Start at half position
@@ -199,8 +209,7 @@ public class TeleOpModeC extends LinearOpMode {
             boolean scissorLimitLoOn = scissorLimitLo.isPressed();
             boolean scissorLimitHiOn = (scissorEncoderCounts >= 10100);
 
-            double extensionEncoderCounts = extensionDrive.getCurrentPosition();
-            boolean extensionPastScissorLimit = (extensionEncoderCounts <= -2000);
+
 
             // TODO: adjust max speeds between 0.0 and 1.0
             double scissorUpOverride = 1.0;
@@ -208,70 +217,75 @@ public class TeleOpModeC extends LinearOpMode {
             double scissorDrivePower = 0.0;
 
             // Gamepad 1 triggers
-            if (gamepad1.right_trigger > 0.1 && scissorLimitHiOn == false) {
-                scissorDrivePower = gamepad1.right_trigger * scissorUpOverride;
-            } else if (gamepad1.left_trigger > 0.1 && scissorLimitLoOn == false && extensionPastScissorLimit == false) {
-                scissorDrivePower = -gamepad1.left_trigger * scissorDownOverride;
+            if (scissorLimitHiOn == false) {
+                scissorDrivePower = 1.0;
+            } else if (scissorLimitLoOn == false){
+                scissorDrivePower = -0.75;
             }
 
             // Gamepad 2 triggers
             if (gamepad2.right_trigger > 0.1 && scissorLimitHiOn == false) {
                 scissorDrivePower = gamepad2.right_trigger * scissorUpOverride;
-            } else if (gamepad2.left_trigger > 0.1 && scissorLimitLoOn == false && extensionPastScissorLimit == false) {
+            } else if (gamepad2.left_trigger > 0.1 && scissorLimitLoOn == false) {
                 scissorDrivePower = -gamepad2.left_trigger * scissorDownOverride;
             }
 
             // *******************************************************************************************
-            // SECTION 4: Extend and Retract Claw
+            // SECTION 4: Open and Close Claw
             // *******************************************************************************************
-
-            // TODO: adjust extension encoder count limits
-            boolean extensionPastLimitMax = (extensionEncoderCounts >= 7800);
-            boolean extensionPastLimitSlow = (extensionEncoderCounts <= 700);
-            boolean extensionPastLimitMin = (extensionEncoderCounts <= -5800);
-
-            // TODO: adjust max speeds between 0.0 and 1.0
-            double extensionFwdPowerMax = 1.0;
-            double extensionBwdPowerMax = 1.0;
-            double extensionDrivePower = 0;
-
-            if (extensionPastLimitSlow) {
-                extensionBwdPowerMax = 0.75;
+            if (gamepad1.a||gamepad2.a == true) {
+                clawServo.setPosition(0.30);
+            } else if (gamepad1.y||gamepad2.a == true) {
+                clawServo.setPosition(0.05);
             }
-
-            // Gamepad 1
-            if (gamepad1.right_bumper && extensionPastLimitMax == false) {
-                extensionDrivePower = extensionFwdPowerMax;
-            } else if (gamepad1.left_bumper && extensionPastLimitMin == false) {
-                extensionDrivePower = -extensionBwdPowerMax;
-            }
-
-            // Gamepad 2
-            if (gamepad2.right_bumper && extensionPastLimitMax == false) {
-                extensionDrivePower = extensionFwdPowerMax;
-            } else if (gamepad2.left_bumper && extensionPastLimitMin == false) {
-                extensionDrivePower = -extensionBwdPowerMax;
-            }
-
             // *******************************************************************************************
-            // SECTION 5: Open and Close Claw
+            // SECTION 5: Color Sensor
             // *******************************************************************************************
-            if (gamepad1.y || gamepad2.y || gamepad1.b || gamepad2.b) {
-                // Keep stepping up until we hit the max value.
-                clawServoPosition += 0.05;
-                if (clawServoPosition >= CLAW_MAX_POS) {
-                    clawServoPosition = CLAW_MAX_POS;
+            int blue = colorSensor.blue();
+            int red = colorSensor.red();
+            int green = colorSensor.green();
+
+            double color = 0;
+
+            if (blue > red && blue > green && blue > 25) {
+                color = 1;
+            }
+            if (red > green && red > blue && red > 40) {
+                color = 2;
+            }
+            if (red > 60 && green > 50 && blue < 40) {
+                color = 4;
+            }
+            // *******************************************************************************************
+            // SECTION 6: Elbow and Shoulder Motors
+            // *******************************************************************************************
+            double elbowPosition = 0.02;
+            int shoulderPosition = shoulderDrive.getCurrentPosition();
+            if (shoulderPosition > 0) {
+                shoulderDrive.setPower(gamepad1.right_trigger * 0.50);
+            }
+            if (shoulderPosition > 720) {
+                shoulderDrive.setPower(gamepad1.right_trigger * -0.50);
+            }
+            //Switch elbow servo to ELbow Motor
+            // elbow servo section
+            elbowTriggerUp.update(gamepad1.right_trigger);
+            elbowTriggerDown.update(gamepad1.left_trigger);
+            if (elbowTriggerUp.wasTriggered()) {
+                elbowPosition = elbowPosition + 0.025;
+                if (elbowPosition > 1) {
+                    elbowPosition = 1.0;
                 }
-            } else if (gamepad1.a || gamepad2.a || gamepad1.x || gamepad2.x) {
-                // Keep stepping down until we hit the min value.
-                clawServoPosition -= 0.05;
-                if (clawServoPosition <= CLAW_MIN_POS) {
-                    clawServoPosition = CLAW_MIN_POS;
+            }
+            if (elbowTriggerDown.wasTriggered()) {
+                elbowPosition = elbowPosition - 0.025;
+                if (elbowPosition < 0) {
+                    elbowPosition = 0;
                 }
             }
-
+            elbowServo.setPosition(elbowPosition);
             // *******************************************************************************************
-            // SECTION 6: Write Outputs
+            // SECTION 7: Write Outputs
             // *******************************************************************************************
 
             // Send calculated power to wheels
@@ -282,7 +296,7 @@ public class TeleOpModeC extends LinearOpMode {
 
             // Power to scissor lift, extension
             scissorDrive.setPower(scissorDrivePower);
-            extensionDrive.setPower(extensionDrivePower);
+
             clawServo.setPosition(clawServoPosition);
 
             // *******************************************************************************************
@@ -296,7 +310,6 @@ public class TeleOpModeC extends LinearOpMode {
             telemetry.addLine(String.format("[%s]----[%s]", MotorPower(leftFrontPower), MotorPower(rightFrontPower)));
             telemetry.addLine(String.format("[%s]----[%s]", MotorPower(leftBackPower), MotorPower(rightBackPower)));
             telemetry.addLine(String.format("Scissor Lift: [%s] [%8.0f] [%s]", MotorPower(scissorDrivePower), scissorEncoderCounts, scissorLimitLoOn));
-            telemetry.addLine(String.format("Claw Extension: [%s] [%8.0f]", MotorPower(extensionDrivePower), extensionEncoderCounts));
             telemetry.addLine(String.format("Claw Servo Position: [%4.2f]", clawServoPosition));
 
             // Update telemetry

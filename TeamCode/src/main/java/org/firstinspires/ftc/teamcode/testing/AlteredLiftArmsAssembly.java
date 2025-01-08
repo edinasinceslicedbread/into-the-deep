@@ -81,8 +81,12 @@ public class AlteredLiftArmsAssembly extends LinearOpMode {
 
             // put logic here
             int shoulderPosition = shoulderDrive.getCurrentPosition();
-            shoulderDrive.setPower(gamepad1.right_trigger * 0.50);
-            shoulderDrive.setPower(gamepad1.right_trigger * -0.50);
+            if (shoulderPosition > 0) {
+                shoulderDrive.setPower(gamepad1.right_trigger * 0.50);
+            }
+            if (shoulderPosition > 720) {
+                shoulderDrive.setPower(gamepad1.right_trigger * -0.50);
+            }
 
             // elbow servo section
             elbowTriggerUp.update(gamepad1.right_trigger);
