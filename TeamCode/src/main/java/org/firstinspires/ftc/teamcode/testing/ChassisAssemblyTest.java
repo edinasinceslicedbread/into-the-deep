@@ -21,7 +21,7 @@ public class ChassisAssemblyTest extends LinearOpMode {
 
     // scissor lift drive and limit sensor
     private DcMotor scissorDrive = null;
-    private TouchSensor scissorLimitLo = null;
+    private TouchSensor scissorLimitLoSensor = null;
 
 
     @Override
@@ -43,6 +43,9 @@ public class ChassisAssemblyTest extends LinearOpMode {
         scissorDrive = hardwareMap.get(DcMotor.class, "scissorDrive");
         scissorDrive.setDirection(DcMotor.Direction.FORWARD);
 
+        // limit touch sensor switch
+        scissorLimitLoSensor = hardwareMap.get(TouchSensor.class, "scissorLimitLo");
+
         // wait for start
         telemetry.addData("Status", "Initialized");
         telemetry.update();
@@ -52,11 +55,14 @@ public class ChassisAssemblyTest extends LinearOpMode {
         while (opModeIsActive()) {
 
             // read current positions
-            double leftFrontCounts = leftFrontDrive.getCurrentPosition();
-            double leftBackCounts = leftBackDrive.getCurrentPosition();
-            double rightFrontCounts = rightFrontDrive.getCurrentPosition();
-            double rightBackCounts = rightBackDrive.getCurrentPosition();
-            double scissorCounts = scissorDrive.getCurrentPosition();
+            int leftFrontCounts = leftFrontDrive.getCurrentPosition();
+            int leftBackCounts = leftBackDrive.getCurrentPosition();
+            int rightFrontCounts = rightFrontDrive.getCurrentPosition();
+            int rightBackCounts = rightBackDrive.getCurrentPosition();
+
+            // scissor encoder and limit switch
+            int scissorCounts = scissorDrive.getCurrentPosition();
+            boolean scissorLimitLo = scissorLimitLoSensor.isPressed();
 
             // move each wheel by pressing buttons
             double leftFrontPower = gamepad1.x ? 0.25 : 0.0;    // X gamepad
@@ -83,7 +89,7 @@ public class ChassisAssemblyTest extends LinearOpMode {
             // update telemetry data
             telemetry.addLine(String.format("[%d]----[%d]", leftFrontCounts, rightFrontCounts));
             telemetry.addLine(String.format("[%d]----[%d]", leftBackCounts, rightBackCounts));
-            telemetry.addLine(String.format("Scissor [%d]", scissorCounts));
+            telemetry.addLine(String.format("Scissor [%d] [%s]", scissorCounts, scissorLimitLo));
             telemetry.update();
 
             idle();
