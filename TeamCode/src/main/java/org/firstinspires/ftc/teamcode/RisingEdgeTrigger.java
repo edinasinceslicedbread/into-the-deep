@@ -4,7 +4,7 @@ public class RisingEdgeTrigger {
     private boolean previousInput = false;
     private boolean output = false;
     // Method to update the trigger state
-    public void update(float currentInput) {
+    public void update(boolean currentInput) {
         if (currentInput && !previousInput) {
             // Input has just gone true
             output = true;
