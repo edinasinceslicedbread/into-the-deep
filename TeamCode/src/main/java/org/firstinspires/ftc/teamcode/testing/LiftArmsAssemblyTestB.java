@@ -75,30 +75,30 @@ public class LiftArmsAssemblyTestB extends LinearOpMode {
             shoulderTriggerDown.update(gamepad1.b);
             if (shoulderTriggerUp.wasTriggered())
             {
-                shoulderTarget += 50;
+                shoulderTarget += 5;
             }
             if (shoulderTriggerDown.wasTriggered())
             {
-                shoulderTarget -= 50;
+                shoulderTarget -= 5;
             }
 
             shoulderDrive.setTargetPosition(shoulderTarget);
-            shoulderDrive.setPower(0.75);
+            shoulderDrive.setPower(0.60);
             // shoulderDrive.setPower(gamepad1.right_stick_x * 0.75);
 
             elbowTriggerUp.update(gamepad1.y);
             elbowTriggerDown.update(gamepad1.a);
             if (elbowTriggerUp.wasTriggered())
             {
-                elbowTarget += 3;
+                elbowTarget += 1;
             }
             if (elbowTriggerDown.wasTriggered())
             {
-                elbowTarget -= 3;
+                elbowTarget -= 1;
             }
 
             elbowDrive.setTargetPosition(elbowTarget);
-            elbowDrive.setPower(1.0);
+            elbowDrive.setPower(0.75);
             // elbowDrive.setPower(gamepad1.left_stick_x * 0.75);
 
             // ****************************************************************************

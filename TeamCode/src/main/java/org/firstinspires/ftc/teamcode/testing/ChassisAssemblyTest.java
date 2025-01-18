@@ -78,13 +78,32 @@ public class ChassisAssemblyTest extends LinearOpMode {
 
             // move scissor by pressing buttons
             double scissorPower = 0;
-            if (gamepad1.right_trigger > 0.05){
+            if (gamepad1.right_trigger > 0.05) {
                 scissorPower = gamepad1.right_trigger;
+                if (scissorCounts >= 2000) {
+                    scissorPower = 0;
+                }
             }
-            if (gamepad1.left_trigger > 0.05){
+            if (gamepad1.left_trigger > 0.05) {
                 scissorPower = -gamepad1.left_trigger;
+                if (scissorCounts <= 0) {
+                    scissorPower = 0;
+                }
             }
+            if (scissorLimitLo) {
+                scissorPower = -0.1;
+            }
+
+            // enforce limits
+            if (scissorPower < -0.1) {
+                scissorPower = -0.1;
+            }
+            if (scissorPower > 0.5) {
+                scissorPower = 0.5;
+            }
+
             scissorDrive.setPower(scissorPower);
+
 
             // update telemetry data
             telemetry.addLine(String.format("[%d]----[%d]", leftFrontCounts, rightFrontCounts));
