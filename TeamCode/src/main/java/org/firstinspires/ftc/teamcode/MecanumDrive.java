@@ -141,7 +141,6 @@ public final class MecanumDrive {
             rightBack.setDirection(DcMotorSimple.Direction.REVERSE);
 
             this.pose = pose;
-
         }
 
         @Override
@@ -459,6 +458,7 @@ public final class MecanumDrive {
         }
 
         estimatedPoseWriter.write(new PoseMessage(localizer.getPose()));
+
 
         return vel;
     }
