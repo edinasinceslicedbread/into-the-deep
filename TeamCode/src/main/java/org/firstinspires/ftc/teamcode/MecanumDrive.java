@@ -57,26 +57,6 @@ public final class MecanumDrive {
         // TODO: fill in these values based on
         //   see https://ftc-docs.firstinspires.org/en/latest/programming_resources/imu/imu.html?highlight=imu#physical-hub-mounting
         public RevHubOrientationOnRobot.LogoFacingDirection logoFacingDirection =
-<<<<<<< Updated upstream
-                RevHubOrientationOnRobot.LogoFacingDirection.UP;
-        public RevHubOrientationOnRobot.UsbFacingDirection usbFacingDirection =
-                RevHubOrientationOnRobot.UsbFacingDirection.FORWARD;
-
-        // drive model parameters
-        public double inPerTick = 1;
-        public double lateralInPerTick = inPerTick;
-        public double trackWidthTicks = 0;
-
-        // feedforward parameters (in tick units)
-        public double kS = 0;
-        public double kV = 0;
-        public double kA = 0;
-
-        // path profile parameters (in inches)
-        public double maxWheelVel = 50;
-        public double minProfileAccel = -30;
-        public double maxProfileAccel = 50;
-=======
                 RevHubOrientationOnRobot.LogoFacingDirection.BACKWARD;
         public RevHubOrientationOnRobot.UsbFacingDirection usbFacingDirection =
                 RevHubOrientationOnRobot.UsbFacingDirection.UP;
@@ -95,7 +75,6 @@ public final class MecanumDrive {
         public double maxWheelVel = 40;
         public double minProfileAccel = -30;
         public double maxProfileAccel = 30;
->>>>>>> Stashed changes
 
         // turn profile parameters (in radians)
         public double maxAngVel = Math.PI; // shared with path
@@ -158,14 +137,11 @@ public final class MecanumDrive {
             imu = lazyImu.get();
 
             // TODO: reverse encoders if needed
-<<<<<<< Updated upstream
-            //   leftFront.setDirection(DcMotorSimple.Direction.REVERSE);
-=======
             rightFront.setDirection(DcMotorSimple.Direction.REVERSE);
             rightBack.setDirection(DcMotorSimple.Direction.REVERSE);
->>>>>>> Stashed changes
 
             this.pose = pose;
+
         }
 
         @Override
@@ -250,17 +226,10 @@ public final class MecanumDrive {
 
         // TODO: make sure your config has motors with these names (or change them)
         //   see https://ftc-docs.firstinspires.org/en/latest/hardware_and_software_configuration/configuring/index.html
-<<<<<<< Updated upstream
-        leftFront = hardwareMap.get(DcMotorEx.class, "leftFront");
-        leftBack = hardwareMap.get(DcMotorEx.class, "leftBack");
-        rightBack = hardwareMap.get(DcMotorEx.class, "rightBack");
-        rightFront = hardwareMap.get(DcMotorEx.class, "rightFront");
-=======
         leftFront = hardwareMap.get(DcMotorEx.class, "leftFrontDrive");
         leftBack = hardwareMap.get(DcMotorEx.class, "leftBackDrive");
         rightBack = hardwareMap.get(DcMotorEx.class, "rightBackDrive");
         rightFront = hardwareMap.get(DcMotorEx.class, "rightFrontDrive");
->>>>>>> Stashed changes
 
         leftFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         leftBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -268,12 +237,8 @@ public final class MecanumDrive {
         rightFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         // TODO: reverse motor directions if needed
-<<<<<<< Updated upstream
-        //   leftFront.setDirection(DcMotorSimple.Direction.REVERSE);
-=======
         rightFront.setDirection(DcMotorSimple.Direction.REVERSE);
         rightBack.setDirection(DcMotorSimple.Direction.REVERSE);
->>>>>>> Stashed changes
 
         // TODO: make sure your config has an IMU with this name (can be BNO or BHI)
         //   see https://ftc-docs.firstinspires.org/en/latest/hardware_and_software_configuration/configuring/index.html
@@ -488,23 +453,13 @@ public final class MecanumDrive {
     public PoseVelocity2d updatePoseEstimate() {
         PoseVelocity2d vel = localizer.update();
         poseHistory.add(localizer.getPose());
-<<<<<<< Updated upstream
-        
-=======
 
->>>>>>> Stashed changes
         while (poseHistory.size() > 100) {
             poseHistory.removeFirst();
         }
 
         estimatedPoseWriter.write(new PoseMessage(localizer.getPose()));
-<<<<<<< Updated upstream
-        
-        
-=======
 
-
->>>>>>> Stashed changes
         return vel;
     }
 
