@@ -11,8 +11,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.teamcode.RisingEdgeTrigger;
 
 
-@TeleOp(name = "LiftArms Tuning Shoulder", group = "Tuning")
-public class LiftArmsTuningShoulder extends LinearOpMode {
+@TeleOp(name = "LiftArms Tuning", group = "Tuning")
+public class LiftArmsTuning extends LinearOpMode {
 
     int jogDistance = 100;
     int jogIncrement = 10;
@@ -31,13 +31,14 @@ public class LiftArmsTuningShoulder extends LinearOpMode {
     private RisingEdgeTrigger coefficientTrigD = new RisingEdgeTrigger();
     private RisingEdgeTrigger coefficientTrigF = new RisingEdgeTrigger();
 
+    // @Config
     @Override
     public void runOpMode() {
 
         // Initialize the hardware variables. Note that the strings used here must correspond
         // to the names assigned during the robot configuration step on the DS or RC devices.
 
-        shoulderDrive = hardwareMap.get(DcMotorEx.class, "shoulderDrive");
+        shoulderDrive = hardwareMap.get(DcMotorEx.class, "elbowDrive");
         shoulderDrive.setDirection(DcMotorEx.Direction.FORWARD);
 
         // set initial PIDF coefficients
