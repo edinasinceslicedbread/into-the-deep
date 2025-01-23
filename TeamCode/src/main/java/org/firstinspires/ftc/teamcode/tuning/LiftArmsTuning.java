@@ -6,20 +6,17 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
-import org.firstinspires.ftc.teamcode.MecanumDrive;
-import org.firstinspires.ftc.teamcode.RisingEdgeTrigger;
 
 
-@TeleOp(name = "Tuning / Robot Arm", group = "002")
+@TeleOp(name = "Tuning / Robot Arm", group = "002 Tuning")
 @Config
 public class LiftArmsTuning extends LinearOpMode {
 
     public static class ShoulderParams {
-        public double degreesPerTick = 1440.0 / 360.0;
+        public double ticksPerDegree = 1440.0 / 360.0;
 
         // control parameters
         public double kP = 0.0;
@@ -32,7 +29,7 @@ public class LiftArmsTuning extends LinearOpMode {
     }
 
     public static class ElbowParams {
-        public double degreesPerTick = 288.0 / 360.0;
+        public double ticksPerDegree = 288.0 / 360.0;
 
         // control parameters
         public double kP = 0.0;
@@ -94,13 +91,15 @@ public class LiftArmsTuning extends LinearOpMode {
             double shoulderTicksTarget = 0.0;
             double shoulderPID = shoulderController.calculate(elbowTicksActual, shoulderTicksTarget);
 
+            double shoulderFeedForward = Math.cos(Math.toRadians(shoulderTicksActual / SHOULDER_PARAMS.ticksPerDegree));
+            double shoulderPower = shoulderPID + shoulderFeedForward;
+
             // elbow control
             elbowController.setPID(ELBOW_PARAMS.kP, ELBOW_PARAMS.kI, ELBOW_PARAMS.kD);
             double elbowTicksTarget = shoulderTicksTarget * 0.1;
             double elbowPID = elbowController.calculate(elbowTicksActual, elbowTicksTarget);
-
-            double shoulderPower = 0.0;
-            double elbowPower = 0.0;
+            double elbowFeedForward = 0.0;
+            double elbowPower = elbowPID+ elbowFeedForward;
 
             // write outputs
             shoulderDrive.setPower(shoulderPower);
@@ -113,9 +112,11 @@ public class LiftArmsTuning extends LinearOpMode {
             telemetry.addData("Run Time", runtime.toString());
             telemetry.addLine("SHOULDER");
             telemetry.addLine(String.format("Target / Actual: [%d] / [%d]", shoulderTicksTarget, shoulderTicksActual));
+            telemetry.addLine(String.format("Power (Amps): %s", shoulderPower));
             telemetry.addLine(String.format("Current (Amps): %d", shoulderAmps));
             telemetry.addLine("ELBOW");
             telemetry.addLine(String.format("Target / Actual: [%d] / [%d]", elbowTicksTarget, elbowTicksActual));
+            telemetry.addLine(String.format("Power (Amps): %s", elbowPower));
             telemetry.addLine(String.format("Current (Amps): %d", elbowAmps));
             telemetry.update();
 
