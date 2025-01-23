@@ -8,7 +8,7 @@ import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 
-@TeleOp(name = "TeleOp B (Claw)", group = "000")
+@TeleOp(name = "TeleOp B (Claw)", group = "001 Robot Competition")
 public class TeleOpModeB extends LinearOpMode {
 
     // scissor lift constants
