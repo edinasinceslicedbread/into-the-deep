@@ -88,7 +88,7 @@ public class LiftArmsTuning extends LinearOpMode {
 
             // shoulder control
             shoulderController.setPID(SHOULDER_PARAMS.kP, SHOULDER_PARAMS.kI, SHOULDER_PARAMS.kD);
-            double shoulderTicksTarget = 0.0;
+            int shoulderTicksTarget = 0;
             double shoulderPID = shoulderController.calculate(elbowTicksActual, shoulderTicksTarget);
 
             double shoulderFeedForward = Math.cos(Math.toRadians(shoulderTicksActual / SHOULDER_PARAMS.ticksPerDegree));
@@ -96,7 +96,7 @@ public class LiftArmsTuning extends LinearOpMode {
 
             // elbow control
             elbowController.setPID(ELBOW_PARAMS.kP, ELBOW_PARAMS.kI, ELBOW_PARAMS.kD);
-            double elbowTicksTarget = shoulderTicksTarget * 0.1;
+            int elbowTicksTarget = 0; // shoulderTicksTarget * 0.1;
             double elbowPID = elbowController.calculate(elbowTicksActual, elbowTicksTarget);
             double elbowFeedForward = 0.0;
             double elbowPower = elbowPID+ elbowFeedForward;
@@ -112,12 +112,12 @@ public class LiftArmsTuning extends LinearOpMode {
             telemetry.addData("Run Time", runtime.toString());
             telemetry.addLine("SHOULDER");
             telemetry.addLine(String.format("Target / Actual: [%d] / [%d]", shoulderTicksTarget, shoulderTicksActual));
-            telemetry.addLine(String.format("Power (Amps): %s", shoulderPower));
-            telemetry.addLine(String.format("Current (Amps): %d", shoulderAmps));
+            telemetry.addLine(String.format("Power (Amps): %4.2f", shoulderPower));
+            telemetry.addLine(String.format("Current (Amps): %4.2f", shoulderAmps));
             telemetry.addLine("ELBOW");
             telemetry.addLine(String.format("Target / Actual: [%d] / [%d]", elbowTicksTarget, elbowTicksActual));
-            telemetry.addLine(String.format("Power (Amps): %s", elbowPower));
-            telemetry.addLine(String.format("Current (Amps): %d", elbowAmps));
+            telemetry.addLine(String.format("Power (Amps): %4.2f", elbowPower));
+            telemetry.addLine(String.format("Current (Amps): %4.2f", elbowAmps));
             telemetry.update();
 
         }
