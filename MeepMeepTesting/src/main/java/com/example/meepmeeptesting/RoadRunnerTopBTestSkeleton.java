@@ -21,22 +21,46 @@ public class RoadRunnerTopBTestSkeleton {
                 .lineToX(56)
                 .lineToX(38)
                 .turn(Math.toRadians(90))
-                .lineToY(10)
+                .lineToY(38)
 
-                .strafeTo(new Vector2d(47, 10))
-                .strafeTo(new Vector2d(47, 57))
-                .strafeTo(new Vector2d(47, 10))
-
-                .strafeTo(new Vector2d(55, 10))
-                .strafeTo(new Vector2d(55, 57))
-                .strafeTo(new Vector2d(55, 10))
-
-                .strafeTo(new Vector2d(61, 10))
-                .strafeTo(new Vector2d(62, 57))
-                .strafeTo(new Vector2d(62, 38))
-
+                .strafeTo(new Vector2d(48, 38))
+                .strafeTo(new Vector2d(48, 33))
+                //grab block
+                .turn(Math.toRadians(134))
+                .waitSeconds(2)
+                //Lift???
+                .strafeTo(new Vector2d(53, 53))
+                .strafeTo(new Vector2d(56, 56))
+                //drop 1st block
+                .waitSeconds(2)
+                .turn(Math.toRadians(-134))
+                .strafeTo(new Vector2d(58, 38))
+                .strafeTo(new Vector2d(58, 33))
+                //grab block #2
+                .turn(Math.toRadians(134))
+                .waitSeconds(2)
+                //Lift???
+                .strafeTo(new Vector2d(53, 53))
+                .strafeTo(new Vector2d(56, 56))
+                                .waitSeconds(2)
+                //exit and park
+                .turn(Math.toRadians(-134))
+                .strafeTo(new Vector2d(56, 38))
                 .strafeTo(new Vector2d(-60, 38))
                 .strafeTo(new Vector2d(-60, 58))
+                                .waitSeconds(3)
+                //TODO Ask team - Try for side block? Push in or shimmy out? Park or prepare to grab from middle? Any problems like hitting block re-work.
+
+               // .strafeTo(new Vector2d(55, 10))
+                //                .strafeTo(new Vector2d(55, 57))
+                //                .strafeTo(new Vector2d(55, 10))
+                //
+                //                .strafeTo(new Vector2d(61, 10))
+                //                .strafeTo(new Vector2d(62, 57))
+                //                .strafeTo(new Vector2d(62, 38))
+                //
+                //                .strafeTo(new Vector2d(-60, 38))
+                //                .strafeTo(new Vector2d(-60, 58))
 
 
                 .build());
