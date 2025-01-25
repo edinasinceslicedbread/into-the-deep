@@ -13,10 +13,8 @@ import org.firstinspires.ftc.teamcode.RisingEdgeTrigger;
 @TeleOp(name = "LiftArmsAsseblyTest", group = "Testing")
 public class LiftArmsAssemblyTest extends LinearOpMode {
 
-
     // Declare OpMode members for each of the 4 motors.
     private ElapsedTime runtime = new ElapsedTime();
-
 
     // scissor lift drive, shoulder, elbow and claw
     private Servo elbowServo = null;
