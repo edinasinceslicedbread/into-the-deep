@@ -1,24 +1,22 @@
-
-
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.ColorRangeSensor;
-import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.RisingEdgeTrigger;
 
 
-@TeleOp(name = "LiftArmsAsseblyTest", group = "Testing")
+@TeleOp(name = "Test / LiftArmsAssemblyTest", group = "Testing")
 public class LiftArmsAssemblyTest extends LinearOpMode {
 
     // Declare OpMode members for each of the 4 motors.
     private ElapsedTime runtime = new ElapsedTime();
 
     // scissor lift drive, shoulder, elbow and claw
-    private Servo elbowServo = null;
-    private DcMotor shoulderDrive = null;
+    private DcMotorEx shoulderDrive = null;
+    private DcMotorEx elbowDrive = null;
     private Servo clawServo = null;
     private ColorRangeSensor colorSensor;
 
@@ -31,19 +29,16 @@ public class LiftArmsAssemblyTest extends LinearOpMode {
     @Override
     public void runOpMode() {
 
-        // Initialize the hardware variables. Note that the strings used here must correspond
-        // to the names assigned during the robot configuration step on the DS or RC devices.
-
-        // scissor drive, claw server, and extend / retract
-        shoulderDrive = hardwareMap.get(DcMotor.class, "shoulderDrive");
-        elbowServo = hardwareMap.get(Servo.class, "elbowServo");
+        // get hardware map
+        shoulderDrive = hardwareMap.get(DcMotorEx.class, "shoulderDrive");
+        elbowDrive = hardwareMap.get(DcMotorEx.class, "elbowDrive");
         clawServo = hardwareMap.get(Servo.class, "clawServo");
         colorSensor = hardwareMap.get(ColorRangeSensor.class, "clawColorSensor");
 
-        // assign scissor, extension, and claw directions
-        shoulderDrive.setDirection(DcMotor.Direction.FORWARD);
-        clawServo.setDirection(Servo.Direction.FORWARD);
-
+        // assign directions
+        shoulderDrive.setDirection(DcMotorEx.Direction.REVERSE);
+        elbowDrive.setDirection(DcMotorEx.Direction.REVERSE);
+        
         // update some telemetry
         telemetry.addData("Status", "Initialized");
         telemetry.update();
@@ -52,11 +47,30 @@ public class LiftArmsAssemblyTest extends LinearOpMode {
         waitForStart();
         runtime.reset();
 
-        double elbowPosition = 0.02;
-
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
 
+            // **********************************************************
+            // arm control
+            // **********************************************************
+
+            // get encoder positions
+            int shoulderPosition = shoulderDrive.getCurrentPosition();
+            int elbowPosition = elbowDrive.getCurrentPosition();
+
+            if (gamepad1.left_trigger > 0.05)
+            {
+                shoulderDrive.setPower(-gamepad1.left_trigger * 0.50);
+            }
+            if (gamepad1.right_trigger > 0.05)
+            {
+                shoulderDrive.setPower(gamepad1.right_trigger * 0.50);
+            }
+            
+            
+            // **********************************************************
+            // color sensor
+            // **********************************************************
             int blue = colorSensor.blue();
             int red = colorSensor.red();
             int green = colorSensor.green();
@@ -79,31 +93,14 @@ public class LiftArmsAssemblyTest extends LinearOpMode {
                 clawServo.setPosition(0.05);
             }
 
-            // put logic here
-            int shoulderPosition = shoulderDrive.getCurrentPosition();
-            shoulderDrive.setPower(gamepad1.left_stick_x * 0.50);
 
-            // elbow servo section
-            elbowTriggerUp.update(gamepad1.x);
-            elbowTriggerDown.update(gamepad1.b);
-            if (elbowTriggerUp.wasTriggered()) {
-                elbowPosition = elbowPosition + 0.025;
-                if (elbowPosition > 1) {
-                    elbowPosition = 1.0;
-                }
-            }
-            if (elbowTriggerDown.wasTriggered()) {
-                elbowPosition = elbowPosition - 0.025;
-                if (elbowPosition < 0) {
-                    elbowPosition = 0;
-                }
-            }
-            elbowServo.setPosition(elbowPosition);
 
+            // **********************************************************
             // update telemetry data
+            // **********************************************************
             telemetry.addData("Run Time", runtime.toString());
-            telemetry.addData("Shoulder", shoulderPosition);
-            telemetry.addData("Elbow", elbowPosition);
+            telemetry.addData("Shoulder Encoder", shoulderPosition);
+            telemetry.addData("Elbow Encoder", elbowPosition);
             telemetry.addLine(String.format("red=%d, green=%d, blue=%d", red, green, blue));
             telemetry.addData("Color", color);
             if (color == 1) {
