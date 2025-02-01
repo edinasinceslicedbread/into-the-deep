@@ -8,7 +8,7 @@ import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 
-@TeleOp(name = "Robot: Into the Deep B", group = "Robot")
+@TeleOp(name = "TeleOp B (Claw)", group = "001 Robot Competition")
 public class TeleOpModeB extends LinearOpMode {
 
     // scissor lift constants
@@ -100,7 +100,6 @@ public class TeleOpModeB extends LinearOpMode {
             } else if (gamepad1.start || gamepad2.start) {
                 driveDirectionFactor = 1.0;
             }
-
 
             // *******************************************************************************************
             // SECTION 2: Main Joystick Robot Driving

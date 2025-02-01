@@ -9,7 +9,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.RisingEdgeTrigger;
 
 
-@Autonomous(name = "Auto Mode B", group = "Auto")
+@Autonomous(name = "Auto B (BETA)", group = "001 Robot Competition")
 public class AutoOpModeB extends LinearOpMode {
 
     // scissor lift constants

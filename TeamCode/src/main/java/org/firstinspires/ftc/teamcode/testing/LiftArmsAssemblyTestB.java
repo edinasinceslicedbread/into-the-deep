@@ -12,7 +12,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.RisingEdgeTrigger;
 
 
-@TeleOp(name = "LiftArmsAsseblyTest B", group = "Testing")
+@TeleOp(name = "Test / LiftArms Assembly B", group = "Testing")
 public class LiftArmsAssemblyTestB extends LinearOpMode {
 
 

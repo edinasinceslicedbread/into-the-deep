@@ -18,51 +18,67 @@ public class RoadRunnerTopBTestSkeleton {
         //Starting Position
         myBot.runAction(myBot.getDrive().actionBuilder(new Pose2d(0, 60, Math.toRadians(180)))
                //Edit Path
-                .lineToX(56)
+                //20 Point autonomous
+                        .waitSeconds(3)
+                .lineToX(55)
                 .lineToX(38)
                 .turn(Math.toRadians(90))
                 .lineToY(38)
 
                 .strafeTo(new Vector2d(48, 38))
                 .strafeTo(new Vector2d(48, 33))
-                //grab block
+                .waitSeconds(1.5)
+                .strafeTo(new Vector2d(48, 38))
+                //grab block #1
                 .turn(Math.toRadians(134))
                 .waitSeconds(2)
                 //Lift???
                 .strafeTo(new Vector2d(53, 53))
                 .strafeTo(new Vector2d(56, 56))
+                .waitSeconds(2)
+                //drop 1st block
+                .strafeTo(new Vector2d(53, 53))
+                .waitSeconds(2)
                 //drop 1st block
                 .waitSeconds(2)
                 .turn(Math.toRadians(-134))
                 .strafeTo(new Vector2d(58, 38))
                 .strafeTo(new Vector2d(58, 33))
+                .waitSeconds(1.5)
+                .strafeTo(new Vector2d(58, 38))
                 //grab block #2
                 .turn(Math.toRadians(134))
                 .waitSeconds(2)
                 //Lift???
                 .strafeTo(new Vector2d(53, 53))
                 .strafeTo(new Vector2d(56, 56))
-                                .waitSeconds(2)
-                //exit and park
-                .turn(Math.toRadians(-134))
-                .strafeTo(new Vector2d(56, 38))
-                .strafeTo(new Vector2d(-60, 38))
-                .strafeTo(new Vector2d(-60, 58))
-                                .waitSeconds(3)
-                //TODO Ask team - Try for side block? Push in or shimmy out? Park or prepare to grab from middle? Any problems like hitting block re-work.
+                .waitSeconds(2)
+                .strafeTo(new Vector2d(53, 53))
+                .waitSeconds(2)
+                //Drop 2nd block
+                .strafeTo(new Vector2d(50, 50))
+                .turn(Math.toRadians(46))
+                .strafeTo(new Vector2d(50, 10))
+                .strafeTo(new Vector2d(61, 10))
+                .strafeTo(new Vector2d(61, 50))
 
-               // .strafeTo(new Vector2d(55, 10))
-                //                .strafeTo(new Vector2d(55, 57))
-                //                .strafeTo(new Vector2d(55, 10))
-                //
-                //                .strafeTo(new Vector2d(61, 10))
-                //                .strafeTo(new Vector2d(62, 57))
-                //                .strafeTo(new Vector2d(62, 38))
-                //
-                //                .strafeTo(new Vector2d(-60, 38))
-                //                .strafeTo(new Vector2d(-60, 58))
+                // Alternative preparation for park
+                //.strafeTo(new Vector2d(61, 38))
+                //.strafeTo(new Vector2d(-61, 38))
+                //.strafeTo(new Vector2d(-61, 58))
+               // .waitSeconds(3)
+                //TODO Pick which one ^ or v
+                //alternative preparation for pick from middle
+                //.strafeTo(new Vector2d(61, 10))
+                //.turn(Math.toRadians(90))
+                //.waitSeconds(3)
 
-
+                //TODO Ask team:
+                // .
+                // Push Block into the under basket zone.
+                // .
+                // Park or prepare to grab from middle?
+                // Any problems like hitting block re-work.
                 .build());
 
         meepMeep.setBackground(MeepMeep.Background.FIELD_INTO_THE_DEEP_OFFICIAL)

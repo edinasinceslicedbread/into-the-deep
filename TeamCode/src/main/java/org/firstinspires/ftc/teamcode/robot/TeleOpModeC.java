@@ -12,7 +12,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.RisingEdgeTrigger;
 
 
-@TeleOp(name = "Robot: Into the Deep C (USE)", group = "Robot")
+@TeleOp(name = "TeleOp C (BETA)", group = "001 Robot Competition")
 public class TeleOpModeC extends LinearOpMode {
 
     // scissor lift constants
@@ -103,14 +103,13 @@ public class TeleOpModeC extends LinearOpMode {
         while (opModeIsActive()) {
 
             // *******************************************************************************************
-            // SECTION 1: toggle homing mode to be able to set the zero position of scissor and extension
+            // SECTION 1: toggle backwards mode to use the pusher
             // *******************************************************************************************
             if (gamepad1.back || gamepad2.back) {
                 driveDirectionFactor = -1.0;
             } else if (gamepad1.start || gamepad2.start) {
                 driveDirectionFactor = 1.0;
             }
-
 
             // *******************************************************************************************
             // SECTION 2: Main Joystick Robot Driving
