@@ -10,7 +10,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.RisingEdgeTrigger;
 
 
-@TeleOp(name = "Chassis Assembly Test", group = "Testing")
+@TeleOp(name = "Test / Chassis Assembly", group = "Testing")
 public class ChassisAssemblyTest extends LinearOpMode {
 
     // main wheel drive motors
@@ -34,8 +34,6 @@ public class ChassisAssemblyTest extends LinearOpMode {
         rightBackDrive = hardwareMap.get(DcMotor.class, "rightBackDrive");
 
         // assign wheel motor directions
-        leftFrontDrive.setDirection(DcMotor.Direction.FORWARD);
-        leftBackDrive.setDirection(DcMotor.Direction.FORWARD);
         rightFrontDrive.setDirection(DcMotor.Direction.REVERSE);
         rightBackDrive.setDirection(DcMotor.Direction.REVERSE);
 
@@ -80,10 +78,11 @@ public class ChassisAssemblyTest extends LinearOpMode {
             double scissorPower = 0;
             if (gamepad1.right_trigger > 0.05) {
                 scissorPower = gamepad1.right_trigger;
-                if (scissorCounts >= 2000) {
+                if (scissorCounts >= 10000) {
                     scissorPower = 0;
                 }
             }
+
             if (gamepad1.left_trigger > 0.05) {
                 scissorPower = -gamepad1.left_trigger;
                 if (scissorCounts <= 0) {
@@ -103,7 +102,6 @@ public class ChassisAssemblyTest extends LinearOpMode {
             }
 
             scissorDrive.setPower(scissorPower);
-
 
             // update telemetry data
             telemetry.addLine(String.format("[%d]----[%d]", leftFrontCounts, rightFrontCounts));
