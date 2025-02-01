@@ -1,5 +1,5 @@
 package org.firstinspires.ftc.teamcode;
-
+//kV: 0.005029731538363367, kS: 1.0051342679677129???
 import androidx.annotation.NonNull;
 
 import com.acmerobotics.dashboard.canvas.Canvas;
@@ -64,7 +64,7 @@ public final class MecanumDrive {
         // drive model parameters
         public double inPerTick = 0.025;
         public double lateralInPerTick = 0.027;
-        public double trackWidthTicks = 1127.5068202517543;
+        public double trackWidthTicks = 1126.949056898203;
 
         // feedforward parameters (in tick units)
         public double kS = 1.0013563778305548;

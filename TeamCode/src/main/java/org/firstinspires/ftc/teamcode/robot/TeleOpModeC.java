@@ -275,11 +275,9 @@ public class TeleOpModeC extends LinearOpMode {
             elbowTriggerUp.update(gamepad1.right_trigger > 0.1);
             elbowTriggerDown.update(gamepad1.left_trigger > 0.1);
             if (elbowTriggerUp.wasTriggered()) {
-                if (elbowPosition < 144) {
                     elbowMotor.setPower(0.75);
                     if (elbowPosition > 1) {
                         elbowPosition = 1.0;
-                    }
                 }
             }
 
