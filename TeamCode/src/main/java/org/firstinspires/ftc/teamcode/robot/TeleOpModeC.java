@@ -260,19 +260,23 @@ public class TeleOpModeC extends LinearOpMode {
             // SECTION 6: Elbow and Shoulder Motors
             // *******************************************************************************************
             double elbowPosition = 0.02;
+
             int shoulderPosition = shoulderDrive.getCurrentPosition();
-            if (shoulderPosition > 0) {
-                shoulderDrive.setPower(gamepad1.right_trigger * 0.50);
+            if (gamepad1.right_trigger > 0.1 || gamepad2.right_trigger > 0.1) {
+                if (shoulderPosition > 0) {
+                    shoulderDrive.setPower(gamepad1.right_trigger * 0.50);
+                }
             }
+            if(gamepad1.left_trigger > 0.1 || gamepad2.left_trigger > 0.1){
             if (shoulderPosition > 720) {
                 shoulderDrive.setPower(gamepad1.right_trigger * -0.50);
+                }
             }
-
             //Switch elbow servo to ELbow Motor
             // elbow servo section
             elbowPosition = elbowMotor.getCurrentPosition();
-            elbowTriggerUp.update(gamepad1.right_trigger > 0.1);
-            elbowTriggerDown.update(gamepad1.left_trigger > 0.1);
+            elbowTriggerUp.update(gamepad1.right_bumper == true);
+            elbowTriggerDown.update(gamepad1.left_bumper == true);
             if (elbowTriggerUp.wasTriggered()) {
                     elbowMotor.setPower(0.75);
                     if (elbowPosition > 1) {
