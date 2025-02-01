@@ -8,7 +8,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.RisingEdgeTrigger;
 
 
-@TeleOp(name = "Test / LiftArmsAssemblyTest", group = "Testing")
+@TeleOp(name = "Test / LiftArms Assembly", group = "Testing")
 public class LiftArmsAssemblyTest extends LinearOpMode {
 
     // Declare OpMode members for each of the 4 motors.
@@ -58,15 +58,16 @@ public class LiftArmsAssemblyTest extends LinearOpMode {
             int shoulderPosition = shoulderDrive.getCurrentPosition();
             int elbowPosition = elbowDrive.getCurrentPosition();
 
+            shoulderDrive.setPower(0);
             if (gamepad1.left_trigger > 0.05)
             {
-                shoulderDrive.setPower(-gamepad1.left_trigger * 0.50);
+                shoulderDrive.setPower(-gamepad1.left_trigger);
             }
             if (gamepad1.right_trigger > 0.05)
             {
-                shoulderDrive.setPower(gamepad1.right_trigger * 0.50);
+                shoulderDrive.setPower(gamepad1.right_trigger);
             }
-            
+
             
             // **********************************************************
             // color sensor

@@ -10,7 +10,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.RisingEdgeTrigger;
 
 
-@TeleOp(name = "Chassis Assembly Test", group = "Testing")
+@TeleOp(name = "Test / Chassis Assembly", group = "Testing")
 public class ChassisAssemblyTest extends LinearOpMode {
 
     // main wheel drive motors
