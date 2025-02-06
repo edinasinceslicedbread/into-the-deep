@@ -31,18 +31,18 @@ public class ArmController {
         public int inPosTolerance = 10;         // encoder ticks
 
         // profile parameters (in encoder ticks)
-        public int maxVelocity = 400;           // ticks per second
-        public int maxAcceleration = 200;       // ticks per second squared
+        public int maxVelocity = 100;           // ticks per second
+        public int maxAcceleration = 50;       // ticks per second squared
         public int maxErrorTicks = 40;          // causes error
 
         // feed forward parameters
         public double ffw_kS = 0.0;             // static gain (not used)
-        public double ffw_kCos = 0.18;          // gravity gain, holding power from lift arm push test
+        public double ffw_kCos = 0.6;          // gravity gain, holding power from lift arm push test
         public double ffw_kV = 0.01;            // velocity gain
         public double ffw_kA = 0.01;            // acceleration gain
 
         // position control parameters
-        public double pos_kP = 0.008;           // proportional gain
+        public double pos_kP = 0.016;           // proportional gain
         public double pos_kI = 0.05;            // integral gain
         public double pos_kD = 0.0;             // derivative gain
 
@@ -315,11 +315,11 @@ public class ArmController {
             shoulderState.shoulderPower = 0.0;
             armControlState = 3;
         }
-        if (shoulderState.shoulderPower > 0.5) {
-            shoulderState.shoulderPower = 0.5;
+        if (shoulderState.shoulderPower > 0.9) {
+            shoulderState.shoulderPower = 0.9;
         }
-        if (shoulderState.shoulderPower < -0.5) {
-            shoulderState.shoulderPower = -0.5;
+        if (shoulderState.shoulderPower < -0.9) {
+            shoulderState.shoulderPower = -0.9;
         }
         shoulderDrive.setPower(shoulderState.shoulderPower);
 
