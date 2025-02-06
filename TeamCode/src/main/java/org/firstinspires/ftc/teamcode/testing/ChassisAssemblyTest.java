@@ -3,14 +3,10 @@ package org.firstinspires.ftc.teamcode.testing;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.TouchSensor;
-import com.qualcomm.robotcore.util.ElapsedTime;
-
-import org.firstinspires.ftc.teamcode.RisingEdgeTrigger;
 
 
-@TeleOp(name = "Test / Chassis Assembly", group = "Testing")
+@TeleOp(name = "TEST | Chassis Assembly", group = "$$$$")
 public class ChassisAssemblyTest extends LinearOpMode {
 
     // main wheel drive motors
@@ -89,6 +85,7 @@ public class ChassisAssemblyTest extends LinearOpMode {
                     scissorPower = 0;
                 }
             }
+
             if (scissorLimitLo) {
                 scissorPower = -0.1;
             }

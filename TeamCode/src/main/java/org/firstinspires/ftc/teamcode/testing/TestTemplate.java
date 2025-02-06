@@ -1,16 +1,16 @@
 package org.firstinspires.ftc.teamcode.testing;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import org.firstinspires.ftc.teamcode.ctrl.RisingEdgeTrigger;
 
-import org.firstinspires.ftc.teamcode.RisingEdgeTrigger;
-
-
-@Autonomous(name = "TestTemplate", group = "Testing")
+@Autonomous(name = "TEST | Test Template", group = "$$$$")
+@Disabled
 public class TestTemplate extends LinearOpMode {
 
     static final int CYCLE_MS = 50;             // period of each cycle

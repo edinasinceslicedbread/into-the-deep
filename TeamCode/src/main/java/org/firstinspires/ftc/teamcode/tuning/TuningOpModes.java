@@ -35,14 +35,14 @@ public final class TuningOpModes {
     // TODO: change this to TankDrive.class if you're using tank
     public static final Class<?> DRIVE_CLASS = MecanumDrive.class;
 
-    public static final String GROUP = "quickstart";
+    public static final String GROUP = "$$$$$$";
     public static final boolean DISABLED = false;
 
     private TuningOpModes() {}
 
     private static OpModeMeta metaForClass(Class<? extends OpMode> cls) {
         return new OpModeMeta.Builder()
-                .setName(cls.getSimpleName())
+                .setName("RR | " + cls.getSimpleName())
                 .setGroup(GROUP)
                 .setFlavor(OpModeMeta.Flavor.TELEOP)
                 .build();

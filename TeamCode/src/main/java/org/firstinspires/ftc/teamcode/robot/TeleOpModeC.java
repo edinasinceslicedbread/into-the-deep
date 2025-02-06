@@ -9,10 +9,10 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.teamcode.RisingEdgeTrigger;
+import org.firstinspires.ftc.teamcode.ctrl.RisingEdgeTrigger;
 
 
-@TeleOp(name = "TeleOp C (BETA)", group = "001 Robot Competition")
+@TeleOp(name = "$$$ TELEOP-C (BETA)", group = "$$$")
 public class TeleOpModeC extends LinearOpMode {
 
     // scissor lift constants

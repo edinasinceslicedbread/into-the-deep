@@ -8,10 +8,10 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.teamcode.RisingEdgeTrigger;
+import org.firstinspires.ftc.teamcode.ctrl.RisingEdgeTrigger;
 
 
-@TeleOp(name = "ClawColorTest", group = "Testing")
+@TeleOp(name = "TEST | Claw Color Assembly", group = "$$$$")
 public class ClawColorAssemblyTest extends LinearOpMode {
 
     static final int CYCLE_MS = 50;             // period of each cycle

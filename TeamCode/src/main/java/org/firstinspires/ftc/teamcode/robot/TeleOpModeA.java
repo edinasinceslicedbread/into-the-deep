@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 
-@TeleOp(name = "TeleOp A (Pusher)", group = "001 Robot Competition")
+@TeleOp(name = "$$$ TELEOP-A (Pusher)", group = "$$$")
 @Config
 public class TeleOpModeA extends LinearOpMode {
 
