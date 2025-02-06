@@ -236,14 +236,17 @@ public class ArmController {
             case 0: // idle
 
                 if (homeTrigger.wasTriggered()) {
+                    elbowDrive.setTargetPosition(elbowParams.homePosTicks);
                     profileEndPosition = shoulderParams.homePosTicks;
                     armControlState = 1;
                 }
                 if (dropTrigger.wasTriggered()) {
+                    elbowDrive.setTargetPosition(elbowParams.dropPosTicks);
                     profileEndPosition = shoulderParams.dropPosTicks;
                     armControlState = 1;
                 }
                 if (pickTrigger.wasTriggered()) {
+                    elbowDrive.setTargetPosition(elbowParams.pickPosTicks);
                     profileEndPosition = shoulderParams.pickPosTicks;
                     armControlState = 1;
                 }
@@ -283,12 +286,6 @@ public class ArmController {
                     shoulderState.currentAccTarget = 0;
                     armControlState = 0;
                 }
-
-                // elbow position
-                if (shoulders)
-                elbowDrive.setTargetPosition(elbowParams.homePosTicks);
-                elbowDrive.setTargetPosition(elbowParams.dropPosTicks);
-                elbowDrive.setTargetPosition(elbowParams.pickPosTicks);
 
                 break;
 
