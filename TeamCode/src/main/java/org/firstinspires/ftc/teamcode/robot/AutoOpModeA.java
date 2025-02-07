@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.robot;
 
 import com.acmerobotics.roadrunner.Pose2d;
+import com.acmerobotics.roadrunner.TrajectoryActionBuilder;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -9,13 +10,19 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.teamcode.RisingEdgeTrigger;
+import org.firstinspires.ftc.teamcode.MecanumDrive;
+import org.firstinspires.ftc.teamcode.ctrl.RisingEdgeTrigger;
 
+import androidx.annotation.NonNull;
+
+// RR-specific imports
+import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
+import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.Pose2d;
+import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.Vector2d;
-import com.noahbres.meepmeep.MeepMeep;
-import com.noahbres.meepmeep.roadrunner.DefaultBotBuilder;
-import com.noahbres.meepmeep.roadrunner.entity.RoadRunnerBotEntity;
+import com.acmerobotics.roadrunner.ftc.Actions;
 
 
 @Autonomous(name = "Auto A (Pusher)", group = "001 Robot Competition")
@@ -104,33 +111,19 @@ public class AutoOpModeA extends LinearOpMode {
 
         waitForStart();
         runtime.reset();
+        Pose2d initialPose = new Pose2d(0, 60, 180);
+        MecanumDrive drive = new MecanumDrive(hardwareMap, initialPose);
+        TrajectoryActionBuilder tab1 = drive.actionBuilder(initialPose)
 
-        leftFrontDrive.setPower(-0.25);
-        rightFrontDrive.setPower(-0.25);
-        rightBackDrive.setPower(-0.25);
-        leftBackDrive.setPower(-0.25);
-
-        sleep(2000);
-
-        leftFrontDrive.setPower(0);
-        rightFrontDrive.setPower(0);
-        rightBackDrive.setPower(0);
-        leftBackDrive.setPower(0);
-
-        MeepMeep meepMeep = new MeepMeep(800);
-
-        RoadRunnerBotEntity myBot = new DefaultBotBuilder(meepMeep)
-                // Set bot constraints: maxVel, maxAccel, maxAngVel, maxAngAccel, track width
-                .setConstraints(60, 60, Math.toRadians(180), Math.toRadians(180), 15)
-                .build();
-        //Edit Below
-        //Starting Position
-        myBot.runAction(myBot.getDrive().actionBuilder(new Pose2d(0, 60, Math.toRadians(180)))
                 //Edit Path
                 .lineToX(56)
+                .waitSeconds(0.001)
                 .lineToX(38)
+                .waitSeconds(0.001)
                 .turn(Math.toRadians(90))
+                .waitSeconds(0.001)
                 .lineToY(10)
+                .waitSeconds(0.001)
 
                 .strafeTo(new Vector2d(47, 10))
                 .strafeTo(new Vector2d(47, 57))
@@ -145,10 +138,9 @@ public class AutoOpModeA extends LinearOpMode {
                 .strafeTo(new Vector2d(62, 38))
 
                 .strafeTo(new Vector2d(-60, 38))
-                .strafeTo(new Vector2d(-60, 58))
+                .strafeTo(new Vector2d(-60, 58));
 
-
-                .build());
+        Actions.runBlocking(tab1.build());
 
 
 

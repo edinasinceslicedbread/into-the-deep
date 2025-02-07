@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.teamcode.RisingEdgeTrigger;
+import org.firstinspires.ftc.teamcode.ctrl.RisingEdgeTrigger;
 
 
 @Autonomous(name = "Auto B (BETA)", group = "001 Robot Competition")

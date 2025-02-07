@@ -61,7 +61,7 @@ public class RoadRunnerTopBTestSkeleton {
                 .strafeTo(new Vector2d(50, 10))
                 .strafeTo(new Vector2d(61, 10))
                 .strafeTo(new Vector2d(61, 50))
-                                .tangen
+
                 // Alternative preparation for park
                 //.strafeTo(new Vector2d(61, 38))
                 //.strafeTo(new Vector2d(-61, 38))

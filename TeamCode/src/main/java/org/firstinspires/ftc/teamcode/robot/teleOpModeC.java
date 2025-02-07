@@ -13,9 +13,9 @@ import org.firstinspires.ftc.teamcode.ctrl.RisingEdgeTrigger;
 
 
 @TeleOp(name = "$$$ TELEOP-C (BETA)", group = "$$$")
-public class TeleOpModeC extends LinearOpMode {
+public class teleOpModeC extends LinearOpMode {
 
-    // scissor lift constants
+    // scissor lift constantszoom
     static final double SCISSOR_MIN_POS = 1000;    // Minimum scissor lift encoder position
     static final double SCISSOR_MAX_POS = 10000;     // Maximum scissor lift encoder position
 
@@ -221,19 +221,19 @@ public class TeleOpModeC extends LinearOpMode {
                 scissorDrivePower = -0.75;
             }
 
-            // Gamepad 2 triggers
-            if (gamepad2.right_trigger > 0.1 && scissorLimitHiOn == false) {
-                scissorDrivePower = gamepad2.right_trigger * scissorUpOverride;
-            } else if (gamepad2.left_trigger > 0.1 && scissorLimitLoOn == false) {
-                scissorDrivePower = -gamepad2.left_trigger * scissorDownOverride;
+            //Gamepad 2 triggers
+            if (gamepad2.right_trigger > 0.01 && scissorLimitHiOn == false) {
+                scissorDrivePower = scissorDrivePower * scissorUpOverride;
+            } else if (gamepad2.left_trigger > 0.01 && scissorLimitLoOn == false) {
+                scissorDrivePower = -scissorDrivePower * scissorDownOverride;
             }
 
             // *******************************************************************************************
             // SECTION 4: Open and Close Claw
             // *******************************************************************************************
-            if (gamepad1.a || gamepad2.a == true) {
+            if (gamepad1.x || gamepad2.x == true) {
                 clawServo.setPosition(0.30);
-            } else if (gamepad1.y || gamepad2.a == true) {
+            } else if (gamepad1.x || gamepad2.x == true) {
                 clawServo.setPosition(0.05);
             }
 
@@ -259,84 +259,48 @@ public class TeleOpModeC extends LinearOpMode {
             // *******************************************************************************************
             // SECTION 6: Elbow and Shoulder Motors
             // *******************************************************************************************
-            double elbowPosition = 0.02;
 
-            int shoulderPosition = shoulderDrive.getCurrentPosition();
-            if (gamepad1.right_trigger > 0.1 || gamepad2.right_trigger > 0.1) {
-                if (shoulderPosition > 0) {
-                    shoulderDrive.setPower(gamepad1.right_trigger * 0.50);
-                }
+
+            // *******************************************************************************************
+            // SECTION 7: Write Outputs
+            // *******************************************************************************************
+
+            // Send calculated power to wheels
+            leftFrontDrive.setPower(leftFrontPower);
+            rightFrontDrive.setPower(rightFrontPower);
+            rightBackDrive.setPower(rightBackPower);
+            leftBackDrive.setPower(leftBackPower);
+
+            // Power to scissor lift, extension
+            scissorDrive.setPower(scissorDrivePower);
+
+            clawServo.setPosition(clawServoPosition);
+
+            // *******************************************************************************************
+            // SECTION 7: Telemetry
+            // *******************************************************************************************
+
+            if (color == 1) {
+                telemetry.addData("Blue", true);
             }
-            if(gamepad1.left_trigger > 0.1 || gamepad2.left_trigger > 0.1){
-            if (shoulderPosition > 720) {
-                shoulderDrive.setPower(gamepad1.right_trigger * -0.50);
-                }
+            if (color == 2) {
+                telemetry.addData("Red", true);
             }
-            //Switch elbow servo to ELbow Motor
-            // elbow servo section
-            elbowPosition = elbowMotor.getCurrentPosition();
-            elbowTriggerUp.update(gamepad1.right_bumper == true);
-            elbowTriggerDown.update(gamepad1.left_bumper == true);
-            if (elbowTriggerUp.wasTriggered()) {
-                    elbowMotor.setPower(0.75);
-                    if (elbowPosition > 1) {
-                        elbowPosition = 1.0;
-                }
+            if (color == 3) {
+                telemetry.addData("Green", true);
+            }
+            if (color == 4) {
+                telemetry.addData("Yellow", true);
             }
 
-            if (gamepad1.right_bumper || gamepad2.right_bumper || gamepad1.left_bumper || gamepad2.left_bumper == false) {
-                elbowMotor.setPower(0.0);
+            telemetry.update();
+            // Update telemetry
+            telemetry.update();
 
-                if (elbowTriggerDown.wasTriggered()) {
-                    if (elbowPosition > 0) {
-                        elbowMotor.setPower(0.5);
-                        if (elbowPosition < 0) {
-                            elbowPosition = 0;
-                        }
-                    }
-                }
+            // idle time for servo
+            sleep(CYCLE_MS);
+            idle();
 
-                // *******************************************************************************************
-                // SECTION 7: Write Outputs
-                // *******************************************************************************************
-
-                // Send calculated power to wheels
-                leftFrontDrive.setPower(leftFrontPower);
-                rightFrontDrive.setPower(rightFrontPower);
-                rightBackDrive.setPower(rightBackPower);
-                leftBackDrive.setPower(leftBackPower);
-
-                // Power to scissor lift, extension
-                scissorDrive.setPower(scissorDrivePower);
-
-                clawServo.setPosition(clawServoPosition);
-
-                // *******************************************************************************************
-                // SECTION 7: Telemetry
-                // *******************************************************************************************
-
-                if (color == 1) {
-                    telemetry.addData("Blue", true);
-                }
-                if (color == 2) {
-                    telemetry.addData("Red", true);
-                }
-                if (color == 3) {
-                    telemetry.addData("Green", true);
-                }
-                if (color == 4) {
-                    telemetry.addData("Yellow", true);
-                }
-
-                telemetry.update();
-                // Update telemetry
-                telemetry.update();
-
-                // idle time for servo
-                sleep(CYCLE_MS);
-                idle();
-
-            }
         }
     }
 

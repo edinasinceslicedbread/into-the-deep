@@ -19,6 +19,8 @@ public class RoadRunnerPushTest {
         myBot.runAction(myBot.getDrive().actionBuilder(new Pose2d(0, 60, Math.toRadians(180)))
                //Edit Path
                 .lineToX(56)
+                        .waitSeconds(0.5)
+                .turn(Math.toRadians(0))
                 .lineToX(38)
                 .turn(Math.toRadians(90))
                 .lineToY(10)
