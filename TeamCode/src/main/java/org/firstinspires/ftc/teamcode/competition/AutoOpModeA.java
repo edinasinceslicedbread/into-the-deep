@@ -1,16 +1,23 @@
-package org.firstinspires.ftc.teamcode.robot;
+package org.firstinspires.ftc.teamcode.competition;
 
+import com.acmerobotics.roadrunner.Pose2d;
+import com.acmerobotics.roadrunner.TrajectoryActionBuilder;
+import com.acmerobotics.roadrunner.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.MecanumDrive;
 import org.firstinspires.ftc.teamcode.ctrl.RisingEdgeTrigger;
 
+// RR-specific imports
+import com.acmerobotics.roadrunner.ftc.Actions;
 
-@Autonomous(name = "Auto B (BETA)", group = "001 Robot Competition")
-public class AutoOpModeB extends LinearOpMode {
+
+@Autonomous(name = "$$$ AUTO-A (Pusher)", group = "$$$")
+public class AutoOpModeA extends LinearOpMode {
 
     // scissor lift constants
     static final double SCISSOR_MIN_POS = 1000;    // Minimum scissor lift encoder position
@@ -27,7 +34,6 @@ public class AutoOpModeB extends LinearOpMode {
 
     // Declare OpMode members for each of the 4 motors.
     private ElapsedTime runtime = new ElapsedTime();
-
     // main wheel drive motors
     private DcMotor leftFrontDrive = null;
     private DcMotor rightFrontDrive = null;
@@ -88,9 +94,6 @@ public class AutoOpModeB extends LinearOpMode {
         // outside the while loop, set initial claw servo position
         double clawServoPosition = (CLAW_MAX_POS - CLAW_MIN_POS) / 2.0; // Start at half position
 
-        // outside the while loop, set homing mode false
-        boolean homingModeActive = false;
-
         // *******************************************************************************************
         // Wait for the game to start (driver presses START)
         // *******************************************************************************************
@@ -99,44 +102,42 @@ public class AutoOpModeB extends LinearOpMode {
 
         waitForStart();
         runtime.reset();
-        //************************************************************************************************
-        //Autonomous Test Code B
-        //************************************************************************************************
-        //TODO; Redo program. 1Pick Up Block 2Use top chasis for angle 3scissor lift 4drive forward and drop block in to basket while staying parralel to wall.
-        //TODO; Scissor lift and clamp claw at start - add back and forth for top after turn.
+        Pose2d initialPose = new Pose2d(0, 60, 180);
+        MecanumDrive drive = new MecanumDrive(hardwareMap, initialPose);
+        TrajectoryActionBuilder tab1 = drive.actionBuilder(initialPose)
 
-        // close claw
-        clawServo.setPosition(1.0);
-        sleep(2000);
+                //Edit Path
+                .lineToX(56)
+                .waitSeconds(0.001)
+                .lineToX(38)
+                .waitSeconds(0.001)
+                .turn(Math.toRadians(90))
+                .waitSeconds(0.001)
+                .lineToY(10)
+                .waitSeconds(0.001)
 
-        // raise scissor lift
-        scissorDrive.setPower(1.0);
-        sleep(2500);            // TOTO: raise lift time
-        scissorDrive.setPower(0.0);
-        sleep(1000);
+                .strafeTo(new Vector2d(47, 10))
+                .strafeTo(new Vector2d(47, 57))
+                .strafeTo(new Vector2d(47, 10))
 
-        // retract claw backward
-        extensionDrive.setPower(-1.0);
-        sleep(2100);            // TODO: retract time
-        extensionDrive.setPower(0.0);
-        sleep(1000);
+                .strafeTo(new Vector2d(55, 10))
+                .strafeTo(new Vector2d(55, 57))
+                .strafeTo(new Vector2d(55, 10))
 
-        // drive robot forward
-        leftFrontDrive.setPower(0.3);
-        rightFrontDrive.setPower(0.3);
-        leftBackDrive.setPower(0.3);
-        rightBackDrive.setPower(0.3);
-        sleep(2000);            // TOTO: drive forward time
-        leftFrontDrive.setPower(0.0);
-        rightFrontDrive.setPower(0.0);
-        leftBackDrive.setPower(0.0);
-        rightBackDrive.setPower(0.0);
-        sleep(1000);
+                .strafeTo(new Vector2d(61, 10))
+                .strafeTo(new Vector2d(62, 57))
+                .strafeTo(new Vector2d(62, 38))
 
-        // open claw
-        clawServo.setPosition(0.0);
-        sleep(5000);
+                .strafeTo(new Vector2d(-60, 38))
+                .strafeTo(new Vector2d(-60, 58));
+
+        Actions.runBlocking(tab1.build());
+
+
 
 
     }
+
+
 }
+

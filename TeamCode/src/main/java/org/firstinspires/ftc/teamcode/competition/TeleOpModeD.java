@@ -12,7 +12,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.ctrl.RisingEdgeTrigger;
 
 
-@TeleOp(name = "$$$ TELEOP-D (ALPHA)", group = "$$$")
+@TeleOp(name = "$$$ TELE-D (ALPHA)", group = "$$$")
 public class TeleOpModeD extends LinearOpMode {
 
     // scissor lift constants

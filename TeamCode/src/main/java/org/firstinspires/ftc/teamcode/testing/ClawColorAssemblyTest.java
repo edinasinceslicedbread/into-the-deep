@@ -11,7 +11,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.ctrl.RisingEdgeTrigger;
 
 
-@TeleOp(name = "TEST | Claw Color Assembly", group = "$$$$")
+@TeleOp(name = "TEST | Claw | Color Assembly", group = "$$$$")
 public class ClawColorAssemblyTest extends LinearOpMode {
 
     static final int CYCLE_MS = 50;             // period of each cycle

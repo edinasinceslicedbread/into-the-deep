@@ -26,7 +26,7 @@ public class ArmPushTest extends LinearOpMode {
     public void runOpMode() {
 
         //------------------------------------------------------------------------------------------------
-        // Arm Hardware Setup
+        // Hardware Setup
         //------------------------------------------------------------------------------------------------
 
         // hardware map
@@ -115,6 +115,11 @@ public class ArmPushTest extends LinearOpMode {
             // Telemetry Data
             //------------------------------------------------------------------------------------------------
             telemetry.addData("Run Time", runtime.toString());
+            telemetry.addLine("Move the elbow and shoulder by hand.");
+            telemetry.addLine("Encoder counters should be counting upwards.");
+            telemetry.addLine("Test the elbow motor by gently using the triggers.");
+            telemetry.addLine("Test the shoulder by incrementing power with the buttons.");
+            telemetry.addLine("--------------------------------------------------");
             telemetry.addLine(String.format("Shoulder: PWR[%4.2f] TICKS[%d]", shoulderPower, shoulderTicksActual));
             telemetry.addLine(String.format("Elbow: PWR[%4.2f] TICKS[%d]", elbowPower, elbowTicksActual));
             telemetry.update();

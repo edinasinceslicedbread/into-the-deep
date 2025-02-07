@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.robot;
+package org.firstinspires.ftc.teamcode.competition;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 
-@TeleOp(name = "$$$ TELEOP-A (Pusher)", group = "$$$")
+@TeleOp(name = "$$$ TELE-A (Pusher)", group = "$$$")
 @Config
 public class TeleOpModeA extends LinearOpMode {
 
