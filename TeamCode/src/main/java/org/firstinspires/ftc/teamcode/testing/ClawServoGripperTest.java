@@ -8,8 +8,8 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 
-@TeleOp(name = "TEST | Gripper Servo Test", group = "$$$$")
-public class ClawGripperServoTest extends LinearOpMode {
+@TeleOp(name = "TEST | Claw | Servo Gripper Test", group = "$$$$")
+public class ClawServoGripperTest extends LinearOpMode {
 
     // elapsed time
     private final ElapsedTime runtime = new ElapsedTime();
@@ -58,14 +58,13 @@ public class ClawGripperServoTest extends LinearOpMode {
                 clawServo.setPosition(0.05);
             }
 
-            // update telemetry data
+            //------------------------------------------------------------------------------------------------
+            // Telemetry Data
+            //------------------------------------------------------------------------------------------------
             telemetry.addData("Run Time", runtime.toString());
             telemetry.addLine("Press left / right bumpers to test the claw gripper.");
             telemetry.addData("Claw Position", clawServo.getPosition());
             telemetry.update();
-
-            // idle time for servo
-            idle();
 
         }
     }
