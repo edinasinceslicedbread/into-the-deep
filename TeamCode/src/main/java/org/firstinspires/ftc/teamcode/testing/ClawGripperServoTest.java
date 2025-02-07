@@ -8,8 +8,8 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 
-@TeleOp(name = "TEST | Claw Open / Close Test", group = "$$$$")
-public class ClawOpenCloseTest extends LinearOpMode {
+@TeleOp(name = "TEST | Gripper Servo Test", group = "$$$$")
+public class ClawGripperServoTest extends LinearOpMode {
 
     // elapsed time
     private final ElapsedTime runtime = new ElapsedTime();
@@ -46,13 +46,14 @@ public class ClawOpenCloseTest extends LinearOpMode {
         //------------------------------------------------------------------------------------------------
         while (opModeIsActive()) {
 
-
-            if (gamepad1.right_bumper || gamepad2.right_bumper)
+            // left bumper opens
+            if (gamepad1.left_bumper || gamepad2.left_bumper)
             {
                 clawServo.setPosition(0.30);
             }
 
-            if (gamepad1.left_bumper || gamepad2.left_bumper)
+            // right bumper closes
+            if (gamepad1.right_bumper || gamepad2.right_bumper)
             {
                 clawServo.setPosition(0.05);
             }
