@@ -13,7 +13,7 @@ import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 @Config
-@TeleOp(name = "TEST | Scissor | Motor Push Test", group = "$$$$")
+@TeleOp(name = "TEST | Scissor | Motor Push Test", group = "$$$$ Scissor")
 public class ScissorMotorPushTest extends LinearOpMode {
 
     // elapsed time

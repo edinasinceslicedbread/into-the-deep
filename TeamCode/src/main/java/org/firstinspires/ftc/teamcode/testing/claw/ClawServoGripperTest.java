@@ -8,7 +8,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 
-@TeleOp(name = "TEST | Claw | Servo Gripper Test", group = "$$$$")
+@TeleOp(name = "TEST | Claw | Servo Gripper Test", group = "$$$$ Claw")
 public class ClawServoGripperTest extends LinearOpMode {
 
     // elapsed time
