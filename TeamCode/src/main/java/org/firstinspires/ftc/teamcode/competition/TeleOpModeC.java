@@ -9,6 +9,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.ctrl.ArmController;
 import org.firstinspires.ftc.teamcode.ctrl.RisingEdgeTrigger;
 
 
@@ -50,7 +51,8 @@ public class TeleOpModeC extends LinearOpMode {
     // digital limit switches
     private TouchSensor scissorLimitLo = null;
 
-
+    //Source code from Arm Controller
+    ArmController armController = new ArmController();
     @Override
     public void runOpMode() {
 
@@ -90,6 +92,8 @@ public class TeleOpModeC extends LinearOpMode {
         // outside the while loop, set homing mode false
         double driveDirectionFactor = 1.0;
 
+        boolean lockSet;
+        lockSet = true;
         // *******************************************************************************************
         // Wait for the game to start (driver presses START)
         // *******************************************************************************************
@@ -105,12 +109,16 @@ public class TeleOpModeC extends LinearOpMode {
             // *******************************************************************************************
             // SECTION 1: toggle backwards mode to use the pusher
             // *******************************************************************************************
-            if (gamepad1.back || gamepad2.back) {
-                driveDirectionFactor = -1.0;
-            } else if (gamepad1.start || gamepad2.start) {
-                driveDirectionFactor = 1.0;
-            }
 
+            if (gamepad1.back||gamepad2.back) {
+                if (lockSet = true) {
+                    driveDirectionFactor = -1.0;
+                    lockSet = false;
+                } else if (lockSet = false) {
+                    driveDirectionFactor = 1.0;
+                    lockSet = true;
+                }
+            }
             // *******************************************************************************************
             // SECTION 2: Main Joystick Robot Driving
             // *******************************************************************************************
@@ -260,6 +268,7 @@ public class TeleOpModeC extends LinearOpMode {
             // SECTION 6: Elbow and Shoulder Motors
             // *******************************************************************************************
 
+            //Refer to Sourced Code Near End of Defines
 
             // *******************************************************************************************
             // SECTION 7: Write Outputs

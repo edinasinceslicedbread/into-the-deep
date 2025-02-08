@@ -99,36 +99,12 @@ public class AutoOpModeA extends LinearOpMode {
 
         waitForStart();
         runtime.reset();
-        Pose2d initialPose = new Pose2d(0, 60, 180);
-        MecanumDrive drive = new MecanumDrive(hardwareMap, initialPose);
-        TrajectoryActionBuilder tab1 = drive.actionBuilder(initialPose)
+       
 
                 //Edit Path
-                .lineToX(56)
-                .waitSeconds(0.001)
-                .lineToX(38)
-                .waitSeconds(0.001)
-                .turn(Math.toRadians(90))
-                .waitSeconds(0.001)
-                .lineToY(10)
-                .waitSeconds(0.001)
 
-                .strafeTo(new Vector2d(47, 10))
-                .strafeTo(new Vector2d(47, 57))
-                .strafeTo(new Vector2d(47, 10))
 
-                .strafeTo(new Vector2d(55, 10))
-                .strafeTo(new Vector2d(55, 57))
-                .strafeTo(new Vector2d(55, 10))
 
-                .strafeTo(new Vector2d(61, 10))
-                .strafeTo(new Vector2d(62, 57))
-                .strafeTo(new Vector2d(62, 38))
-
-                .strafeTo(new Vector2d(-60, 38))
-                .strafeTo(new Vector2d(-60, 58));
-
-        Actions.runBlocking(tab1.build());
 
 
 
