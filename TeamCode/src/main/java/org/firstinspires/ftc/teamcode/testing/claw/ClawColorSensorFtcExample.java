@@ -17,7 +17,7 @@ public class ClawColorSensorFtcExample extends LinearOpMode {
     public void runOpMode() {
 
         // hsvValues is an array that will hold the hue, saturation, and value information.
-        float hsvValues[] = {0F,0F,0F};
+        float hsvValues[] = {0F, 0F, 0F};
 
         // values is a reference to the hsvValues array.
         final float values[] = hsvValues;
@@ -51,7 +51,7 @@ public class ClawColorSensorFtcExample extends LinearOpMode {
             bCurrState = gamepad1.x;
 
             // check for button state transitions.
-            if (bCurrState && (bCurrState != bPrevState))  {
+            if (bCurrState && (bCurrState != bPrevState)) {
 
                 // button is transitioning to a pressed state. So Toggle LED
                 bLedOn = !bLedOn;

@@ -55,11 +55,9 @@ public class ClawColorSensorTest extends LinearOpMode {
             // All number data for the if statement can be replaced with a different value for a set value depending on distance from block.
             if (blue > red && blue > green && blue > 25) {
                 detectedColor = 1;
-            }
-            else if (red > green && red > blue && red > 40) {
+            } else if (red > green && red > blue && red > 40) {
                 detectedColor = 2;
-            }
-            else if (red > 60 && green > 50 && blue < 40) {
+            } else if (red > 60 && green > 50 && blue < 40) {
                 detectedColor = 4;
             }
 

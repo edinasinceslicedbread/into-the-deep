@@ -7,9 +7,10 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
+
 import org.firstinspires.ftc.teamcode.ctrl.RisingEdgeTrigger;
 
-@Autonomous(name = "TEST | Test Template", group = "$$$$")
+@Autonomous(name = "TEST | Test Template", group = "$$$$ Template")
 @Disabled
 public class TestTemplate extends LinearOpMode {
 
@@ -78,7 +79,6 @@ public class TestTemplate extends LinearOpMode {
         while (opModeIsActive()) {
 
             // put logic here
-
 
 
             // update telemetry data

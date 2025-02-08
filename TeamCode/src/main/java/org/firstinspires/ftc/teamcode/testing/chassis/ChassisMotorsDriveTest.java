@@ -7,8 +7,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-
-@TeleOp(name = "TEST | Chassis | Motors Push Test", group = "$$$$ Chassis")
+@TeleOp(name = "TEST | Chassis | Driving Test", group = "$$$$ Chassis")
 public class ChassisMotorsDriveTest extends LinearOpMode {
 
     // elapsed time
@@ -169,6 +168,8 @@ public class ChassisMotorsDriveTest extends LinearOpMode {
             // update telemetry data
             telemetry.addLine("Use the left and right sticks to dirve.");
             telemetry.addLine("Pressing the sticks will enable turbo.");
+            telemetry.addLine("Pressing BACK makes pusher forward control.");
+            telemetry.addLine("Pressing START makes claw forward control.");
             telemetry.addLine("--------------------------------------------------");
             telemetry.addData("Driving Direction", driveDirectionFactor < 0 ? "!!! PUSHER FORWARD !!!" : "!!! CLAW FORWARD !!!");
             telemetry.addLine(String.format("Turbo Override: L[%4.2f] R[%4.2f]", turboOverrideLeftStick, turboOverrideRightStick));

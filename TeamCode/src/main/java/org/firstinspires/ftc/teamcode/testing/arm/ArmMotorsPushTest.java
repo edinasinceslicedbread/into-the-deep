@@ -80,13 +80,13 @@ public class ArmMotorsPushTest extends LinearOpMode {
 
             if (rightBumper.wasTriggered()) {
                 shoulderPower += 0.01;
-                if (shoulderPower > 1.0){
+                if (shoulderPower > 1.0) {
                     shoulderPower = 1.0;
                 }
             }
             if (leftBumper.wasTriggered()) {
                 shoulderPower -= 0.01;
-                if (shoulderPower < -1.0){
+                if (shoulderPower < -1.0) {
                     shoulderPower = -1.0;
                 }
             }

@@ -9,7 +9,6 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.ctrl.ArmController;
 
-@Config
 @TeleOp(name = "TEST | Arm | Elbow Control Test", group = "$$$$ Arm")
 public class ArmElbowControlTest extends LinearOpMode {
 
