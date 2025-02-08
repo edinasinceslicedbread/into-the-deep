@@ -49,6 +49,14 @@ public class AutoOpModeA extends LinearOpMode {
 
         waitForStart();
         runtime.reset();
+<<<<<<< HEAD
+                =======
+
+
+        //Edit Path
+
+
+>>>>>>> 161b98a74b5a3d03e3cb47dbefded4897f4fe01b
 
         leftFrontDrive.setPower(-0.25);
         rightFrontDrive.setPower(-0.25);
