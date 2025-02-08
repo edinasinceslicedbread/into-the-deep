@@ -215,9 +215,9 @@ public class TeleOpModeC extends LinearOpMode {
             double scissorDrivePower = 0.0;
 
             // Gamepad 1 triggers
-            if (scissorLimitHiOn == false) {
+            if (gamepad1.right_trigger > 0.01 && scissorLimitHiOn == false) {
                 scissorDrivePower = 1.0;
-            } else if (scissorLimitLoOn == false) {
+            } else if (gamepad1.left_trigger > 0.01 && scissorLimitLoOn == false) {
                 scissorDrivePower = -0.75;
             }
 
