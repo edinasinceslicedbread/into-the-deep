@@ -7,11 +7,13 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.ctrl.RisingEdgeTrigger;
+import org.firstinspires.ftc.teamcode.testing.arm.ArmControllerAuto;
 
 
 @Autonomous(name = "$$$ AUTO-B (BETA)", group = "$$$")
 public class AutoOpModeB extends LinearOpMode {
-
+    //Source code from ArmCtrlAuto
+    ArmControllerAuto armControllerAuto = new ArmControllerAuto();
     // scissor lift constants
     static final double SCISSOR_MIN_POS = 1000;    // Minimum scissor lift encoder position
     static final double SCISSOR_MAX_POS = 10000;     // Maximum scissor lift encoder position
@@ -99,7 +101,7 @@ public class AutoOpModeB extends LinearOpMode {
         //TODO; Scissor lift and clamp claw at start - add back and forth for top after turn.
 
         // close claw
-        clawServo.setPosition(1.0);
+        clawServo.setPosition(0.5);
         sleep(2000);
 
         // raise scissor lift
@@ -108,8 +110,8 @@ public class AutoOpModeB extends LinearOpMode {
         scissorDrive.setPower(0.0);
         sleep(1000);
 
-        // retract claw backward
-        sleep(2100);            // TODO: retract time
+        // Move claw up.
+         int autoUpdateVariable = 2;           // TODO: retract time
         sleep(1000);
 
         // drive robot forward

@@ -99,7 +99,7 @@ public class AutoOpModeA extends LinearOpMode {
 
         waitForStart();
         runtime.reset();
-       
+
 
                 //Edit Path
 
