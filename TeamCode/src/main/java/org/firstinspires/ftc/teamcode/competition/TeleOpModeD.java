@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.competition;
 
+import android.annotation.SuppressLint;
+
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.ColorRangeSensor;
@@ -15,109 +17,97 @@ import org.firstinspires.ftc.teamcode.ctrl.RisingEdgeTrigger;
 @TeleOp(name = "$$$ TELE-D (ALPHA)", group = "$$$")
 public class TeleOpModeD extends LinearOpMode {
 
-    // scissor lift constants
-    static final double SCISSOR_MIN_POS = 1000;    // Minimum scissor lift encoder position
-    static final double SCISSOR_MAX_POS = 10000;     // Maximum scissor lift encoder position
+    // elapsed time
+    private final ElapsedTime runtime = new ElapsedTime();
 
-    // claw extension constants
-    static final double EXTENSION_MIN_POS = -3000;  // Minimum claw extension encoder position
-    static final double EXTENSION_MAX_POS = 5000;   // Maximum claw extension encoder position
+    //------------------------------------------------------------------------------------------------
+    // Hardware Definitions
+    //------------------------------------------------------------------------------------------------
 
-    // claw gripper constants
-    static final int CYCLE_MS = 50;             // period of each cycle
-    static final double CLAW_MIN_POS = 0.0;     // Minimum rotational position
-    static final double CLAW_MAX_POS = 1.0;     // Maximum rotational position
-
-    // Declare OpMode members for each of the 4 motors.
-    private ElapsedTime runtime = new ElapsedTime();
-
-    // main wheel drive motors
+    // chassis
     private DcMotor leftFrontDrive = null;
     private DcMotor rightFrontDrive = null;
     private DcMotor leftBackDrive = null;
     private DcMotor rightBackDrive = null;
 
-    // scissor lift drive, extension drive, and claw servo
-    private DcMotor scissorDrive = null;
+    // scissor
+    private DcMotorEx scissorDrive = null;
+    private TouchSensor scissorLoSensor = null;
+
+    // claw
     private Servo clawServo = null;
-    private DcMotorEx elbowMotor = null;
-    private DcMotor shoulderDrive = null;
-    private ColorRangeSensor colorSensor;
 
-    private RisingEdgeTrigger elbowTriggerUp = new RisingEdgeTrigger();
-    private RisingEdgeTrigger elbowTriggerDown = new RisingEdgeTrigger();
-
-    // digital limit switches
-    private TouchSensor scissorLimitLo = null;
-
-
+    @SuppressLint("DefaultLocale")
     @Override
+
     public void runOpMode() {
 
-        // *******************************************************************************************
-        // Initialize the hardware variables. Note that the strings used here must correspond
-        // to the names assigned during the robot configuration step on the DS or RC devices.
-        // *******************************************************************************************
+        //------------------------------------------------------------------------------------------------
+        // Hardware Setup
+        //------------------------------------------------------------------------------------------------
 
-        // main wheel drive motor hardware names
+        // chassis
         leftFrontDrive = hardwareMap.get(DcMotor.class, "leftFrontDrive");
         rightFrontDrive = hardwareMap.get(DcMotor.class, "rightFrontDrive");
         leftBackDrive = hardwareMap.get(DcMotor.class, "leftBackDrive");
         rightBackDrive = hardwareMap.get(DcMotor.class, "rightBackDrive");
 
-        // scissor drive, claw server, and extend / retract
-        scissorDrive = hardwareMap.get(DcMotor.class, "scissorDrive");
-        shoulderDrive = hardwareMap.get(DcMotor.class, "shoulderDrive");
-        elbowMotor = hardwareMap.get(DcMotorEx.class, "elbowDrive");
+        // scissor
+        scissorDrive = hardwareMap.get(DcMotorEx.class, "scissorDrive");
+        scissorLoSensor = hardwareMap.get(TouchSensor.class, "scissorLoSensor");
+
+        // claw
         clawServo = hardwareMap.get(Servo.class, "clawServo");
-        colorSensor = hardwareMap.get(ColorRangeSensor.class, "clawColorSensor");
 
-        // digital limit switches
-        scissorLimitLo = hardwareMap.get(TouchSensor.class, "scissorLimitLo");
+        //------------------------------------------------------------------------------------------------
+        // Advanced Setup
+        //------------------------------------------------------------------------------------------------
 
-        // assign wheel motor directions
-        leftFrontDrive.setDirection(DcMotor.Direction.FORWARD);
-        leftBackDrive.setDirection(DcMotor.Direction.FORWARD);
+        // chassis motor directions (reverse right motors)
         rightFrontDrive.setDirection(DcMotor.Direction.REVERSE);
         rightBackDrive.setDirection(DcMotor.Direction.REVERSE);
 
-        // assign scissor, extension, and claw directions
-        scissorDrive.setDirection(DcMotor.Direction.FORWARD);
-
-        // outside the while loop, set initial claw servo position
-        double clawServoPosition = CLAW_MIN_POS; // Start at half position
-
-        // outside the while loop, set homing mode false
+        // other variables
         double driveDirectionFactor = 1.0;
 
-        // *******************************************************************************************
-        // Wait for the game to start (driver presses START)
-        // *******************************************************************************************
+        //------------------------------------------------------------------------------------------------
+        // Start Button
+        //------------------------------------------------------------------------------------------------
+
+        // update some telemetry
         telemetry.addData("Status", "Initialized");
         telemetry.update();
 
+        // Wait for the game to start (driver presses START)
         waitForStart();
         runtime.reset();
 
-        // run until the end of the match (driver presses STOP)
+        //------------------------------------------------------------------------------------------------
+        // Run until the end of the match (driver presses STOP)
+        //------------------------------------------------------------------------------------------------
         while (opModeIsActive()) {
 
-            // *******************************************************************************************
-            // SECTION 1: toggle backwards mode to use the pusher
-            // *******************************************************************************************
+            //------------------------------------------------------------------------------------------------
+            // Chassis Control
+            //------------------------------------------------------------------------------------------------
+
+            // read current positions
+            int leftFrontTicksActual = leftFrontDrive.getCurrentPosition();
+            int leftBackTicksActual = leftBackDrive.getCurrentPosition();
+            int rightFrontTicksActual = rightFrontDrive.getCurrentPosition();
+            int rightBackTicksActual = rightBackDrive.getCurrentPosition();
+
+            // toggle backwards mode to use the pusher
+            // --------------------------------------------------------------------------------------------
             if (gamepad1.back || gamepad2.back) {
                 driveDirectionFactor = -1.0;
             } else if (gamepad1.start || gamepad2.start) {
                 driveDirectionFactor = 1.0;
             }
 
-            // *******************************************************************************************
-            // SECTION 2: Main Joystick Robot Driving
-            // *******************************************************************************************
 
             // turbo mode speed overrides with left and right stick buttons
             // --------------------------------------------------------------------------------------------
-
             double turboOverrideLeftStick = 0.25;
             double turboOverrideRightStick = 0.25;
             // max wheel speed override
@@ -140,24 +130,26 @@ public class TeleOpModeD extends LinearOpMode {
 
             // gamepad 1
             if (Math.abs(gamepad1.left_stick_y) > 0.1) {
-                axial = -gamepad1.left_stick_y * turboOverrideLeftStick * driveDirectionFactor;  // Note: pushing stick forward gives negative value
+                // Note: pushing stick forward gives negative value
+                axial = -gamepad1.left_stick_y * turboOverrideLeftStick * driveDirectionFactor;
             }
             if (Math.abs(gamepad1.left_stick_x) > 0.1) {
                 lateral = gamepad1.left_stick_x * turboOverrideLeftStick * driveDirectionFactor;
             }
             if (Math.abs(gamepad1.right_stick_x) > 0.1) {
-                yaw = gamepad1.right_stick_x * turboOverrideRightStick; // * driveDirectionFactor;
+                yaw = gamepad1.right_stick_x * turboOverrideRightStick;
             }
 
             // gamepad 2
             if (Math.abs(gamepad2.left_stick_y) > 0.1) {
-                axial = -gamepad2.left_stick_y * turboOverrideLeftStick * driveDirectionFactor;  // Note: pushing stick forward gives negative value
+                // Note: pushing stick forward gives negative value
+                axial = -gamepad2.left_stick_y * turboOverrideLeftStick * driveDirectionFactor;
             }
             if (Math.abs(gamepad2.left_stick_x) > 0.1) {
                 lateral = gamepad2.left_stick_x * turboOverrideLeftStick * driveDirectionFactor;
             }
             if (Math.abs(gamepad2.right_stick_x) > 0.1) {
-                yaw = gamepad2.right_stick_x * turboOverrideRightStick; // * driveDirectionFactor;
+                yaw = gamepad2.right_stick_x * turboOverrideRightStick;
             }
 
             // D-Pad overrides for the same joystick functions as above
@@ -199,165 +191,58 @@ public class TeleOpModeD extends LinearOpMode {
                 rightBackPower /= max;
             }
 
-            // *******************************************************************************************
-            // SECTION 3: Raise and Lower Scissor Lift
-            // *******************************************************************************************
+            // Send calculated power to wheels
+            leftFrontDrive.setPower(leftFrontPower);
+            rightFrontDrive.setPower(rightFrontPower);
+            leftBackDrive.setPower(leftBackPower);
+            rightBackDrive.setPower(rightBackPower);
 
-            // read encoder feedback position and limit switch status
-            double scissorEncoderCounts = scissorDrive.getCurrentPosition();
-            boolean scissorLimitLoOn = scissorLimitLo.isPressed();
-            boolean scissorLimitHiOn = (scissorEncoderCounts >= 10100);
+            //------------------------------------------------------------------------------------------------
+            // Scissor Control
+            //------------------------------------------------------------------------------------------------
 
+            // read position and limit switch
+            int scissorTicksActual = scissorDrive.getCurrentPosition();
+            boolean scissorLoPressed = scissorLoSensor.isPressed();
 
-            // TODO: adjust max speeds between 0.0 and 1.0
-            double scissorUpOverride = 1.0;
-            double scissorDownOverride = 0.75;
-            double scissorDrivePower = 0.0;
+            // no power without triggers
+            double scissorPower = 0;
 
-            // Gamepad 1 triggers
-            if (scissorLimitHiOn == false) {
-                scissorDrivePower = 1.0;
-            } else if (scissorLimitLoOn == false) {
-                scissorDrivePower = -0.75;
+            // right trigger moves scissor up to limited value
+            if (gamepad1.right_trigger > 0.05) {
+                scissorPower = gamepad1.right_trigger * 0.5;
             }
 
-            // Gamepad 2 triggers
-            if (gamepad2.right_trigger > 0.1 && scissorLimitHiOn == false) {
-                scissorDrivePower = gamepad2.right_trigger * scissorUpOverride;
-            } else if (gamepad2.left_trigger > 0.1 && scissorLimitLoOn == false) {
-                scissorDrivePower = -gamepad2.left_trigger * scissorDownOverride;
+            // left trigger moves scissor down to limited value
+            if (gamepad1.left_trigger > 0.05) {
+                scissorPower = -gamepad1.left_trigger * 0.2;
             }
 
-            // *******************************************************************************************
-            // SECTION 4: Open and Close Claw
-            // *******************************************************************************************
-            if (gamepad1.a || gamepad2.a == true) {
+            // lower limit switch override
+            if (scissorPower < 0.0 && scissorLoPressed) {
+                scissorPower = 0;
+            }
+
+            // output the power
+            scissorDrive.setPower(scissorPower);
+
+            //------------------------------------------------------------------------------------------------
+            // Claw Control
+            //------------------------------------------------------------------------------------------------
+            // left bumper opens
+            if (gamepad1.left_bumper || gamepad2.left_bumper) {
                 clawServo.setPosition(0.30);
-            } else if (gamepad1.y || gamepad2.a == true) {
+            }
+
+            // right bumper closes
+            if (gamepad1.right_bumper || gamepad2.right_bumper) {
                 clawServo.setPosition(0.05);
             }
 
-            // *******************************************************************************************
-            // SECTION 5: Color Sensor
-            // *******************************************************************************************
-            int blue = colorSensor.blue();
-            int red = colorSensor.red();
-            int green = colorSensor.green();
+            idle();
 
-            double color = 0;
-
-            if (blue > red && blue > green && blue > 25) {
-                color = 1;
-            }
-            if (red > green && red > blue && red > 40) {
-                color = 2;
-            }
-            if (red > 60 && green > 50 && blue < 40) {
-                color = 4;
-            }
-
-            // *******************************************************************************************
-            // SECTION 6: Elbow and Shoulder Motors
-            // *******************************************************************************************
-            double elbowPosition = 0.02;
-
-            int shoulderPosition = shoulderDrive.getCurrentPosition();
-            if (gamepad1.right_trigger > 0.1 || gamepad2.right_trigger > 0.1) {
-                if (shoulderPosition > 0) {
-                    shoulderDrive.setPower(gamepad1.right_trigger * 0.50);
-                }
-            }
-            if(gamepad1.left_trigger > 0.1 || gamepad2.left_trigger > 0.1){
-            if (shoulderPosition > 720) {
-                shoulderDrive.setPower(gamepad1.right_trigger * -0.50);
-                }
-            }
-            //Switch elbow servo to ELbow Motor
-            // elbow servo section
-            elbowPosition = elbowMotor.getCurrentPosition();
-            elbowTriggerUp.update(gamepad1.right_bumper == true);
-            elbowTriggerDown.update(gamepad1.left_bumper == true);
-            if (elbowTriggerUp.wasTriggered()) {
-                    elbowMotor.setPower(0.75);
-                    if (elbowPosition > 1) {
-                        elbowPosition = 1.0;
-                }
-            }
-
-            if (gamepad1.right_bumper || gamepad2.right_bumper || gamepad1.left_bumper || gamepad2.left_bumper == false) {
-                elbowMotor.setPower(0.0);
-
-                if (elbowTriggerDown.wasTriggered()) {
-                    if (elbowPosition > 0) {
-                        elbowMotor.setPower(0.5);
-                        if (elbowPosition < 0) {
-                            elbowPosition = 0;
-                        }
-                    }
-                }
-
-                // *******************************************************************************************
-                // SECTION 7: Write Outputs
-                // *******************************************************************************************
-
-                // Send calculated power to wheels
-                leftFrontDrive.setPower(leftFrontPower);
-                rightFrontDrive.setPower(rightFrontPower);
-                rightBackDrive.setPower(rightBackPower);
-                leftBackDrive.setPower(leftBackPower);
-
-                // Power to scissor lift, extension
-                scissorDrive.setPower(scissorDrivePower);
-
-                clawServo.setPosition(clawServoPosition);
-
-                // *******************************************************************************************
-                // SECTION 7: Telemetry
-                // *******************************************************************************************
-
-                if (color == 1) {
-                    telemetry.addData("Blue", true);
-                }
-                if (color == 2) {
-                    telemetry.addData("Red", true);
-                }
-                if (color == 3) {
-                    telemetry.addData("Green", true);
-                }
-                if (color == 4) {
-                    telemetry.addData("Yellow", true);
-                }
-
-                telemetry.update();
-                // Update telemetry
-                telemetry.update();
-
-                // idle time for servo
-                sleep(CYCLE_MS);
-                idle();
-
-            }
         }
     }
 
-    private String MotorPower(double leftFrontPower) {
-
-        // \u25A0: Square
-        // \u25B2: Up arrow
-        // \u25BC: Down arrow
-        // \u25B6: Right triangle
-        // \u25C0: Left triangle
-
-        String power = String.format("%4.2f", Math.abs(leftFrontPower));
-        String direction = "";
-        if (leftFrontPower > 0.01) {
-            direction = "\u25B2"; // Up arrow
-        } else if (leftFrontPower < -0.01) {
-            direction = "\u25BC"; // Down arrow
-        } else {
-            direction = "\u25A0 "; // No movement
-        }
-        return direction + power;
-    }
 }
 

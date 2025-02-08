@@ -36,7 +36,6 @@ public class AutoOpModeB extends LinearOpMode {
 
     // scissor lift drive, extension drive, and claw servo
     private DcMotor scissorDrive = null;
-    private DcMotor extensionDrive = null;
     private Servo clawServo = null;
 
     // digital limit switches
@@ -64,13 +63,12 @@ public class AutoOpModeB extends LinearOpMode {
 
         // scissor drive, claw server, and extend / retract
         scissorDrive = hardwareMap.get(DcMotor.class, "scissorDrive");
-        extensionDrive = hardwareMap.get(DcMotor.class, "extensionDrive");
         clawServo = hardwareMap.get(Servo.class, "clawServo");
 
         // digital limit switches
         // TODO: uncomment if touch sensors are added
-        // scissorLimitLo = hardwareMap.get(DigitalChannel.class, "scissorLimitLo");
-        // scissorLimitHi = hardwareMap.get(DigitalChannel.class, "scissorLimitHi");
+        // scissorLimitLo = hardwareMap.get(DigitalChannel.class, "scissorLoSensor");
+        // scissorLimitHi = hardwareMap.get(DigitalChannel.class, "scissorHiSensor");
         // extensionLimitBwd = hardwareMap.get(DigitalChannel.class, "extensionLimitBwd");
         // extensionLimitFwd = hardwareMap.get(DigitalChannel.class, "extensionLimitFwd");
 
@@ -82,7 +80,6 @@ public class AutoOpModeB extends LinearOpMode {
 
         // assign scissor, extension, and claw directions
         scissorDrive.setDirection(DcMotor.Direction.FORWARD);
-        extensionDrive.setDirection(DcMotor.Direction.REVERSE);
         clawServo.setDirection(Servo.Direction.FORWARD);
 
         // outside the while loop, set initial claw servo position
@@ -116,9 +113,7 @@ public class AutoOpModeB extends LinearOpMode {
         sleep(1000);
 
         // retract claw backward
-        extensionDrive.setPower(-1.0);
         sleep(2100);            // TODO: retract time
-        extensionDrive.setPower(0.0);
         sleep(1000);
 
         // drive robot forward

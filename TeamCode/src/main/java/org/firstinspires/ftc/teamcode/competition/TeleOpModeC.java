@@ -13,7 +13,7 @@ import org.firstinspires.ftc.teamcode.ctrl.RisingEdgeTrigger;
 
 
 @TeleOp(name = "$$$ TELE-C (BETA)", group = "$$$")
-public class teleOpModeC extends LinearOpMode {
+public class TeleOpModeC extends LinearOpMode {
 
     // scissor lift constantszoom
     static final double SCISSOR_MIN_POS = 1000;    // Minimum scissor lift encoder position
@@ -70,10 +70,10 @@ public class teleOpModeC extends LinearOpMode {
         shoulderDrive = hardwareMap.get(DcMotor.class, "shoulderDrive");
         elbowMotor = hardwareMap.get(DcMotorEx.class, "elbowDrive");
         clawServo = hardwareMap.get(Servo.class, "clawServo");
-        colorSensor = hardwareMap.get(ColorRangeSensor.class, "clawColorSensor");
+        colorSensor = hardwareMap.get(ColorRangeSensor.class, "colorSensor");
 
         // digital limit switches
-        scissorLimitLo = hardwareMap.get(TouchSensor.class, "scissorLimitLo");
+        scissorLimitLo = hardwareMap.get(TouchSensor.class, "scissorLoSensor");
 
         // assign wheel motor directions
         leftFrontDrive.setDirection(DcMotor.Direction.FORWARD);

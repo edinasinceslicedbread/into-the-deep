@@ -35,7 +35,6 @@ public class TeleOpModeB extends LinearOpMode {
 
     // scissor lift drive, extension drive, and claw servo
     private DcMotor scissorDrive = null;
-    private DcMotor extensionDrive = null;
     private Servo clawServo = null;
 
     // digital limit switches
@@ -57,11 +56,10 @@ public class TeleOpModeB extends LinearOpMode {
 
         // scissor drive, claw server, and extend / retract
         scissorDrive = hardwareMap.get(DcMotor.class, "scissorDrive");
-        extensionDrive = hardwareMap.get(DcMotor.class, "extensionDrive");
         clawServo = hardwareMap.get(Servo.class, "clawServo");
 
         // digital limit switches
-        scissorLimitLo = hardwareMap.get(TouchSensor.class, "scissorLimitLo");
+        scissorLimitLo = hardwareMap.get(TouchSensor.class, "scissorLoSensor");
 
         // assign wheel motor directions
         leftFrontDrive.setDirection(DcMotor.Direction.FORWARD);
@@ -71,7 +69,6 @@ public class TeleOpModeB extends LinearOpMode {
 
         // assign scissor, extension, and claw directions
         scissorDrive.setDirection(DcMotor.Direction.FORWARD);
-        extensionDrive.setDirection(DcMotor.Direction.REVERSE);
         clawServo.setDirection(Servo.Direction.FORWARD);
 
         // outside the while loop, set initial claw servo position
@@ -198,8 +195,6 @@ public class TeleOpModeB extends LinearOpMode {
             boolean scissorLimitLoOn = scissorLimitLo.isPressed();
             boolean scissorLimitHiOn = (scissorEncoderCounts >= 10100);
 
-            double extensionEncoderCounts = extensionDrive.getCurrentPosition();
-            boolean extensionPastScissorLimit = (extensionEncoderCounts <= -2000);
 
             // TODO: adjust max speeds between 0.0 and 1.0
             double scissorUpOverride = 1.0;
@@ -209,14 +204,14 @@ public class TeleOpModeB extends LinearOpMode {
             // Gamepad 1 triggers
             if (gamepad1.right_trigger > 0.1 && scissorLimitHiOn == false) {
                 scissorDrivePower = gamepad1.right_trigger * scissorUpOverride;
-            } else if (gamepad1.left_trigger > 0.1 && scissorLimitLoOn == false && extensionPastScissorLimit == false) {
+            } else if (gamepad1.left_trigger > 0.1 && scissorLimitLoOn == false) {
                 scissorDrivePower = -gamepad1.left_trigger * scissorDownOverride;
             }
 
             // Gamepad 2 triggers
             if (gamepad2.right_trigger > 0.1 && scissorLimitHiOn == false) {
                 scissorDrivePower = gamepad2.right_trigger * scissorUpOverride;
-            } else if (gamepad2.left_trigger > 0.1 && scissorLimitLoOn == false && extensionPastScissorLimit == false) {
+            } else if (gamepad2.left_trigger > 0.1 && scissorLimitLoOn == false) {
                 scissorDrivePower = -gamepad2.left_trigger * scissorDownOverride;
             }
 
@@ -224,31 +219,22 @@ public class TeleOpModeB extends LinearOpMode {
             // SECTION 4: Extend and Retract Claw
             // *******************************************************************************************
 
-            // TODO: adjust extension encoder count limits
-            boolean extensionPastLimitMax = (extensionEncoderCounts >= 7800);
-            boolean extensionPastLimitSlow = (extensionEncoderCounts <= 700);
-            boolean extensionPastLimitMin = (extensionEncoderCounts <= -5800);
-
             // TODO: adjust max speeds between 0.0 and 1.0
             double extensionFwdPowerMax = 1.0;
             double extensionBwdPowerMax = 1.0;
             double extensionDrivePower = 0;
 
-            if (extensionPastLimitSlow) {
-                extensionBwdPowerMax = 0.75;
-            }
-
             // Gamepad 1
-            if (gamepad1.right_bumper && extensionPastLimitMax == false) {
+            if (gamepad1.right_bumper) {
                 extensionDrivePower = extensionFwdPowerMax;
-            } else if (gamepad1.left_bumper && extensionPastLimitMin == false) {
+            } else if (gamepad1.left_bumper) {
                 extensionDrivePower = -extensionBwdPowerMax;
             }
 
             // Gamepad 2
-            if (gamepad2.right_bumper && extensionPastLimitMax == false) {
+            if (gamepad2.right_bumper) {
                 extensionDrivePower = extensionFwdPowerMax;
-            } else if (gamepad2.left_bumper && extensionPastLimitMin == false) {
+            } else if (gamepad2.left_bumper) {
                 extensionDrivePower = -extensionBwdPowerMax;
             }
 
@@ -281,7 +267,6 @@ public class TeleOpModeB extends LinearOpMode {
 
             // Power to scissor lift, extension
             scissorDrive.setPower(scissorDrivePower);
-            extensionDrive.setPower(extensionDrivePower);
             clawServo.setPosition(clawServoPosition);
 
             // *******************************************************************************************
@@ -295,7 +280,6 @@ public class TeleOpModeB extends LinearOpMode {
             telemetry.addLine(String.format("[%s]----[%s]", MotorPower(leftFrontPower), MotorPower(rightFrontPower)));
             telemetry.addLine(String.format("[%s]----[%s]", MotorPower(leftBackPower), MotorPower(rightBackPower)));
             telemetry.addLine(String.format("Scissor Lift: [%s] [%8.0f] [%s]", MotorPower(scissorDrivePower), scissorEncoderCounts, scissorLimitLoOn));
-            telemetry.addLine(String.format("Claw Extension: [%s] [%8.0f]", MotorPower(extensionDrivePower), extensionEncoderCounts));
             telemetry.addLine(String.format("Claw Servo Position: [%4.2f]", clawServoPosition));
 
             // Update telemetry

@@ -18,7 +18,7 @@ public class ScissorMotorPushTest extends LinearOpMode {
     // Hardware Definitions
     //------------------------------------------------------------------------------------------------
 
-    // hardware devices
+    // scissor
     private DcMotorEx scissorDrive = null;
     private TouchSensor scissorLoSensor = null;
 
@@ -29,6 +29,8 @@ public class ScissorMotorPushTest extends LinearOpMode {
         //------------------------------------------------------------------------------------------------
         // Hardware Definitions
         //------------------------------------------------------------------------------------------------
+
+        // scissor
         scissorDrive = hardwareMap.get(DcMotorEx.class, "scissorDrive");
         scissorLoSensor = hardwareMap.get(TouchSensor.class, "scissorLoSensor");
 

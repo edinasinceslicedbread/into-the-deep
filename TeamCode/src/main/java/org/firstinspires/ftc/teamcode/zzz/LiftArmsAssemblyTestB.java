@@ -43,7 +43,7 @@ public class LiftArmsAssemblyTestB extends LinearOpMode {
         shoulderDrive = hardwareMap.get(DcMotorEx.class, "shoulderDrive");
         elbowDrive = hardwareMap.get(DcMotorEx.class, "elbowDrive");
         clawServo = hardwareMap.get(Servo.class, "clawServo");
-        colorSensor = hardwareMap.get(ColorRangeSensor.class, "clawColorSensor");
+        colorSensor = hardwareMap.get(ColorRangeSensor.class, "colorSensor");
 
         // assign scissor, extension, and claw directions
         shoulderDrive.setDirection(DcMotor.Direction.REVERSE);

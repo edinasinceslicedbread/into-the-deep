@@ -40,7 +40,7 @@ public class AlteredLiftArmsAssembly extends LinearOpMode {
         shoulderDrive = hardwareMap.get(DcMotor.class, "shoulderDrive");
         elbowServo = hardwareMap.get(Servo.class, "elbowServo");
         clawServo = hardwareMap.get(Servo.class, "clawServo");
-        colorSensor = hardwareMap.get(ColorRangeSensor.class, "clawColorSensor");
+        colorSensor = hardwareMap.get(ColorRangeSensor.class, "colorSensor");
 
         // assign scissor, extension, and claw directions
         shoulderDrive.setDirection(DcMotor.Direction.FORWARD);

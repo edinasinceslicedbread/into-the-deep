@@ -16,6 +16,8 @@ public class ClawServoGripperTest extends LinearOpMode {
     //------------------------------------------------------------------------------------------------
     // Hardware Definitions
     //------------------------------------------------------------------------------------------------
+
+    // claw
     private Servo clawServo = null;
 
     @SuppressLint("DefaultLocale")
@@ -26,7 +28,6 @@ public class ClawServoGripperTest extends LinearOpMode {
         // Hardware Setup
         //------------------------------------------------------------------------------------------------
         clawServo = hardwareMap.get(Servo.class, "clawServo");
-        clawServo.setDirection(Servo.Direction.FORWARD);
 
         //------------------------------------------------------------------------------------------------
         // Start Button
