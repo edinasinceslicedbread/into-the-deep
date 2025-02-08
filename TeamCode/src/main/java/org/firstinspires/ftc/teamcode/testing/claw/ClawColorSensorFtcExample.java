@@ -8,8 +8,8 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 
-@TeleOp(name = "TEST | Claw | Color Sensor Example", group = "$$$$")
-public class ClawColorSensorExample extends LinearOpMode {
+@TeleOp(name = "TEST | Claw | Color Sensor FTC Example", group = "$$$$")
+public class ClawColorSensorFtcExample extends LinearOpMode {
 
     ColorSensor colorSensor;    // Hardware Device Object
 
