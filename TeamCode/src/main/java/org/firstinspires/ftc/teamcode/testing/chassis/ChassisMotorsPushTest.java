@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-@TeleOp(name = "TEST | Chassis | Motors Push Test", group = "$$$$ Chassis")
+@TeleOp(name = "CHASSIS | Motors Push Test", group = "$$$$ Chassis")
 public class ChassisMotorsPushTest extends LinearOpMode {
 
     // elapsed time

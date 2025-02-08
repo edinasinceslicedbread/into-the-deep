@@ -2,17 +2,13 @@ package org.firstinspires.ftc.teamcode.testing.scissor;
 
 import android.annotation.SuppressLint;
 
-import com.acmerobotics.dashboard.config.Config;
-import com.arcrobotics.ftclib.controller.PIDController;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.ColorRangeSensor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-@TeleOp(name = "TEST | Scissor | Motor Push Test", group = "$$$$ Scissor")
+@TeleOp(name = "SCISSOR | Motor Push Test", group = "$$$$ Scissor")
 public class ScissorMotorPushTest extends LinearOpMode {
 
     // elapsed time

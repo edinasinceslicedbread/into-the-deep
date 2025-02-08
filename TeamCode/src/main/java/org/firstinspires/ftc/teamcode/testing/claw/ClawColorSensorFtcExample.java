@@ -8,7 +8,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 
-@TeleOp(name = "TEST | Claw | Color Sensor FTC Example", group = "$$$$ Claw")
+@TeleOp(name = "CLAW | Color Sensor FTC Example", group = "$$$$ Claw")
 public class ClawColorSensorFtcExample extends LinearOpMode {
 
     ColorSensor colorSensor;    // Hardware Device Object

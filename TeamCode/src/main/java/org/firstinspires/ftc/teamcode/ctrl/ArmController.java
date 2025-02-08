@@ -13,11 +13,15 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 public class ArmController {
 
     //------------------------------------------------------------------------------------------------
-    // Hardware and Parameters
+    // Hardware
     //------------------------------------------------------------------------------------------------
 
     private DcMotorEx shoulderDrive = null;
     private DcMotorEx elbowDrive = null;
+
+    //------------------------------------------------------------------------------------------------
+    // Parameters and State
+    //------------------------------------------------------------------------------------------------
 
     public static class ShoulderParams {
 
@@ -74,6 +78,7 @@ public class ArmController {
         // elbow positions in encoder ticks
         public int homePosTicks = 0;
         public int dropPosTicks = degreesToTicks(90.0);
+        public int drivePosTicks = degreesToTicks(60.0);
         public int pickPosTicks = 50;
         public int inPosTolerance = 10;         // encoder ticks
 
@@ -156,13 +161,10 @@ public class ArmController {
 
     }
 
+    // parameters
     public ShoulderParams shoulderParams = new ShoulderParams();
     public ShoulderState shoulderState = new ShoulderState(shoulderParams);
     public ElbowParams elbowParams = new ElbowParams();
-
-    //------------------------------------------------------------------------------------------------
-    // Arm configuration
-    //------------------------------------------------------------------------------------------------
 
     // control fields
     public int armControlState = 0;         // state machine variable
@@ -172,21 +174,18 @@ public class ArmController {
     public double profileRunTime = 0.0;
 
     // state and triggers
-    private final RisingEdgeTrigger homeTrigger = new RisingEdgeTrigger();    // send to home button
-    private final RisingEdgeTrigger dropTrigger = new RisingEdgeTrigger();    // send to drop button
-    private final RisingEdgeTrigger pickTrigger = new RisingEdgeTrigger();    // send to pick button
+    public RisingEdgeTrigger homeTrigger = new RisingEdgeTrigger();    // send to home button
+    public RisingEdgeTrigger dropTrigger = new RisingEdgeTrigger();    // send to drop button
+    public RisingEdgeTrigger driveTrigger = new RisingEdgeTrigger();    // send to drop button
+    public RisingEdgeTrigger pickTrigger = new RisingEdgeTrigger();    // send to pick button
 
     // shoulder control
     public TrapezoidalMotionProfile.Profile[] shoulderProfile = new TrapezoidalMotionProfile.Profile[0];
-    private final ArmFeedforward shoulderFeedforward = new ArmFeedforward(shoulderParams.ffw_kS, shoulderParams.ffw_kCos, shoulderParams.ffw_kV, shoulderParams.ffw_kA);
-    private final PIDController shoulderPosCtrl = new PIDController(shoulderParams.pos_kP, shoulderParams.pos_kI, shoulderParams.pos_kD);
-    private final PController shoulderVelCtrl = new PController(shoulderParams.vel_kP);
+    public ArmFeedforward shoulderFeedforward = new ArmFeedforward(shoulderParams.ffw_kS, shoulderParams.ffw_kCos, shoulderParams.ffw_kV, shoulderParams.ffw_kA);
+    public PIDController shoulderPosCtrl = new PIDController(shoulderParams.pos_kP, shoulderParams.pos_kI, shoulderParams.pos_kD);
+    public PController shoulderVelCtrl = new PController(shoulderParams.vel_kP);
 
     public void initialize(HardwareMap hardwareMap) {
-
-        //------------------------------------------------------------------------------------------------
-        // Arm Hardware Setup
-        //------------------------------------------------------------------------------------------------
 
         // hardware map
         shoulderDrive = hardwareMap.get(DcMotorEx.class, "shoulderDrive");
@@ -219,13 +218,10 @@ public class ArmController {
 
     public void update(ElapsedTime runtime, Gamepad gamepad1, Gamepad gamepad2) {
 
-        //------------------------------------------------------------------------------------------------
-        // Arm Control
-        //------------------------------------------------------------------------------------------------
-
-        // arm button triggers
+        // update triggers
         homeTrigger.update(gamepad1.x);
         dropTrigger.update(gamepad1.y);
+        driveTrigger.update(gamepad1.a);
         pickTrigger.update(gamepad1.b);
 
         // shoulder status and error

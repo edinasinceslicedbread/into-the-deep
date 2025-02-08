@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.ColorRangeSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-@TeleOp(name = "TEST | Claw | Color Sensor Test", group = "$$$$ Claw")
+@TeleOp(name = "CLAW | Color Sensor Test", group = "$$$$ Claw")
 public class ClawColorSensorTest extends LinearOpMode {
 
     // elapsed time

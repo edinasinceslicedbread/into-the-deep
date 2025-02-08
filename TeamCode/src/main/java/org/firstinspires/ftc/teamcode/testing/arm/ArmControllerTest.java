@@ -2,14 +2,13 @@ package org.firstinspires.ftc.teamcode.testing.arm;
 
 import android.annotation.SuppressLint;
 
-import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.ctrl.ArmController;
 
-@TeleOp(name = "TEST | Arm | Controller Test", group = "$$$$ Arm")
+@TeleOp(name = "ARM | Controller Test", group = "$$$$ Arm")
 public class ArmControllerTest extends LinearOpMode {
 
     // elapsed time
