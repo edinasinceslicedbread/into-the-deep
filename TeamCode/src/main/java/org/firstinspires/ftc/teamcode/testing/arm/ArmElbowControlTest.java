@@ -2,6 +2,8 @@ package org.firstinspires.ftc.teamcode.testing.arm;
 
 import android.annotation.SuppressLint;
 
+import com.arcrobotics.ftclib.controller.wpilibcontroller.ProfiledPIDController;
+import com.arcrobotics.ftclib.trajectory.TrapezoidProfile;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -27,25 +29,27 @@ public class ArmElbowControlTest extends LinearOpMode {
 
     public static class ElbowParams {
 
-        // the elbow motor has 288 ticks per revolution
+        // the elbow motor has 240 ticks per revolution
         public double ticksPerDegree = 240.0 / 360.0;
 
-        // max velocity (in degrees per second)
-        public double maxVelocity = 30.0;
-
         // elbow positions in encoder ticks
-        public int homePosTicks = 0;
-        public int dropPosTicks = degreesToTicks(90.0);
-        public int drivePosTicks = degreesToTicks(60.0);
-        public int pickPosTicks = 50;
-        public int inPosTolerance = 10;         // encoder ticks
+        public int homePickPosTicks = 0;
+        public int basketDropPosTicks = degreesToTicks(95.0);
+        public int chamberClipPosTicks = degreesToTicks(135.0);
+        public int submersiblePickPosTicks = 50;
+
+        // motion profile constraints (in encoder ticks)
+        public double maxVelocity = 90;
+        public double maxAcceleration = 45;
+
+        // controller tolerance
+        public int positionTolerance = 4;         // encoder ticks
+        public int velocityTolerance = 10;         // encoder ticks per second
 
         // control parameters
-        public double pos_kP = 5.0;
-        public double vel_kP = 5.0;
-        public double vel_kI = 0.0;
-        public double vel_kD = 0.0;
-        public double vel_kF = 0.0;
+        public double kP = 0.1;
+        public double kI = 0.0;
+        public double kD = 0.0;
 
         // function to convert degrees to encoder ticks
         public int degreesToTicks(double degrees) {
@@ -57,18 +61,31 @@ public class ArmElbowControlTest extends LinearOpMode {
             return (double) ticks / ticksPerDegree;
         }
 
+        public TrapezoidProfile.Constraints getProfileConstraints() {
+            return new TrapezoidProfile.Constraints(maxVelocity, maxAcceleration);
+        }
+
+    }
+
+    public static class ElbowState {
+        public int currentPosActual = 0;
+        public int currentVelActual = 0;
     }
 
     // parameters
     public ElbowParams elbowParams = new ElbowParams();
+    public ElbowState elbowState = new ElbowState();
 
-    // control varialbes
+    // elbow PID controller
+
+    public ProfiledPIDController elbowController
+            = new ProfiledPIDController(elbowParams.kP, elbowParams.kI, elbowParams.kD, elbowParams.getProfileConstraints());
+
     // button triggers
-    public RisingEdgeTrigger homeTrigger = new RisingEdgeTrigger();    // send to home button
-    public RisingEdgeTrigger dropTrigger = new RisingEdgeTrigger();    // send to drop button
-    public RisingEdgeTrigger driveTrigger = new RisingEdgeTrigger();    // send to drop button
-    public RisingEdgeTrigger pickTrigger = new RisingEdgeTrigger();    // send to pick button
-    double elbowTicksTarget = 0.0;
+    public RisingEdgeTrigger homePickTrigger = new RisingEdgeTrigger();    // send to home button
+    public RisingEdgeTrigger upperBasketTrigger = new RisingEdgeTrigger();    // send to drop button
+    public RisingEdgeTrigger chamberClipTrigger = new RisingEdgeTrigger();    // send to drop button
+    public RisingEdgeTrigger submersiblePickTrigger = new RisingEdgeTrigger();    // send to pick button
 
     @SuppressLint("DefaultLocale")
     @Override
@@ -78,10 +95,7 @@ public class ArmElbowControlTest extends LinearOpMode {
         // Hardware Setup
         //------------------------------------------------------------------------------------------------
 
-        // hardware map
         elbowDrive = hardwareMap.get(DcMotorEx.class, "elbowDrive");
-
-        // motor directions
         elbowDrive.setDirection(DcMotorEx.Direction.REVERSE);
 
         //------------------------------------------------------------------------------------------------
@@ -96,17 +110,13 @@ public class ArmElbowControlTest extends LinearOpMode {
         waitForStart();
         runtime.reset();
 
-        // reset elbow motor
-        elbowDrive.setPositionPIDFCoefficients(elbowParams.pos_kP);
-        elbowDrive.setVelocityPIDFCoefficients(elbowParams.vel_kP, elbowParams.vel_kI, elbowParams.vel_kD, elbowParams.vel_kF);
-        elbowDrive.setTargetPosition(elbowDrive.getCurrentPosition());
-        elbowDrive.setTargetPositionTolerance(elbowParams.inPosTolerance);
-        elbowDrive.setVelocity(elbowParams.maxVelocity, AngleUnit.DEGREES);
-        elbowDrive.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
+        //------------------------------------------------------------------------------------------------
+        // Reset
+        //------------------------------------------------------------------------------------------------
+        elbowDrive.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
         elbowDrive.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
-
-        // control variables
-        int elbowTicksTarget = 0;
+        elbowController.setTolerance(elbowParams.positionTolerance, elbowParams.velocityTolerance);
+        elbowController.setGoal(new TrapezoidProfile.State(elbowDrive.getCurrentPosition(), 0.0));
 
         //------------------------------------------------------------------------------------------------
         // Run until the end of the match (driver presses STOP)
@@ -114,33 +124,39 @@ public class ArmElbowControlTest extends LinearOpMode {
         while (opModeIsActive()) {
 
             // update triggers
-            homeTrigger.update(gamepad1.x);
-            dropTrigger.update(gamepad1.y);
-            driveTrigger.update(gamepad1.a);
-            pickTrigger.update(gamepad1.b);
+            homePickTrigger.update(gamepad1.x);
+            upperBasketTrigger.update(gamepad1.y);
+            chamberClipTrigger.update(gamepad1.a);
+            submersiblePickTrigger.update(gamepad1.b);
 
-            int elbowTicksActual = elbowDrive.getCurrentPosition();
+            // get current position and velocity
+            elbowState.currentPosActual = elbowDrive.getCurrentPosition();
+            elbowState.currentVelActual = elbowParams.degreesToTicks(elbowDrive.getVelocity(AngleUnit.DEGREES));
 
-            // move commands
-            if (homeTrigger.wasTriggered()) {
-                elbowTicksTarget=elbowParams.homePosTicks;
-                elbowDrive.setTargetPosition(elbowTicksTarget);
+            if (homePickTrigger.wasTriggered()) {
+                int goalPosition = elbowController.atGoal() ? elbowParams.homePickPosTicks : elbowState.currentPosActual;
+                elbowController.setGoal(new TrapezoidProfile.State(goalPosition, 0.0));
             }
-            if (dropTrigger.wasTriggered()) {
-                elbowTicksTarget=elbowParams.dropPosTicks;
-                elbowDrive.setTargetPosition(elbowTicksTarget);
+            if (upperBasketTrigger.wasTriggered()) {
+                int goalPosition = elbowController.atGoal() ? elbowParams.basketDropPosTicks : elbowState.currentPosActual;
+                elbowController.setGoal(new TrapezoidProfile.State(goalPosition, 0.0));
             }
-            if (driveTrigger.wasTriggered()) {
-                elbowTicksTarget=elbowParams.drivePosTicks;
-                elbowDrive.setTargetPosition(elbowTicksTarget);
+            if (chamberClipTrigger.wasTriggered()) {
+                int goalPosition = elbowController.atGoal() ? elbowParams.chamberClipPosTicks : elbowState.currentPosActual;
+                elbowController.setGoal(new TrapezoidProfile.State(goalPosition, 0.0));
             }
-            if (pickTrigger.wasTriggered()) {
-                elbowTicksTarget=elbowParams.pickPosTicks;
-                elbowDrive.setTargetPosition(elbowTicksTarget);
+            if (submersiblePickTrigger.wasTriggered()) {
+                int goalPosition = elbowController.atGoal() ? elbowParams.submersiblePickPosTicks : elbowState.currentPosActual;
+                elbowController.setGoal(new TrapezoidProfile.State(goalPosition, 0.0));
             }
+
+            // run PID controller
+            double elbowPower = elbowController.calculate(elbowState.currentPosActual);
 
             // set motor power
-            double elbowPower = 1.0;
+            if (elbowPower > 0.2) {
+                elbowPower = 0.2;
+            }
             elbowDrive.setPower(elbowPower);
 
             //------------------------------------------------------------------------------------------------
@@ -148,10 +164,12 @@ public class ArmElbowControlTest extends LinearOpMode {
             //------------------------------------------------------------------------------------------------
             telemetry.addData("Run Time", runtime.toString());
             telemetry.addLine("Use the A, B, X, and Y buttons to move the elbow.");
-            telemetry.addLine("X -> Home, Y -> Drop, A -> Driving, B -> Pick");
+            telemetry.addLine("X -> Home Pick, Y -> Basket Drop, A -> Chamber Clip, B -> Submersible Pick");
             telemetry.addLine("--------------------------------------------------");
-            telemetry.addLine(String.format("Elbow Target: TICKS[%d]", elbowTicksTarget));
-            telemetry.addLine(String.format("Elbow Status: PWR[%4.2f] TICKS[%d]", elbowPower, elbowTicksActual));
+            telemetry.addLine(String.format("Elbow Target: TICKS[%d]", (int) Math.round(elbowController.getGoal().position)));
+            telemetry.addLine(String.format("Elbow Status: PWR[%4.2f] TICKS[%d]", elbowPower, elbowState.currentPosActual));
+            telemetry.addLine(String.format("Elbow Error: POS[%4.2f] VEL[%4.2f]", elbowController.getPositionError(), elbowController.getVelocityError()));
+            telemetry.addLine(String.format("At: Goal[%s] SetPoint[%s]", elbowController.atGoal(), elbowController.atSetpoint()));
             telemetry.update();
 
         }
