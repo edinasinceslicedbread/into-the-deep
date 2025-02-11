@@ -57,17 +57,18 @@ public class ArmTeleOpModeTest extends LinearOpMode {
             // Telemetry Data
             //------------------------------------------------------------------------------------------------
             telemetry.addData("Run Time", runtime.toString());
-            telemetry.addData("Arm State", armController.armControlState);
-            telemetry.addData("--- Motion Run Time", armController.profileRunTime);
-            telemetry.addData("Profiles", armController.shoulderProfile.length);
-            telemetry.addLine(String.format("Home[%s] Drop[%s] Pick[%s]", armController.shoulderState.inHomeWindow, armController.shoulderState.inDropWindow, armController.shoulderState.inPickWindow));
-            telemetry.addData("------- FFW Power", armController.shoulderState.shoulderPowerFfw);
-            telemetry.addLine(String.format("        P [%4.2f] V [%4.2f] A [%4.2f]", armController.shoulderState.shoulderPosTargetRad, armController.shoulderState.shoulderVelTargetRad, armController.shoulderState.shoulderAccTargetRad));
-            telemetry.addData("------- POS Power", armController.shoulderState.shoulderPowerPidPos);
-            telemetry.addLine(String.format("        A [%d] T [%d] E [%d]", armController.shoulderState.currentPosActual, armController.shoulderState.currentPosTarget, armController.shoulderState.currentPosError));
-            telemetry.addData("------- VEL Power", armController.shoulderState.shoulderPowerPidVel);
-            telemetry.addLine(String.format("        A [%d] T [%d] E [%d]", armController.shoulderState.currentVelActual, armController.shoulderState.currentVelTarget, armController.shoulderState.currentVelError));
-            telemetry.addData("------- PID Power", armController.shoulderState.shoulderPower);
+            telemetry.addLine("Use the A, B, X, and Y buttons to move the armController.shoulder.");
+            telemetry.addLine(String.format("X [%s] -> Home Position", armController.shoulderState.atHomePos));
+            telemetry.addLine(String.format("Y [%s] [%s]-> Basket or Chamber", armController.shoulderState.atBasketPos, armController.shoulderState.atDrivePos));
+            telemetry.addLine(String.format("A [%s] -> Stop Motion", armController.shoulderState.currentVelActual > 0.0));
+            telemetry.addLine(String.format("B [%s] -> Pick at Chamber Submersible", armController.shoulderState.atPickPos));
+            telemetry.addLine("--------------------------------------------------");
+            telemetry.addLine(String.format("Power: FFW[%4.2f] PID[%4.2f]", armController.shoulderState.motorPowerFFW, armController.shoulderState.motorPowerPID));
+            telemetry.addLine(String.format("Shoulder Target: GOAL[%d] SP[%d]", (int) Math.round(armController.shoulderController.getGoal().position), (int) Math.round(armController.shoulderController.getSetpoint().position)));
+            telemetry.addLine(String.format("Shoulder Status: PWR[%4.2f] TICKS[%d]", armController.shoulderState.motorPower, armController.shoulderState.currentPosActual));
+            telemetry.addLine("--------------------------------------------------");
+            telemetry.addLine(String.format("Shoulder Error: POS[%4.2f] VEL[%4.2f]", armController.shoulderController.getPositionError(), armController.shoulderController.getVelocityError()));
+            telemetry.addLine(String.format("At: Goal[%s] SetPoint[%s]", armController.shoulderController.atGoal(), armController.shoulderController.atSetpoint()));
             telemetry.update();
 
 
