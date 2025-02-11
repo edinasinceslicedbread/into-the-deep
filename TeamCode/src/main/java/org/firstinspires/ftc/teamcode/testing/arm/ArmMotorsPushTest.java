@@ -9,7 +9,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.ctrl.RisingEdgeTrigger;
 
-@TeleOp(name = "ARM | Motors Push Test", group = "$$$$ Arm")
+@TeleOp(name = "ARM | 01 Motors Push Test", group = "$$$$ Arm")
 public class ArmMotorsPushTest extends LinearOpMode {
 
     // elapsed time
