@@ -12,8 +12,8 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.ctrl.RisingEdgeTrigger;
 
-@TeleOp(name = "ARM | Elbow Control Test", group = "$$$$ Arm")
-public class ArmElbowControlTest extends LinearOpMode {
+@TeleOp(name = "ARM | Control Elbow Test", group = "$$$$ Arm")
+public class ArmControlElbowTest extends LinearOpMode {
 
     // elapsed time
     private final ElapsedTime runtime = new ElapsedTime();
@@ -39,8 +39,8 @@ public class ArmElbowControlTest extends LinearOpMode {
         public int submersiblePickPosTicks = 50;
 
         // motion profile constraints (in encoder ticks)
-        public double maxVelocity = 90;
-        public double maxAcceleration = 45;
+        public int maxVelocity = 90;
+        public int maxAcceleration = 45;
 
         // controller tolerance
         public int positionTolerance = 4;         // encoder ticks
@@ -116,6 +116,7 @@ public class ArmElbowControlTest extends LinearOpMode {
         elbowDrive.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
         elbowDrive.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
         elbowController.setTolerance(elbowParams.positionTolerance, elbowParams.velocityTolerance);
+        elbowController.reset(elbowDrive.getCurrentPosition());
         elbowController.setGoal(new TrapezoidProfile.State(elbowDrive.getCurrentPosition(), 0.0));
 
         //------------------------------------------------------------------------------------------------
