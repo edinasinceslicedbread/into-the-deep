@@ -11,10 +11,11 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.ctrl.ArmController;
 import org.firstinspires.ftc.teamcode.ctrl.RisingEdgeTrigger;
 
 
-@TeleOp(name = "$$$ TELE-D (ALPHA)", group = "$$$")
+@TeleOp(name = "$$$ TELE-D (SIGMA)", group = "$$$")
 public class TeleOpModeD extends LinearOpMode {
 
     // elapsed time
@@ -36,6 +37,9 @@ public class TeleOpModeD extends LinearOpMode {
 
     // claw
     private Servo clawServo = null;
+
+    // arm
+    private ArmController armController = new ArmController();
 
     @SuppressLint("DefaultLocale")
     @Override
@@ -59,6 +63,9 @@ public class TeleOpModeD extends LinearOpMode {
         // claw
         clawServo = hardwareMap.get(Servo.class, "clawServo");
 
+        // arm
+        armController.initialize(hardwareMap);
+
         //------------------------------------------------------------------------------------------------
         // Advanced Setup
         //------------------------------------------------------------------------------------------------
@@ -81,6 +88,9 @@ public class TeleOpModeD extends LinearOpMode {
         // Wait for the game to start (driver presses START)
         waitForStart();
         runtime.reset();
+
+        // arm reset
+        armController.reset();
 
         //------------------------------------------------------------------------------------------------
         // Run until the end of the match (driver presses STOP)
@@ -238,6 +248,11 @@ public class TeleOpModeD extends LinearOpMode {
             if (gamepad1.right_bumper || gamepad2.right_bumper) {
                 clawServo.setPosition(0.05);
             }
+
+            //------------------------------------------------------------------------------------------------
+            // arm Control
+            //------------------------------------------------------------------------------------------------
+            armController.update(runtime, gamepad1, gamepad2);
 
             idle();
 

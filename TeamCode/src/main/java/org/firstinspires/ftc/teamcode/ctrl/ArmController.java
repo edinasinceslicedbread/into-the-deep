@@ -28,6 +28,10 @@ public class ArmController {
         // the shoulder motor has 1440 ticks per revolution
         public double ticksPerDegree = 1440.0 / 360.0;
 
+        // controller tolerance
+        public int positionTolerance = 50;  // encoder ticks
+        public int velocityTolerance = 250; // encoder ticks per second, high value as this is pretty shaky
+
         // shoulder positions (in encoder ticks)
         public int homePosTicks = 0;
         public int drivePosTicks = 240;
@@ -35,25 +39,21 @@ public class ArmController {
         public int pickPosTicks = 780;
 
         // motion profile constraints
-        public int maxVelocity = 150;       // ticks per second
-        public int maxAcceleration = 125;   // ticks per second per second
-        public int stopVelocity = 100;      // ticks per second
-        public int stopAcceleration = 50;   // ticks per second per second
+        public int maxVelocity = 125;       // ticks per second
+        public int maxAcceleration = 100;   // ticks per second per second
+        public int stopVelocity = 200;      // ticks per second
+        public int stopAcceleration = 150;   // ticks per second per second
 
         // feed forward parameters
         public double kS = 0.1;             // static FFW gain (power just to turn motor and gears freely)
-        public double kCos = 0.7;           // gravity FFW gain (power to move arm up from horizontal)
-        public double kV = 0.05;             // velocity FFW gain (applied to velocity set point)
-        public double kA = 0.1;             // acceleration FFW gain (not used, or profile generator doesn't return acceleration)
+        public double kCos = 0.6;           // gravity FFW gain (power to move arm up from horizontal)
+        public double kV = 0.1;             // velocity FFW gain (applied to velocity set point)
+        public double kA = 0.0;             // acceleration FFW gain (not used, or profile generator doesn't return acceleration)
 
         // control parameters
-        public double kP = 0.03;            // proportional PID loop gain
+        public double kP = 0.015;            // proportional PID loop gain
         public double kI = 0.0;             // integral PID loop gain (not used)
         public double kD = 0.0;             // derivative PID loop gain (not used)
-
-        // controller tolerance
-        public int positionTolerance = 50;  // encoder ticks
-        public int velocityTolerance = 250; // encoder ticks per second, high value as this is pretty shaky
 
         // function to convert degrees to encoder ticks
         public int degreesToTicks(double degrees) {
@@ -87,10 +87,8 @@ public class ArmController {
         public boolean atBasketPos = false;
         public boolean atPickPos = false;
 
-        public boolean atHomeGoal = false;
-        public boolean atDriveGoal = false;
-        public boolean atBasketGoal = false;
-        public boolean atPickGoal = false;
+        // command flags
+        public int lastGoalTargetTicks = 0;
 
         // output power
         public double motorPowerFFW = 0.0;
@@ -124,6 +122,9 @@ public class ArmController {
         public int basketPosTicks = 85;
         public int pickPosTicks = 33;
 
+        // home positions to clear 42 inch limits
+        public int homeApproachTicks = -10;
+
         // motion profile constraints
         public int maxVelocity = 90;        // ticks per second
         public int maxAcceleration = 45;    // ticks per second per second
@@ -135,7 +136,7 @@ public class ArmController {
         public int velocityTolerance = 100;        // encoder ticks per second
 
         // control parameters
-        public double kP = 0.1;     // proportional PID loop gain
+        public double kP = 0.05;     // proportional PID loop gain
         public double kI = 0.0;     // integral PID loop gain (not used)
         public double kD = 0.0;     // derivative PID loop gain (not used)
 
@@ -170,6 +171,9 @@ public class ArmController {
         public boolean atDrivePos = false;
         public boolean atBasketPos = false;
         public boolean atPickPos = false;
+
+        // command flags
+        public int lastGoalTargetTicks = 0;
 
         // output power
         public double motorPower;
@@ -216,11 +220,6 @@ public class ArmController {
     public RisingEdgeTrigger stopTrigger = new RisingEdgeTrigger();    // send to drop button
 
     //------------------------------------------------------------------------------------------------
-    // Arm Controller Fields
-    //------------------------------------------------------------------------------------------------
-    public int lastReachedPosition = 0;
-
-    //------------------------------------------------------------------------------------------------
     // Initialize
     //------------------------------------------------------------------------------------------------
 
@@ -262,7 +261,7 @@ public class ArmController {
     //------------------------------------------------------------------------------------------------
     public void update(ElapsedTime runtime, Gamepad gamepad1, Gamepad gamepad2) {
 
-        // update triggers
+        // button triggers
         homePosTrigger.update(gamepad1.x);
         upperPosTrigger.update(gamepad1.y);
         pickPosTrigger.update(gamepad1.b);
@@ -272,49 +271,63 @@ public class ArmController {
         shoulderState.update(shoulderDrive, shoulderParams);
         elbowState.update(elbowDrive, elbowParams);
 
-        // last position flags
-        if (shoulderState.atHomePos) lastReachedPosition = 0;
-        if (shoulderState.atDrivePos) lastReachedPosition = 1;
-        if (shoulderState.atBasketPos) lastReachedPosition = 2;
-        if (shoulderState.atPickPos) lastReachedPosition = 3;
-
         //------------------------------------------------------------------------------------------------
         // Monitor Triggers
         //------------------------------------------------------------------------------------------------
+
+        // go to home position triggered
         if (homePosTrigger.wasTriggered()) {
+
+            // drive the shoulder to home and elbow to the approaching home clearance position
             shoulderController.setConstraints(shoulderParams.getMaxConstraints());
             shoulderController.setGoal(new TrapezoidProfile.State(shoulderParams.homePosTicks, 0.0));
+            shoulderState.lastGoalTargetTicks = elbowParams.homePosTicks;
+            // drive the elbow to the home position
             elbowController.setConstraints(elbowParams.getMaxConstraints());
             elbowController.setGoal(new TrapezoidProfile.State(elbowParams.homePosTicks, 0.0));
+            elbowState.lastGoalTargetTicks = elbowParams.homePosTicks;
+
         }
+
+        // go to upper basket or chamber position triggered
         if (upperPosTrigger.wasTriggered()) {
 
-            if (lastReachedPosition == 3) {
-                // if we were at pick position go to basket
+            if (shoulderState.lastGoalTargetTicks == elbowParams.drivePosTicks) {
+                // if we were at submersible pick or chamber position then go up to basket position
                 shoulderController.setConstraints(shoulderParams.getMaxConstraints());
                 shoulderController.setGoal(new TrapezoidProfile.State(shoulderParams.basketPosTicks, 0.0));
+                shoulderState.lastGoalTargetTicks = elbowParams.basketPosTicks;
                 elbowController.setConstraints(elbowParams.getMaxConstraints());
                 elbowController.setGoal(new TrapezoidProfile.State(elbowParams.basketPosTicks, 0.0));
+                elbowState.lastGoalTargetTicks = elbowParams.basketPosTicks;
             } else {
-                // otherwise by default go to the drive position
+                // otherwise by default go to the drive and chamber position
                 shoulderController.setConstraints(shoulderParams.getMaxConstraints());
                 shoulderController.setGoal(new TrapezoidProfile.State(shoulderParams.drivePosTicks, 0.0));
+                shoulderState.lastGoalTargetTicks = elbowParams.drivePosTicks;
                 elbowController.setConstraints(elbowParams.getMaxConstraints());
                 elbowController.setGoal(new TrapezoidProfile.State(elbowParams.drivePosTicks, 0.0));
+                elbowState.lastGoalTargetTicks = elbowParams.drivePosTicks;
             }
         }
+
+        // go to pick from submersible location trigger
         if (pickPosTrigger.wasTriggered()) {
-            lastCommandedPos = 1;
             shoulderController.setConstraints(shoulderParams.getMaxConstraints());
             shoulderController.setGoal(new TrapezoidProfile.State(shoulderParams.pickPosTicks, 0.0));
+            shoulderState.lastGoalTargetTicks = elbowParams.pickPosTicks;
             elbowController.setConstraints(elbowParams.getMaxConstraints());
             elbowController.setGoal(new TrapezoidProfile.State(elbowParams.pickPosTicks, 0.0));
+            elbowState.lastGoalTargetTicks = elbowParams.pickPosTicks;
         }
+
+        // stop motion trigger
         if (stopTrigger.wasTriggered()) {
             shoulderController.setConstraints(shoulderParams.getStopConstraints());
             shoulderController.setGoal(new TrapezoidProfile.State(shoulderState.currentPosActual, 0.0));
             elbowController.setConstraints(elbowParams.getStopConstraints());
             elbowController.setGoal(new TrapezoidProfile.State(elbowState.currentPosActual, 0.0));
+            elbowState.lastGoalTargetTicks = elbowState.currentPosActual;
         }
 
         //------------------------------------------------------------------------------------------------
