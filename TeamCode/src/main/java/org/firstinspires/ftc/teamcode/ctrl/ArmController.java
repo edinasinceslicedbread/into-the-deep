@@ -262,10 +262,10 @@ public class ArmController {
     public void update(ElapsedTime runtime, Gamepad gamepad1, Gamepad gamepad2) {
 
         // button triggers
-        homePosTrigger.update(gamepad1.x);
-        upperPosTrigger.update(gamepad1.y);
-        pickPosTrigger.update(gamepad1.b);
-        stopTrigger.update(gamepad1.a);
+        homePosTrigger.update(gamepad1.x || gamepad2.x);
+        upperPosTrigger.update(gamepad1.y || gamepad2.y);
+        pickPosTrigger.update(gamepad1.b || gamepad2.b);
+        stopTrigger.update(gamepad1.a || gamepad2.a);
 
         // update status
         shoulderState.update(shoulderDrive, shoulderParams);
