@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.teamcode.ctrl.ArmControllerTeleOp;
+import org.firstinspires.ftc.teamcode.ctrl.ArmControllerV2;
 
 @TeleOp(name = "ARM | 04 TeleOpMode Test", group = "$$$$ Arm")
 public class ArmTeleOpModeTest extends LinearOpMode {
@@ -17,7 +17,7 @@ public class ArmTeleOpModeTest extends LinearOpMode {
     //------------------------------------------------------------------------------------------------
     // Controllers
     //------------------------------------------------------------------------------------------------
-    ArmControllerTeleOp armController = new ArmControllerTeleOp();
+    ArmControllerV2 armController = new ArmControllerV2();
 
     @SuppressLint("DefaultLocale")
     @Override

@@ -10,7 +10,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
-public class ArmControllerTeleOp {
+public class ArmControllerV2 {
 
     //------------------------------------------------------------------------------------------------
     // Hardware
@@ -30,7 +30,7 @@ public class ArmControllerTeleOp {
 
         // controller tolerance
         public int positionTolerance = 40;  // encoder ticks
-        public int velocityTolerance = 200; // encoder ticks per second, high value as this is pretty shaky
+        public int velocityTolerance = 250; // encoder ticks per second, high value as this is pretty shaky
 
         // shoulder positions (in encoder ticks)
         public int homePosTicks = 0;
@@ -226,6 +226,13 @@ public class ArmControllerTeleOp {
     // controller variables
     public int armControlState = 0;         // state machine variable
 
+    // status variables
+    public boolean atHomePos = false;;
+    public boolean atReadyPos = false;;
+    public boolean atChamberPos = false;;
+    public boolean atBasketPos = false;;
+    public boolean atPickPos = false;;
+
     //------------------------------------------------------------------------------------------------
     // Initialize
     //------------------------------------------------------------------------------------------------
@@ -270,17 +277,24 @@ public class ArmControllerTeleOp {
         update(runtime, gamepad1, gamepad2, 0);
     }
 
-    public void update(ElapsedTime runtime, Gamepad gamepad1, Gamepad gamepad2, int autoCmd) {
+    public void update(ElapsedTime runtime, Gamepad gamepad1, Gamepad gamepad2, int armAutoCmd) {
 
         // button triggers
-        homePosTrigger.update(gamepad1.x || gamepad2.x || autoCmd == 1);
-        upperPosTrigger.update(gamepad1.y || gamepad2.y || autoCmd == 2);
-        pickPosTrigger.update(gamepad1.b || gamepad2.b || autoCmd == 2);
-        stopTrigger.update(gamepad1.a || gamepad2.a);
+        homePosTrigger.update(gamepad1.x || gamepad2.x || armAutoCmd == 1);
+        upperPosTrigger.update(gamepad1.y || gamepad2.y || armAutoCmd == 2);
+        pickPosTrigger.update(gamepad1.b || gamepad2.b || armAutoCmd == 3);
+        stopTrigger.update(gamepad1.a || gamepad2.a || armAutoCmd == 4);
 
         // update status
         shoulderState.update(shoulderDrive, shoulderParams, shoulderController);
         elbowState.update(elbowDrive, elbowParams, elbowController);
+
+        // update status variables
+        atHomePos = shoulderState.atHomePos && elbowState.atHomePos;
+        atReadyPos = shoulderState.atReadyPos && elbowState.atReadyPos;
+        atChamberPos = shoulderState.atChamberPos && elbowState.atChamberPos;
+        atBasketPos = shoulderState.atBasketPos && elbowState.atBasketPos;
+        atPickPos = shoulderState.atPickPos && elbowState.atPickPos;
 
         //------------------------------------------------------------------------------------------------
         // Monitor Triggers
@@ -308,7 +322,7 @@ public class ArmControllerTeleOp {
 
                 // upper position trigger
                 if (upperPosTrigger.wasTriggered()) {
-                    if (shoulderState.lastMoveTargetTicks == shoulderParams.chamberPosTicks) {
+                    if (shoulderState.lastMoveTargetTicks == shoulderParams.chamberPosTicks || armAutoCmd == 2) {
                         shoulderState.lastMoveTargetTicks = shoulderParams.basketPosTicks;
                         elbowState.lastMoveTargetTicks = elbowParams.basketPosTicks;
                     } else {

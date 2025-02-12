@@ -12,6 +12,7 @@ import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.ctrl.ArmController;
+import org.firstinspires.ftc.teamcode.ctrl.ArmControllerV2;
 import org.firstinspires.ftc.teamcode.ctrl.RisingEdgeTrigger;
 
 
@@ -39,7 +40,7 @@ public class TeleOpModeD extends LinearOpMode {
     private Servo clawServo = null;
 
     // arm
-    private ArmController armController = new ArmController();
+    private ArmControllerV2 armController = new ArmControllerV2();
 
     @SuppressLint("DefaultLocale")
     @Override
@@ -164,9 +165,12 @@ public class TeleOpModeD extends LinearOpMode {
 
             // D-Pad overrides for the same joystick functions as above
             // --------------------------------------------------------------------------------------------
-            // TODO: adjust max speed between 0.0 and 1.0
             double precisionMax = 0.20;
-            if (!(gamepad1.dpad_up && gamepad1.dpad_down && gamepad1.dpad_left && gamepad1.dpad_right)) {
+
+            // gamepad 1
+            boolean dpadButtons1 = gamepad1.dpad_up && gamepad1.dpad_down && gamepad1.dpad_left && gamepad1.dpad_right;
+            boolean dpadButtons2 = gamepad2.dpad_up && gamepad2.dpad_down && gamepad2.dpad_left && gamepad2.dpad_right;
+            if (!(dpadButtons1 || dpadButtons2)) {
                 if (gamepad1.dpad_up || gamepad2.dpad_up) {
                     axial = precisionMax * driveDirectionFactor;
                 }
@@ -180,7 +184,7 @@ public class TeleOpModeD extends LinearOpMode {
                     lateral = precisionMax * driveDirectionFactor;
                 }
             }
-
+            
             // Combine the joystick requests for each axis-motion to determine each wheel's power.
             // Set up a variable for each drive wheel to save the power level for telemetry.
             double leftFrontPower = axial + lateral + yaw;
@@ -221,11 +225,20 @@ public class TeleOpModeD extends LinearOpMode {
             // right trigger moves scissor up to limited value
             if (gamepad1.right_trigger > 0.05) {
                 scissorPower = gamepad1.right_trigger * 0.5;
+            } else if (gamepad2.right_trigger > 0.05) {
+                scissorPower = gamepad2.right_trigger * 0.5;
             }
 
             // left trigger moves scissor down to limited value
             if (gamepad1.left_trigger > 0.05) {
                 scissorPower = -gamepad1.left_trigger * 0.2;
+            } else if (gamepad2.left_trigger > 0.05) {
+                scissorPower = -gamepad2.left_trigger * 0.2;
+            }
+
+            // upper limit switch override
+            if (scissorTicksActual > 6600.0) {
+                scissorPower = 0;
             }
 
             // lower limit switch override
