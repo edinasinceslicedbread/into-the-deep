@@ -99,21 +99,6 @@ public class AutoOpModeA extends LinearOpMode {
 
         waitForStart();
         runtime.reset();
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
-                =======
->>>>>>> ff6a2960efe82f31c031a2ea52f629bbc0f11fcb
-
-
-        //Edit Path
-
-
-<<<<<<< HEAD
-=======
->>>>>>> 161b98a74b5a3d03e3cb47dbefded4897f4fe01b
->>>>>>> ff6a2960efe82f31c031a2ea52f629bbc0f11fcb
-
 
 
 

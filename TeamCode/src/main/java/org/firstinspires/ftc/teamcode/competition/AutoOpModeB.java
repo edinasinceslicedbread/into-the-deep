@@ -36,6 +36,7 @@ public class AutoOpModeB extends LinearOpMode {
     private DcMotor scissorDrive = null;
     private Servo clawServo = null;
 
+
     int autoUpdateVariable;
 
     // digital limit switches

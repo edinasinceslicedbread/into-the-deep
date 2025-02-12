@@ -1,5 +1,5 @@
 package org.firstinspires.ftc.teamcode;
-//kV: 0.005029731538363367, kS: 1.0051342679677129???
+//kV: 0.1.0051342679677129, kS: 1.0051342679677129???
 import androidx.annotation.NonNull;
 
 import com.acmerobotics.dashboard.canvas.Canvas;
@@ -62,13 +62,13 @@ public final class MecanumDrive {
                 RevHubOrientationOnRobot.UsbFacingDirection.UP;
 
         // drive model parameters
-        public double inPerTick = 0.025;
-        public double lateralInPerTick = 0.027;
-        public double trackWidthTicks = 1126.949056898203;
+        public double inPerTick = 0.0256;
+        public double lateralInPerTick = 0.02716;
+        public double trackWidthTicks = 1139.6440569376884;
 
         // feedforward parameters (in tick units)
-        public double kS = 1.0013563778305548;
-        public double kV = 0.005024294238293102;
+        public double kS = 1.5053656134725717;
+        public double kV = 0.004967919868641673;
         public double kA = 0.001;
 
         // path profile parameters (in inches)
