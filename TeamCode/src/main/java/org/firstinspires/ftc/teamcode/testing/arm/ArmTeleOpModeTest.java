@@ -62,7 +62,7 @@ public class ArmTeleOpModeTest extends LinearOpMode {
             telemetry.addLine(String.format("Y -> S:[%s] E:[%s] Chamber", armController.shoulderState.atChamberPos, armController.elbowState.atChamberPos));
             telemetry.addLine(String.format("Y -> S:[%s] E:[%s] Basket", armController.shoulderState.atBasketPos, armController.elbowState.atBasketPos));
             telemetry.addLine(String.format("A -> S:[%s] E:[%s] Stop Motion", armController.shoulderController.atGoal(), armController.elbowController.atGoal()));
-            telemetry.addLine(String.format("B -> S:[%s] E:[%s] Pick at Submersible", armController.shoulderState.atPickPos, armController.elbowState.atPickPos));
+            telemetry.addLine(String.format("B -> S:[%s] E:[%s] Pick at Submersible", armController.shoulderState.atExtendPos, armController.elbowState.atExtendPos));
             telemetry.addLine("--------------------------------------------------");
             telemetry.addLine(String.format("Power: FFW[%4.2f] PID[%4.2f]", armController.shoulderState.motorPowerFFW, armController.shoulderState.motorPowerPID));
             telemetry.addLine(String.format("Shoulder Target: GOAL[%d] SP[%d]", (int) Math.round(armController.shoulderController.getGoal().position), (int) Math.round(armController.shoulderController.getSetpoint().position)));

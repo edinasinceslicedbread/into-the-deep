@@ -34,27 +34,28 @@ public class ArmControllerV2 {
 
         // shoulder positions (in encoder ticks)
         public int homePosTicks = 0;
-        public int readyPosTicks = degreesToTicks(88.0);
-        public int chamberPosTicks = 240;
-        public int basketPosTicks = degreesToTicks(90.0);
-        public int pickPosTicks = 780;
+        public int readyPosTicks = degreesToTicks(87.0);
+        public int chamberPosTicks = degreesToTicks(75.0);
+        public int basketPosTicks = degreesToTicks(88.0);
+        public int extendPosTicks = 780;
+        public int pickupPosTicks = 780;
 
         // motion profile constraints
-        public int maxVelocity = 125;       // ticks per second
-        public int maxAcceleration = 100;   // ticks per second per second
+        public int maxVelocity = 150;       // ticks per second
+        public int maxAcceleration = 150;   // ticks per second per second
         public int stopVelocity = 200;      // ticks per second
         public int stopAcceleration = 150;   // ticks per second per second
 
-        // feed forward parameters
+        // feed forward parameters for profile positions
         public double kS = 0.1;             // static FFW gain (power just to turn motor and gears freely)
         public double kCos = 0.6;           // gravity FFW gain (power to move arm up from horizontal)
         public double kV = 0.1;             // velocity FFW gain (applied to velocity set point)
         public double kA = 0.0;             // acceleration FFW gain (not used, or profile generator doesn't return acceleration)
 
         // control parameters
-        public double kP = 0.015;            // proportional PID loop gain
-        public double kI = 0.0;             // integral PID loop gain (not used)
-        public double kD = 0.0;             // derivative PID loop gain (not used)
+        public double kP = 0.025;            // proportional PID loop gain
+        public double kI = 0.0;              // integral PID loop gain (not used)
+        public double kD = 0.0;              // derivative PID loop gain (not used)
 
         // function to convert degrees to encoder ticks
         public int degreesToTicks(double degrees) {
@@ -66,7 +67,7 @@ public class ArmControllerV2 {
             return (double) ticks / ticksPerDegree;
         }
 
-        public TrapezoidProfile.Constraints getMaxConstraints() {
+        public TrapezoidProfile.Constraints getProfileConstraints() {
             return new TrapezoidProfile.Constraints(maxVelocity, maxAcceleration);
         }
 
@@ -87,7 +88,8 @@ public class ArmControllerV2 {
         public boolean atReadyPos = false;
         public boolean atChamberPos = false;
         public boolean atBasketPos = false;
-        public boolean atPickPos = false;
+        public boolean atExtendPos = false;
+        public boolean atPickupPos = false;
 
         // command flags
         public int lastMoveTargetTicks = 0;
@@ -108,7 +110,8 @@ public class ArmControllerV2 {
             atReadyPos = Math.abs(currentPosActual - params.readyPosTicks) < params.positionTolerance && controller.atGoal();
             atChamberPos = Math.abs(currentPosActual - params.chamberPosTicks) < params.positionTolerance && controller.atGoal();
             atBasketPos = Math.abs(currentPosActual - params.basketPosTicks) < params.positionTolerance && controller.atGoal();
-            atPickPos = Math.abs(currentPosActual - params.pickPosTicks) < params.positionTolerance && controller.atGoal();
+            atExtendPos = Math.abs(currentPosActual - params.extendPosTicks) < params.positionTolerance && controller.atGoal();
+            atPickupPos = Math.abs(currentPosActual - params.pickupPosTicks) < params.positionTolerance && controller.atGoal();
 
         }
 
@@ -128,7 +131,8 @@ public class ArmControllerV2 {
         public int readyPosTicks = -10;
         public int chamberPosTicks = 150;
         public int basketPosTicks = 85;
-        public int pickPosTicks = 33;
+        public int extendPosTicks = 34;
+        public int pickupPosTicks = 54;
 
         // home positions to clear 42 inch limits
         public int homeApproachTicks = -10;
@@ -140,7 +144,7 @@ public class ArmControllerV2 {
         public int stopAcceleration = 90;   // ticks per second per second
 
         // control parameters
-        public double kP = 0.05;     // proportional PID loop gain
+        public double kP = 0.08;     // proportional PID loop gain
         public double kI = 0.0;     // integral PID loop gain (not used)
         public double kD = 0.0;     // derivative PID loop gain (not used)
 
@@ -154,7 +158,7 @@ public class ArmControllerV2 {
             return (double) ticks / ticksPerDegree;
         }
 
-        public TrapezoidProfile.Constraints getMaxConstraints() {
+        public TrapezoidProfile.Constraints getProfileConstraints() {
             return new TrapezoidProfile.Constraints(maxVelocity, maxAcceleration);
         }
 
@@ -175,7 +179,8 @@ public class ArmControllerV2 {
         public boolean atReadyPos = false;
         public boolean atChamberPos = false;
         public boolean atBasketPos = false;
-        public boolean atPickPos = false;
+        public boolean atExtendPos = false;
+        public boolean atPickupPos = false;
 
         // command flags
         public int lastMoveTargetTicks = 0;
@@ -194,7 +199,8 @@ public class ArmControllerV2 {
             atReadyPos = Math.abs(currentPosActual - params.readyPosTicks) < params.positionTolerance && controller.atGoal();
             atChamberPos = Math.abs(currentPosActual - params.chamberPosTicks) < params.positionTolerance && controller.atGoal();
             atBasketPos = Math.abs(currentPosActual - params.basketPosTicks) < params.positionTolerance && controller.atGoal();
-            atPickPos = Math.abs(currentPosActual - params.pickPosTicks) < params.positionTolerance && controller.atGoal();
+            atExtendPos = Math.abs(currentPosActual - params.extendPosTicks) < params.positionTolerance && controller.atGoal();
+            atPickupPos = Math.abs(currentPosActual - params.pickupPosTicks) < params.positionTolerance && controller.atGoal();
 
         }
 
@@ -211,27 +217,28 @@ public class ArmControllerV2 {
     public ElbowState elbowState = new ElbowState();
 
     // elbow PID controller
-    public ProfiledPIDController elbowController = new ProfiledPIDController(elbowParams.kP, elbowParams.kI, elbowParams.kD, elbowParams.getMaxConstraints());
+    public ProfiledPIDController elbowController = new ProfiledPIDController(elbowParams.kP, elbowParams.kI, elbowParams.kD, elbowParams.getProfileConstraints());
 
     // shoulder FFW and PID controller
-    public ArmFeedforward shoulderFeedforward = new ArmFeedforward(shoulderParams.kS, shoulderParams.kCos, shoulderParams.kV, shoulderParams.kA);
-    public ProfiledPIDController shoulderController = new ProfiledPIDController(shoulderParams.kP, shoulderParams.kI, shoulderParams.kD, shoulderParams.getMaxConstraints());
+    public ArmFeedforward shoulderFeedForward = new ArmFeedforward(shoulderParams.kS, shoulderParams.kCos, shoulderParams.kV, shoulderParams.kA);
+    public ProfiledPIDController shoulderController = new ProfiledPIDController(shoulderParams.kP, shoulderParams.kI, shoulderParams.kD, shoulderParams.getProfileConstraints());
 
     // button triggers
-    public RisingEdgeTrigger homePosTrigger = new RisingEdgeTrigger();    // send to home button
-    public RisingEdgeTrigger upperPosTrigger = new RisingEdgeTrigger();    // send to drop button
-    public RisingEdgeTrigger pickPosTrigger = new RisingEdgeTrigger();    // send to pick button
-    public RisingEdgeTrigger stopTrigger = new RisingEdgeTrigger();    // send to drop button
+    public RisingEdgeTrigger homePosTrigger = new RisingEdgeTrigger();      // move arm to home position button
+    public RisingEdgeTrigger upperPosTrigger = new RisingEdgeTrigger();     // move arm to basked or chamber drop position button
+    public RisingEdgeTrigger extendPosTrigger = new RisingEdgeTrigger();    // move arm to extended position at submersible button
+    public RisingEdgeTrigger stopTrigger = new RisingEdgeTrigger();         // stop arm movement immediately button
 
     // controller variables
     public int armControlState = 0;         // state machine variable
 
     // status variables
-    public boolean atHomePos = false;;
-    public boolean atReadyPos = false;;
-    public boolean atChamberPos = false;;
-    public boolean atBasketPos = false;;
-    public boolean atPickPos = false;;
+    public boolean atHomePos = false;
+    public boolean atReadyPos = false;
+    public boolean atChamberPos = false;
+    public boolean atBasketPos = false;
+    public boolean atExtendedPos = false;
+    public boolean atPickupPos = false;
 
     //------------------------------------------------------------------------------------------------
     // Initialize
@@ -282,7 +289,7 @@ public class ArmControllerV2 {
         // button triggers
         homePosTrigger.update(gamepad1.x || gamepad2.x || armAutoCmd == 1);
         upperPosTrigger.update(gamepad1.y || gamepad2.y || armAutoCmd == 2);
-        pickPosTrigger.update(gamepad1.b || gamepad2.b || armAutoCmd == 3);
+        extendPosTrigger.update(gamepad1.b || gamepad2.b || armAutoCmd == 3);
         stopTrigger.update(gamepad1.a || gamepad2.a || armAutoCmd == 4);
 
         // update status
@@ -294,7 +301,8 @@ public class ArmControllerV2 {
         atReadyPos = shoulderState.atReadyPos && elbowState.atReadyPos;
         atChamberPos = shoulderState.atChamberPos && elbowState.atChamberPos;
         atBasketPos = shoulderState.atBasketPos && elbowState.atBasketPos;
-        atPickPos = shoulderState.atPickPos && elbowState.atPickPos;
+        atExtendedPos = shoulderState.atExtendPos && elbowState.atExtendPos;
+        atPickupPos = shoulderState.atPickupPos && elbowState.atPickupPos;
 
         //------------------------------------------------------------------------------------------------
         // Monitor Triggers
@@ -315,8 +323,13 @@ public class ArmControllerV2 {
 
                 // home position trigger
                 if (homePosTrigger.wasTriggered()) {
-                    shoulderState.lastMoveTargetTicks = shoulderParams.homePosTicks;
-                    elbowState.lastMoveTargetTicks = elbowParams.homePosTicks;
+                    if (shoulderState.lastMoveTargetTicks == shoulderParams.basketPosTicks || shoulderState.lastMoveTargetTicks == shoulderParams.extendPosTicks) {
+                        shoulderState.lastMoveTargetTicks = shoulderParams.chamberPosTicks;
+                        elbowState.lastMoveTargetTicks = elbowParams.chamberPosTicks;
+                    } else {
+                        shoulderState.lastMoveTargetTicks = shoulderParams.homePosTicks;
+                        elbowState.lastMoveTargetTicks = elbowParams.homePosTicks;
+                    }
                     armControlState = 1;
                 }
 
@@ -332,10 +345,20 @@ public class ArmControllerV2 {
                     armControlState = 1;
                 }
 
-                // pick position trigger
-                if (pickPosTrigger.wasTriggered()) {
-                    shoulderState.lastMoveTargetTicks = shoulderParams.pickPosTicks;
-                    elbowState.lastMoveTargetTicks = elbowParams.pickPosTicks;
+                // extended position trigger
+                if (extendPosTrigger.wasTriggered()) {
+                    if (shoulderState.lastMoveTargetTicks == shoulderParams.basketPosTicks) {
+                        shoulderState.lastMoveTargetTicks = shoulderParams.chamberPosTicks;
+                        elbowState.lastMoveTargetTicks = elbowParams.chamberPosTicks;
+                    } else {
+                        if (elbowState.lastMoveTargetTicks == elbowParams.extendPosTicks) {
+                            shoulderState.lastMoveTargetTicks = shoulderParams.pickupPosTicks;
+                            elbowState.lastMoveTargetTicks = elbowParams.pickupPosTicks;
+                        } else {
+                            shoulderState.lastMoveTargetTicks = shoulderParams.extendPosTicks;
+                            elbowState.lastMoveTargetTicks = elbowParams.extendPosTicks;
+                        }
+                    }
                     armControlState = 1;
                 }
 
@@ -343,8 +366,8 @@ public class ArmControllerV2 {
 
             case 1: // check for ready position move
                 if (shoulderState.atHomePos || shoulderState.lastMoveTargetTicks == shoulderParams.homePosTicks) {
-                    shoulderController.setConstraints(shoulderParams.getMaxConstraints());
-                    elbowController.setConstraints(elbowParams.getMaxConstraints());
+                    shoulderController.setConstraints(shoulderParams.getProfileConstraints());
+                    elbowController.setConstraints(elbowParams.getProfileConstraints());
                     shoulderController.setGoal(new TrapezoidProfile.State(shoulderParams.readyPosTicks, 0.0));
                     elbowController.setGoal(new TrapezoidProfile.State(elbowParams.readyPosTicks, 0.0));
                     armControlState = 2;
@@ -362,13 +385,13 @@ public class ArmControllerV2 {
             case 3: // initiate the move
 
                 if (shoulderState.lastMoveTargetTicks == shoulderParams.homePosTicks) {
-                    shoulderController.setConstraints(shoulderParams.getMaxConstraints());
+                    shoulderController.setConstraints(shoulderParams.getProfileConstraints());
                     shoulderController.setGoal(new TrapezoidProfile.State(shoulderState.lastMoveTargetTicks, 0.0));
                     armControlState = 4;
                 } else {
-                    shoulderController.setConstraints(shoulderParams.getMaxConstraints());
+                    shoulderController.setConstraints(shoulderParams.getProfileConstraints());
                     shoulderController.setGoal(new TrapezoidProfile.State(shoulderState.lastMoveTargetTicks, 0.0));
-                    elbowController.setConstraints(elbowParams.getMaxConstraints());
+                    elbowController.setConstraints(elbowParams.getProfileConstraints());
                     elbowController.setGoal(new TrapezoidProfile.State(elbowState.lastMoveTargetTicks, 0.0));
                     armControlState = 5;
                 }
@@ -376,7 +399,7 @@ public class ArmControllerV2 {
 
             case 4: // move elbow to home position
                 if (shoulderController.atGoal() && elbowController.atGoal()) {
-                    elbowController.setConstraints(elbowParams.getMaxConstraints());
+                    elbowController.setConstraints(elbowParams.getProfileConstraints());
                     elbowController.setGoal(new TrapezoidProfile.State(elbowState.lastMoveTargetTicks, 0.0));
                     armControlState = 5;
                 }
@@ -384,6 +407,10 @@ public class ArmControllerV2 {
 
             case 5: // wait for move complete
                 if (shoulderController.atGoal() && elbowController.atGoal()) {
+                    armControlState = 0;
+                }
+                if (elbowState.lastMoveTargetTicks == elbowParams.pickupPosTicks)
+                {
                     armControlState = 0;
                 }
                 break;
@@ -398,7 +425,7 @@ public class ArmControllerV2 {
         // shoulder feed forward controller
         double shoulderPosTargetRad = Math.toRadians(shoulderParams.ticksToDegree((int) Math.round(shoulderController.getSetpoint().position)));
         double shoulderVelTargetRad = Math.toRadians(shoulderParams.ticksToDegree((int) Math.round(shoulderController.getSetpoint().velocity)));
-        shoulderState.motorPowerFFW = shoulderFeedforward.calculate(shoulderPosTargetRad, shoulderVelTargetRad, 0.0);
+        shoulderState.motorPowerFFW = shoulderFeedForward.calculate(shoulderPosTargetRad, shoulderVelTargetRad, 0.0);
 
         // shoulder PID controller
         shoulderState.motorPowerPID = shoulderController.calculate(shoulderState.currentPosActual);
@@ -414,11 +441,11 @@ public class ArmControllerV2 {
             shoulderState.motorPower = -1.0;
         }
 
-        // turn off power if at home or pick positions
+        // turn off power if at home or extended positions
         if (shoulderState.atHomePos && shoulderController.atGoal()) {
             shoulderState.motorPower = 0.0;
         }
-        if (shoulderState.atPickPos && shoulderController.atGoal()) {
+        if (shoulderState.atExtendPos && shoulderController.atGoal()) {
             shoulderState.motorPower = 0.0;
         }
 

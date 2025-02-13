@@ -4,17 +4,13 @@ import android.annotation.SuppressLint;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.ColorRangeSensor;
+import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
-
-import org.firstinspires.ftc.teamcode.ctrl.ArmController;
 import org.firstinspires.ftc.teamcode.ctrl.ArmControllerV2;
-import org.firstinspires.ftc.teamcode.ctrl.RisingEdgeTrigger;
-
 
 @TeleOp(name = "$$$ TELE-D (SIGMA)", group = "$$$")
 public class TeleOpModeD extends LinearOpMode {
@@ -38,6 +34,7 @@ public class TeleOpModeD extends LinearOpMode {
 
     // claw
     private Servo clawServo = null;
+    ColorSensor colorSensor = null;    // Hardware Device Object
 
     // arm
     private ArmControllerV2 armController = new ArmControllerV2();
@@ -63,6 +60,7 @@ public class TeleOpModeD extends LinearOpMode {
 
         // claw
         clawServo = hardwareMap.get(Servo.class, "clawServo");
+        colorSensor = hardwareMap.get(ColorSensor.class, "colorSensor");
 
         // arm
         armController.initialize(hardwareMap);
@@ -77,6 +75,8 @@ public class TeleOpModeD extends LinearOpMode {
 
         // other variables
         double driveDirectionFactor = 1.0;
+        double clawOpenPosition = 0.35;
+        double clawClosePosition = 0.05;
 
         //------------------------------------------------------------------------------------------------
         // Start Button
@@ -90,8 +90,9 @@ public class TeleOpModeD extends LinearOpMode {
         waitForStart();
         runtime.reset();
 
-        // arm reset
+        // arm and claw reset
         armController.reset();
+        clawServo.setPosition(clawOpenPosition);
 
         //------------------------------------------------------------------------------------------------
         // Run until the end of the match (driver presses STOP)
@@ -119,14 +120,16 @@ public class TeleOpModeD extends LinearOpMode {
 
             // turbo mode speed overrides with left and right stick buttons
             // --------------------------------------------------------------------------------------------
-            double turboOverrideLeftStick = 0.25;
-            double turboOverrideRightStick = 0.25;
+            double turboOverrideAxial  = 0.25;       // default maximum axial speed
+            double turboOverrideLateral = 0.35;       // default maximum axial speed
+            double turboOverrideTurning = 0.25;      // default maximum yaw speed
             // max wheel speed override
             if (gamepad1.left_stick_button || gamepad2.left_stick_button) {
-                turboOverrideLeftStick = 0.60;
+                turboOverrideAxial = 0.50;
+                turboOverrideLateral = 0.60;
             }
             if (gamepad1.right_stick_button || gamepad2.right_stick_button) {
-                turboOverrideRightStick = 0.60;
+                turboOverrideTurning = 0.50;
             }
 
             // start of code from ftc robot controller external examples
@@ -142,46 +145,47 @@ public class TeleOpModeD extends LinearOpMode {
             // gamepad 1
             if (Math.abs(gamepad1.left_stick_y) > 0.1) {
                 // Note: pushing stick forward gives negative value
-                axial = -gamepad1.left_stick_y * turboOverrideLeftStick * driveDirectionFactor;
+                axial = -gamepad1.left_stick_y * turboOverrideAxial * driveDirectionFactor;
             }
             if (Math.abs(gamepad1.left_stick_x) > 0.1) {
-                lateral = gamepad1.left_stick_x * turboOverrideLeftStick * driveDirectionFactor;
+                lateral = gamepad1.left_stick_x * turboOverrideLateral * driveDirectionFactor;
             }
             if (Math.abs(gamepad1.right_stick_x) > 0.1) {
-                yaw = gamepad1.right_stick_x * turboOverrideRightStick;
+                yaw = gamepad1.right_stick_x * turboOverrideTurning;
             }
 
             // gamepad 2
             if (Math.abs(gamepad2.left_stick_y) > 0.1) {
                 // Note: pushing stick forward gives negative value
-                axial = -gamepad2.left_stick_y * turboOverrideLeftStick * driveDirectionFactor;
+                axial = -gamepad2.left_stick_y * turboOverrideAxial * driveDirectionFactor;
             }
             if (Math.abs(gamepad2.left_stick_x) > 0.1) {
-                lateral = gamepad2.left_stick_x * turboOverrideLeftStick * driveDirectionFactor;
+                lateral = gamepad2.left_stick_x * turboOverrideLateral * driveDirectionFactor;
             }
             if (Math.abs(gamepad2.right_stick_x) > 0.1) {
-                yaw = gamepad2.right_stick_x * turboOverrideRightStick;
+                yaw = gamepad2.right_stick_x * turboOverrideTurning;
             }
 
             // D-Pad overrides for the same joystick functions as above
             // --------------------------------------------------------------------------------------------
-            double precisionMax = 0.20;
+            double dpadAxialMax = 0.20;
+            double dpadLateralMax = 0.30;
 
             // gamepad 1
             boolean dpadButtons1 = gamepad1.dpad_up && gamepad1.dpad_down && gamepad1.dpad_left && gamepad1.dpad_right;
             boolean dpadButtons2 = gamepad2.dpad_up && gamepad2.dpad_down && gamepad2.dpad_left && gamepad2.dpad_right;
             if (!(dpadButtons1 || dpadButtons2)) {
                 if (gamepad1.dpad_up || gamepad2.dpad_up) {
-                    axial = precisionMax * driveDirectionFactor;
+                    axial = dpadAxialMax * driveDirectionFactor;
                 }
                 if (gamepad1.dpad_down || gamepad2.dpad_down) {
-                    axial = -precisionMax * driveDirectionFactor;
+                    axial = -dpadAxialMax * driveDirectionFactor;
                 }
                 if (gamepad1.dpad_left || gamepad2.dpad_left) {
-                    lateral = -precisionMax * driveDirectionFactor;
+                    lateral = -dpadLateralMax * driveDirectionFactor;
                 }
                 if (gamepad1.dpad_right || gamepad2.dpad_right) {
-                    lateral = precisionMax * driveDirectionFactor;
+                    lateral = dpadLateralMax * driveDirectionFactor;
                 }
             }
             
@@ -254,12 +258,12 @@ public class TeleOpModeD extends LinearOpMode {
             //------------------------------------------------------------------------------------------------
             // left bumper opens
             if (gamepad1.left_bumper || gamepad2.left_bumper) {
-                clawServo.setPosition(0.30);
+                clawServo.setPosition(clawOpenPosition);
             }
 
             // right bumper closes
             if (gamepad1.right_bumper || gamepad2.right_bumper) {
-                clawServo.setPosition(0.05);
+                clawServo.setPosition(clawClosePosition);
             }
 
             //------------------------------------------------------------------------------------------------
