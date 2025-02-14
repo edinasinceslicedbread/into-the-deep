@@ -218,7 +218,7 @@ public class ArmController {
     public RisingEdgeTrigger upperPosTrigger = new RisingEdgeTrigger();    // send to drop button
     public RisingEdgeTrigger pickPosTrigger = new RisingEdgeTrigger();    // send to pick button
     public RisingEdgeTrigger stopTrigger = new RisingEdgeTrigger();    // send to drop button
-
+    public RisingEdgeTrigger autoTopBasket = new RisingEdgeTrigger();
     //------------------------------------------------------------------------------------------------
     // Initialize
     //------------------------------------------------------------------------------------------------
@@ -259,14 +259,14 @@ public class ArmController {
     //------------------------------------------------------------------------------------------------
     // Update
     //------------------------------------------------------------------------------------------------
-    public void update(ElapsedTime runtime, Gamepad gamepad1, Gamepad gamepad2) {
+    public void update(ElapsedTime runtime, Gamepad gamepad1, Gamepad gamepad2, int autoUpdateVariable) {
 
         // button triggers
-        homePosTrigger.update(gamepad1.x);
-        upperPosTrigger.update(gamepad1.y);
-        pickPosTrigger.update(gamepad1.b);
-        stopTrigger.update(gamepad1.a);
-
+        homePosTrigger.update(gamepad1.x||gamepad2.x||autoUpdateVariable == 1);
+        upperPosTrigger.update(gamepad1.y||gamepad2.y);
+        pickPosTrigger.update(gamepad1.b||gamepad2.b);
+        stopTrigger.update(gamepad1.a||gamepad2.a);
+        autoTopBasket.update(autoUpdateVariable == 2);
         // update status
         shoulderState.update(shoulderDrive, shoulderParams);
         elbowState.update(elbowDrive, elbowParams);
@@ -285,6 +285,18 @@ public class ArmController {
             // drive the elbow to the home position
             elbowController.setConstraints(elbowParams.getMaxConstraints());
             elbowController.setGoal(new TrapezoidProfile.State(elbowParams.homePosTicks, 0.0));
+            elbowState.lastGoalTargetTicks = elbowParams.homePosTicks;
+
+        }
+        if (autoTopBasket.wasTriggered()) {
+
+            // drive the shoulder to home and elbow to the approaching home clearance position
+            shoulderController.setConstraints(shoulderParams.getMaxConstraints());
+            shoulderController.setGoal(new TrapezoidProfile.State(shoulderParams.basketPosTicks, 0.0));
+            shoulderState.lastGoalTargetTicks = elbowParams.homePosTicks;
+            // drive the elbow to the home position
+            elbowController.setConstraints(elbowParams.getMaxConstraints());
+            elbowController.setGoal(new TrapezoidProfile.State(elbowParams.basketPosTicks, 0.0));
             elbowState.lastGoalTargetTicks = elbowParams.homePosTicks;
 
         }

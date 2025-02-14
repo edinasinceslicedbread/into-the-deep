@@ -53,7 +53,7 @@ public class ClawServoGripperTest extends LinearOpMode {
 
             // right bumper closes
             if (gamepad1.right_bumper || gamepad2.right_bumper) {
-                clawServo.setPosition(0.05);
+                clawServo.setPosition(0.025);
             }
 
             //------------------------------------------------------------------------------------------------

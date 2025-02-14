@@ -108,7 +108,18 @@ public class AutoModeTemplate extends LinearOpMode {
 
                     // wait a couple seconds, move to next state
                     if (runtime.seconds() > 1.0) {
-                        armAutoCmd = 0; // reset command
+                        armAutoCmd = 0;
+                        sleep(1500);
+                        leftFrontDrive.setPower(-0.30);
+                        rightFrontDrive.setPower(-0.30);
+                        rightBackDrive.setPower(-0.30);
+                        leftBackDrive.setPower(-0.30);
+                        sleep(1000);
+                        leftFrontDrive.setPower(0);
+                        rightFrontDrive.setPower(0);
+                        rightBackDrive.setPower(0);
+                        leftBackDrive.setPower(0);
+                        // reset command
                         autoOpModeState = 1;
                     }
                     break;

@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.ctrl.ArmController;
 import org.firstinspires.ftc.teamcode.ctrl.RisingEdgeTrigger;
 import org.firstinspires.ftc.teamcode.testing.arm.ArmControllerAuto;
 
@@ -45,7 +46,7 @@ public class AutoOpModeB extends LinearOpMode {
     // private TouchSensor extensionLimitBwd = null;
     // private TouchSensor extensionLimitFwd = null;
 
-    private RisingEdgeTrigger homingTrigger = new RisingEdgeTrigger();
+   ArmController armcontroller = new ArmController();
 
     @Override
     public void runOpMode() {
@@ -103,25 +104,35 @@ public class AutoOpModeB extends LinearOpMode {
         //TODO; Scissor lift and clamp claw at start - add back and forth for top after turn.
 
         // close claw
-        clawServo.setPosition(0.5);
+        clawServo.setPosition(0.05);
+
+        armcontroller.update(new ElapsedTime(), gamepad1, gamepad2, 1);
         sleep(2000);
 
         // raise scissor lift
         scissorDrive.setPower(1.0);
+        leftFrontDrive.setPower(-0.3);
+        rightFrontDrive.setPower(-0.3);
+        leftBackDrive.setPower(-0.3);
+        rightBackDrive.setPower(-0.3);
         sleep(2500);            // TOTO: raise lift time
         scissorDrive.setPower(0.0);
+        leftFrontDrive.setPower(0.0);
+        rightFrontDrive.setPower(0.0);
+        leftBackDrive.setPower(0.0);
+        rightBackDrive.setPower(0.0);
         sleep(1000);
+        int autoUpdateVariable = 2;
 
-        // Move claw up.
-         int autoUpdateVariable = 2;           // TODO: retract time
-        sleep(1000);
+        // TODO: retract time
+        sleep(1500);
 
         // drive robot forward
-        leftFrontDrive.setPower(0.3);
-        rightFrontDrive.setPower(0.3);
-        leftBackDrive.setPower(0.3);
-        rightBackDrive.setPower(0.3);
-        sleep(2000);            // TOTO: drive forward time
+        leftFrontDrive.setPower(-0.1);
+        rightFrontDrive.setPower(-0.1);
+        leftBackDrive.setPower(-0.1);
+        rightBackDrive.setPower(-0.1);
+        sleep(300);            // TOTO: drive forward time
         leftFrontDrive.setPower(0.0);
         rightFrontDrive.setPower(0.0);
         leftBackDrive.setPower(0.0);
@@ -129,7 +140,8 @@ public class AutoOpModeB extends LinearOpMode {
         sleep(1000);
 
         // open claw
-        clawServo.setPosition(0.0);
+
+        clawServo.setPosition(0.30);
         sleep(5000);
 
 
