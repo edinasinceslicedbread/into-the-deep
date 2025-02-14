@@ -12,13 +12,13 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.ctrl.ArmControllerV2;
 
-@Autonomous(name = "$$$ AUTO-D (BASKET 24 IN.)", group = "$$$")
+@Autonomous(name = "$$$ AUTO-D (BASKET 24 IN.)", group = "$$$B")
 public class AutoOpModeB2 extends LinearOpMode {
 
     // config variables
     double inPerTick = 0.026;
     double maxDistanceInches = 24.0;
-    int scissorTicksMax = 2000;
+    int scissorTicksMax = 4500;
 
     // elapsed time
     private final ElapsedTime runtime = new ElapsedTime();
@@ -192,7 +192,6 @@ public class AutoOpModeB2 extends LinearOpMode {
                 rightFrontDrive.setPower(0.0);
                 leftBackDrive.setPower(0.0);
                 rightBackDrive.setPower(0.0);
-                autoOpModeState = 2;
             }
 
             //------------------------------------------------------------------------------------------------
@@ -205,6 +204,9 @@ public class AutoOpModeB2 extends LinearOpMode {
             //------------------------------------------------------------------------------------------------
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.addData("Auto OpMode State", autoOpModeState);
+            telemetry.addLine("--------------------------------------------------");
+            telemetry.addLine(String.format("Scissor: PWR[%4.2f] TICKS[%d]", scissorDrive.getPower(), scissorDrive.getCurrentPosition()));
+            telemetry.addLine(String.format("Lower Limit Switch: [%s]", scissorLoSensor.isPressed()));
             telemetry.update();
 
         }

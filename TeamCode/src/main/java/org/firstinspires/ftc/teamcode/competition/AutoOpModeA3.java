@@ -5,7 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-@Autonomous(name = "$$$ AUTO-A (PUSH 36 INCH)", group = "$$$")
+@Autonomous(name = "$$$ AUTO-A (PUSH 36 INCH)", group = "$$$A")
 public class AutoOpModeA3 extends LinearOpMode {
 
     // config variables
@@ -33,10 +33,6 @@ public class AutoOpModeA3 extends LinearOpMode {
         // assign wheel motor directions
         rightFrontDrive.setDirection(DcMotor.Direction.REVERSE);
         rightBackDrive.setDirection(DcMotor.Direction.REVERSE);
-
-        // config variables
-        double inPerTick = 0.0245;
-        double maxDistanceInches = 24.0;
 
         // other variables
         int autoOpModeState = 0;
@@ -78,8 +74,7 @@ public class AutoOpModeA3 extends LinearOpMode {
                     autoOpModeState = 1;
                     break;
 
-                case 1: // move arm to basket position
-
+                case 1: // wait for distance reached
 
                     distance = (startingTicks - currentTicks) * inPerTick;
                     if (distance > maxDistanceInches) {
@@ -87,13 +82,7 @@ public class AutoOpModeA3 extends LinearOpMode {
                         rightFrontDrive.setPower(0.0);
                         leftBackDrive.setPower(0.0);
                         rightBackDrive.setPower(0.0);
-                        autoOpModeState = 2;
                     }
-
-
-                case 2: // finished state
-
-                    break;
 
             }
 

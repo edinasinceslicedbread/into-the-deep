@@ -12,13 +12,13 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.ctrl.ArmControllerV2;
 
-@Autonomous(name = "$$$ AUTO-D (BASKET 18 IN.)", group = "$$$")
+@Autonomous(name = "$$$ AUTO-D (BASKET 18 IN.)", group = "$$$B")
 public class AutoOpModeB1 extends LinearOpMode {
 
     // config variables
     double inPerTick = 0.026;
     double maxDistanceInches = 18.0;
-    int scissorTicksMax = 2000;
+    int scissorTicksMax = 4500;
 
     // elapsed time
     private final ElapsedTime runtime = new ElapsedTime();
@@ -192,7 +192,6 @@ public class AutoOpModeB1 extends LinearOpMode {
                 rightFrontDrive.setPower(0.0);
                 leftBackDrive.setPower(0.0);
                 rightBackDrive.setPower(0.0);
-                autoOpModeState = 2;
             }
 
             //------------------------------------------------------------------------------------------------
