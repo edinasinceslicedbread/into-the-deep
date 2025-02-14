@@ -35,7 +35,7 @@ public class ArmControllerV2 {
         // shoulder positions (in encoder ticks)
         public int homePosTicks = 0;
         public int readyPosTicks = degreesToTicks(87.0);
-        public int chamberPosTicks = degreesToTicks(75.0);
+        public int chamberPosTicks = degreesToTicks(68.0);
         public int basketPosTicks = degreesToTicks(88.0);
         public int extendPosTicks = 780;
         public int pickupPosTicks = 780;
@@ -115,6 +115,14 @@ public class ArmControllerV2 {
 
         }
 
+        public boolean atStopSupportPos(ShoulderParams params, ProfiledPIDController controller) {
+            boolean atExtendStop = Math.abs(currentPosActual - params.extendPosTicks) < params.positionTolerance
+                    && controller.getSetpoint().position == params.extendPosTicks;
+            boolean atHomeStop = Math.abs(currentPosActual - params.homePosTicks) < params.positionTolerance
+                    && controller.getSetpoint().position == params.homePosTicks;
+            return atExtendStop || atHomeStop;
+        }
+
     }
 
     public static class ElbowParams {
@@ -130,7 +138,7 @@ public class ArmControllerV2 {
         public int homePosTicks = 0;
         public int readyPosTicks = -10;
         public int chamberPosTicks = 150;
-        public int basketPosTicks = 85;
+        public int basketPosTicks = 90;
         public int extendPosTicks = 34;
         public int pickupPosTicks = 50;
 
@@ -322,8 +330,13 @@ public class ArmControllerV2 {
             case 0: // idle state
 
                 // home position trigger
-                if (homePosTrigger.wasTriggered()) {
-                    if (shoulderState.lastMoveTargetTicks == shoulderParams.basketPosTicks || shoulderState.lastMoveTargetTicks == shoulderParams.extendPosTicks) {
+                if (homePosTrigger.wasTriggered() && !shoulderState.atHomePos) {
+                    if (armAutoCmd == 1)
+                    {
+                        shoulderState.lastMoveTargetTicks = shoulderParams.homePosTicks;
+                        elbowState.lastMoveTargetTicks = elbowParams.homePosTicks;
+                    }
+                    else if (shoulderState.lastMoveTargetTicks == shoulderParams.basketPosTicks || shoulderState.lastMoveTargetTicks == shoulderParams.extendPosTicks) {
                         shoulderState.lastMoveTargetTicks = shoulderParams.chamberPosTicks;
                         elbowState.lastMoveTargetTicks = elbowParams.chamberPosTicks;
                     } else {
@@ -364,7 +377,7 @@ public class ArmControllerV2 {
 
                 break;
 
-            case 1: // check for ready position move
+            case 1: // check if move to ready position is needed
                 if (shoulderState.atHomePos || shoulderState.lastMoveTargetTicks == shoulderParams.homePosTicks) {
                     shoulderController.setConstraints(shoulderParams.getProfileConstraints());
                     elbowController.setConstraints(elbowParams.getProfileConstraints());
@@ -376,7 +389,7 @@ public class ArmControllerV2 {
                 }
                 break;
 
-            case 2: // wait for at ready position
+            case 2: // wait for the move to ready position to complete then finish original target move
                 if (shoulderState.atReadyPos && elbowState.atReadyPos) {
                     armControlState = 3;
                 }
@@ -442,10 +455,7 @@ public class ArmControllerV2 {
         }
 
         // turn off power if at home or extended positions
-        if (shoulderState.atHomePos && shoulderController.atGoal()) {
-            shoulderState.motorPower = 0.0;
-        }
-        if (shoulderState.atExtendPos && shoulderController.atGoal()) {
+        if (shoulderState.atStopSupportPos(shoulderParams, shoulderController)) {
             shoulderState.motorPower = 0.0;
         }
 

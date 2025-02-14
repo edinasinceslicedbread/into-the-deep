@@ -75,7 +75,7 @@ public class TeleOpModeD extends LinearOpMode {
 
         // other variables
         double driveDirectionFactor = 1.0;
-        double clawOpenPosition = 0.35;
+        double clawOpenPosition = 0.50;
         double clawClosePosition = 0.05;
 
         //------------------------------------------------------------------------------------------------
@@ -240,7 +240,7 @@ public class TeleOpModeD extends LinearOpMode {
                 scissorPower = -gamepad2.left_trigger * 0.4;
             }
 
-            // upper limit switch override
+            // upper limit position override
             if (scissorPower > 0.0 && scissorTicksActual > 6600.0) {
                 scissorPower = 0;
             }
@@ -264,6 +264,11 @@ public class TeleOpModeD extends LinearOpMode {
             // right bumper closes
             if (gamepad1.right_bumper || gamepad2.right_bumper) {
                 clawServo.setPosition(clawClosePosition);
+            }
+
+            // claw compensation
+            if (gamepad1.x || gamepad2.x) {
+                clawServo.setPosition(clawOpenPosition);
             }
 
             //------------------------------------------------------------------------------------------------

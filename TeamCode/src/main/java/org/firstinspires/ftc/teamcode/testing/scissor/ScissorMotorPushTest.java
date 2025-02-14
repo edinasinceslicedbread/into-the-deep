@@ -86,7 +86,6 @@ public class ScissorMotorPushTest extends LinearOpMode {
             // Telemetry Data
             //------------------------------------------------------------------------------------------------
             telemetry.addData("Run Time", runtime.toString());
-            telemetry.addData("Run Time", runtime.toString());
             telemetry.addLine("Test the scissor by gently using with the triggers.");
             telemetry.addLine("Right trigger moves the scissor up.");
             telemetry.addLine("Left trigger moves the scissor down.");

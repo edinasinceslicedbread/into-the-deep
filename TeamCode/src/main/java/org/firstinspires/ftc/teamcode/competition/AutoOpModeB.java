@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.competition;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -12,6 +13,7 @@ import org.firstinspires.ftc.teamcode.testing.arm.ArmControllerAuto;
 
 
 @Autonomous(name = "$$$ AUTO-B (BETA)", group = "$$$")
+@Disabled
 public class AutoOpModeB extends LinearOpMode {
     //Source code from ArmCtrlAuto
     ArmControllerAuto armControllerAuto = new ArmControllerAuto();

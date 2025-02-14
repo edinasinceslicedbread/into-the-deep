@@ -3,7 +3,6 @@ package org.firstinspires.ftc.teamcode.competition;
 import android.annotation.SuppressLint;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -11,12 +10,15 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.teamcode.ctrl.ArmController;
 import org.firstinspires.ftc.teamcode.ctrl.ArmControllerV2;
 
-@Autonomous(name = "$$$ AUTO (TEMPLATE)", group = "$$$")
-@Disabled
-public class AutoModeTemplate extends LinearOpMode {
+@Autonomous(name = "$$$ AUTO-D (BASKET 18 IN.)", group = "$$$")
+public class AutoOpModeB1 extends LinearOpMode {
+
+    // config variables
+    double inPerTick = 0.026;
+    double maxDistanceInches = 18.0;
+    int scissorTicksMax = 2000;
 
     // elapsed time
     private final ElapsedTime runtime = new ElapsedTime();
@@ -79,7 +81,10 @@ public class AutoModeTemplate extends LinearOpMode {
 
         // other variables
         int autoOpModeState = 0;
+        double startingTicks = 0.0;
+        double distance = 0.0;
         int armAutoCmd = 0;
+
 
         //------------------------------------------------------------------------------------------------
         // Start Button
@@ -101,6 +106,12 @@ public class AutoModeTemplate extends LinearOpMode {
         //------------------------------------------------------------------------------------------------
         while (opModeIsActive()) {
 
+            double lf = leftFrontDrive.getCurrentPosition();
+            double rf = rightFrontDrive.getCurrentPosition();
+            double lb = leftBackDrive.getCurrentPosition();
+            double rb = rightBackDrive.getCurrentPosition();
+            double currentTicks = (lf + rf + lb + rb) / 4;
+
             //------------------------------------------------------------------------------------------------
             // state machine
             //------------------------------------------------------------------------------------------------
@@ -113,14 +124,11 @@ public class AutoModeTemplate extends LinearOpMode {
                     // wait a couple seconds, move to next state
                     if (runtime.seconds() > 1.0) {
                         armAutoCmd = 0;
-//                        leftFrontDrive.setPower(-0.30);
-//                        rightFrontDrive.setPower(-0.30);
-//                        rightBackDrive.setPower(-0.30);
-//                        leftBackDrive.setPower(-0.30);
-//                        leftFrontDrive.setPower(0);
-//                        rightFrontDrive.setPower(0);
-//                        rightBackDrive.setPower(0);
-//                        leftBackDrive.setPower(0);
+                        leftFrontDrive.setPower(-0.20);
+                        rightFrontDrive.setPower(-0.20);
+                        rightBackDrive.setPower(-0.20);
+                        leftBackDrive.setPower(-0.20);
+                        startingTicks = currentTicks;
                         // reset command
                         autoOpModeState = 1;
                     }
@@ -139,7 +147,12 @@ public class AutoModeTemplate extends LinearOpMode {
 
                     // power scissor drive up until position reached
                     scissorDrive.setPower(0.5);
-                    if (scissorDrive.getCurrentPosition() > 2000) {
+                    if (scissorDrive.getCurrentPosition() > scissorTicksMax) {
+                        scissorDrive.setPower(0.0);
+                        autoOpModeState = 3;
+                    }
+                    if (runtime.seconds() > 15.0)
+                    {
                         scissorDrive.setPower(0.0);
                         autoOpModeState = 3;
                     }
@@ -172,6 +185,16 @@ public class AutoModeTemplate extends LinearOpMode {
 
             }
 
+            // stop if distance reached
+            distance = (startingTicks - currentTicks) * inPerTick;
+            if (distance > maxDistanceInches) {
+                leftFrontDrive.setPower(0.0);
+                rightFrontDrive.setPower(0.0);
+                leftBackDrive.setPower(0.0);
+                rightBackDrive.setPower(0.0);
+                autoOpModeState = 2;
+            }
+
             //------------------------------------------------------------------------------------------------
             // run arm controller every cycle
             //------------------------------------------------------------------------------------------------
@@ -182,6 +205,9 @@ public class AutoModeTemplate extends LinearOpMode {
             //------------------------------------------------------------------------------------------------
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.addData("Auto OpMode State", autoOpModeState);
+            telemetry.addLine("--------------------------------------------------");
+            telemetry.addLine(String.format("Scissor: PWR[%4.2f] TICKS[%d]", scissorDrive.getPower(), scissorDrive.getCurrentPosition()));
+            telemetry.addLine(String.format("Lower Limit Switch: [%s]", scissorLoSensor.isPressed()));
             telemetry.update();
 
         }
