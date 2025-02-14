@@ -24,6 +24,9 @@ public class ClawServoGripperTest extends LinearOpMode {
 
     RisingEdgeTrigger leftBumperTrigger = new RisingEdgeTrigger();
     RisingEdgeTrigger rightBumperTrigger = new RisingEdgeTrigger();
+
+
+    // halfway point of claw
     double servoPosition = 0.50;
 
     @SuppressLint("DefaultLocale")
@@ -47,9 +50,6 @@ public class ClawServoGripperTest extends LinearOpMode {
         waitForStart();
         runtime.reset();
 
-        // set to default position
-        clawServo.setPosition(servoPosition);
-
         //------------------------------------------------------------------------------------------------
         // Run until the end of the match (driver presses STOP)
         //------------------------------------------------------------------------------------------------
@@ -60,13 +60,25 @@ public class ClawServoGripperTest extends LinearOpMode {
 
             // left bumper opens
             if (leftBumperTrigger.wasTriggered()) {
-                clawServo.setPosition(servoPosition += 0.05);
+                servoPosition += 0.05;
             }
 
             // right bumper closes
             if (rightBumperTrigger.wasTriggered()) {
-                clawServo.setPosition(servoPosition -= 0.05);
+                servoPosition -= 0.05;
             }
+
+            // limit servo position
+            if (servoPosition < 0.0)
+            {
+                servoPosition = 0.0;
+            }
+            else if (servoPosition > 1.0)
+            {
+                servoPosition = 1.0;
+            }
+
+            clawServo.setPosition(servoPosition);
 
             //------------------------------------------------------------------------------------------------
             // Telemetry Data
@@ -74,7 +86,8 @@ public class ClawServoGripperTest extends LinearOpMode {
             telemetry.addData("Run Time", runtime.toString());
             telemetry.addLine("Press left / right bumpers to test the claw gripper.");
             telemetry.addLine("It starts at 0.50 and increments by 0.05 with each press.");
-            telemetry.addData("Claw Position", clawServo.getPosition());
+            telemetry.addData("Servo Target", servoPosition);
+            telemetry.addData("Servo Actual", clawServo.getPosition());
             telemetry.update();
 
         }
