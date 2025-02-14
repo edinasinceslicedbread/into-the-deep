@@ -132,7 +132,7 @@ public class ArmControllerV2 {
         public int chamberPosTicks = 150;
         public int basketPosTicks = 85;
         public int extendPosTicks = 34;
-        public int pickupPosTicks = 54;
+        public int pickupPosTicks = 50;
 
         // home positions to clear 42 inch limits
         public int homeApproachTicks = -10;
