@@ -228,16 +228,16 @@ public class TeleOpModeD extends LinearOpMode {
 
             // right trigger moves scissor up to limited value
             if (gamepad1.right_trigger > 0.05) {
-                scissorPower = gamepad1.right_trigger * 0.5;
+                scissorPower = gamepad1.right_trigger * 0.8;
             } else if (gamepad2.right_trigger > 0.05) {
-                scissorPower = gamepad2.right_trigger * 0.5;
+                scissorPower = gamepad2.right_trigger * 0.8;
             }
 
             // left trigger moves scissor down to limited value
             if (gamepad1.left_trigger > 0.05) {
-                scissorPower = -gamepad1.left_trigger * 0.2;
+                scissorPower = -gamepad1.left_trigger * 0.4;
             } else if (gamepad2.left_trigger > 0.05) {
-                scissorPower = -gamepad2.left_trigger * 0.2;
+                scissorPower = -gamepad2.left_trigger * 0.4;
             }
 
             // upper limit switch override
@@ -271,7 +271,6 @@ public class TeleOpModeD extends LinearOpMode {
             //------------------------------------------------------------------------------------------------
             armController.update(runtime, gamepad1, gamepad2);
 
-            idle();
 
         }
     }
