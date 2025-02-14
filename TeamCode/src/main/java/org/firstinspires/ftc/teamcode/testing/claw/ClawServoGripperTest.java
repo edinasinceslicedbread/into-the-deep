@@ -7,6 +7,8 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.ctrl.RisingEdgeTrigger;
+
 @TeleOp(name = "CLAW | Servo Gripper Test", group = "$$$$ Claw")
 public class ClawServoGripperTest extends LinearOpMode {
 
@@ -19,6 +21,10 @@ public class ClawServoGripperTest extends LinearOpMode {
 
     // claw
     private Servo clawServo = null;
+
+    RisingEdgeTrigger leftBumperTrigger = new RisingEdgeTrigger();
+    RisingEdgeTrigger rightBumperTrigger = new RisingEdgeTrigger();
+    double servoPosition = 0.50;
 
     @SuppressLint("DefaultLocale")
     @Override
@@ -41,19 +47,25 @@ public class ClawServoGripperTest extends LinearOpMode {
         waitForStart();
         runtime.reset();
 
+        // set to default position
+        clawServo.setPosition(servoPosition);
+
         //------------------------------------------------------------------------------------------------
         // Run until the end of the match (driver presses STOP)
         //------------------------------------------------------------------------------------------------
         while (opModeIsActive()) {
 
+            leftBumperTrigger.update(gamepad1.left_bumper);
+            rightBumperTrigger.update(gamepad1.right_bumper);
+
             // left bumper opens
-            if (gamepad1.left_bumper || gamepad2.left_bumper) {
-                clawServo.setPosition(0.30);
+            if (leftBumperTrigger.wasTriggered()) {
+                clawServo.setPosition(servoPosition += 0.05);
             }
 
             // right bumper closes
-            if (gamepad1.right_bumper || gamepad2.right_bumper) {
-                clawServo.setPosition(0.025);
+            if (rightBumperTrigger.wasTriggered()) {
+                clawServo.setPosition(servoPosition -= 0.05);
             }
 
             //------------------------------------------------------------------------------------------------
@@ -61,6 +73,7 @@ public class ClawServoGripperTest extends LinearOpMode {
             //------------------------------------------------------------------------------------------------
             telemetry.addData("Run Time", runtime.toString());
             telemetry.addLine("Press left / right bumpers to test the claw gripper.");
+            telemetry.addLine("It starts at 0.50 and increments by 0.05 with each press.");
             telemetry.addData("Claw Position", clawServo.getPosition());
             telemetry.update();
 
