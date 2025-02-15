@@ -18,7 +18,7 @@ public class AutoOpModeB1 extends LinearOpMode {
     // config variables
     double inPerTick = 0.026;
     double maxDistanceInches = 18.0;
-    int scissorTicksMax = 4500;
+    int scissorTicksMax = 7900;
 
     // elapsed time
     private final ElapsedTime runtime = new ElapsedTime();
@@ -82,9 +82,10 @@ public class AutoOpModeB1 extends LinearOpMode {
         // other variables
         int autoOpModeState = 0;
         double startingTicks = 0.0;
-        double distance = 0.0;
-        int armAutoCmd = 0;
-
+        double drivenDistance = 0.0;
+        int armPositionCmd = 0;
+        boolean wheelsDone = false;
+        boolean scissorDone = false;
 
         //------------------------------------------------------------------------------------------------
         // Start Button
@@ -116,44 +117,72 @@ public class AutoOpModeB1 extends LinearOpMode {
             // state machine
             //------------------------------------------------------------------------------------------------
             switch (autoOpModeState) {
+
                 case 0: // initial state
 
                     // close claw
                     clawServo.setPosition(clawClosePosition);
 
-                    // wait a couple seconds, move to next state
+                    // wait a second, power wheels and scissor
                     if (runtime.seconds() > 1.0) {
-                        armAutoCmd = 0;
-                        leftFrontDrive.setPower(-0.20);
-                        rightFrontDrive.setPower(-0.20);
-                        rightBackDrive.setPower(-0.20);
-                        leftBackDrive.setPower(-0.20);
-                        startingTicks = currentTicks;
-                        // reset command
-                        autoOpModeState = 1;
+
+                        // start scissor
+                        scissorDrive.setPower(0.6);
+
+                        // start wheel motors
+                        if (runtime.seconds() > 2.0)
+                        {
+                            leftFrontDrive.setPower(-0.20);
+                            rightFrontDrive.setPower(-0.20);
+                            rightBackDrive.setPower(-0.20);
+                            leftBackDrive.setPower(-0.20);
+                            startingTicks = currentTicks;
+
+                            // next state
+                            autoOpModeState = 1;
+
+                        }
+
                     }
                     break;
 
-                case 1: // move arm to basket position
+                case 1: // wait for positions
 
-                    armAutoCmd = 2;
-                    if (armController.atBasketPos) {
-                        armAutoCmd = 0; // reset command
-                        autoOpModeState = 2;
-                    }
-                    break;
-
-                case 2: // move scissor up
-
-                    // power scissor drive up until position reached
-                    scissorDrive.setPower(0.5);
-                    if (scissorDrive.getCurrentPosition() > scissorTicksMax) {
+                    // power scissor drive up until position or timeout
+                   if (scissorDrive.getCurrentPosition() > scissorTicksMax) {
                         scissorDrive.setPower(0.0);
-                        autoOpModeState = 3;
+                        scissorDone = true;
                     }
+
+                    // stop if distance reached
+                    drivenDistance = (startingTicks - currentTicks) * inPerTick;
+                    if (drivenDistance > maxDistanceInches) {
+                        leftFrontDrive.setPower(0.0);
+                        rightFrontDrive.setPower(0.0);
+                        leftBackDrive.setPower(0.0);
+                        rightBackDrive.setPower(0.0);
+                        wheelsDone = true;
+                    }
+
+                   if (wheelsDone && scissorDone) {
+                       autoOpModeState = 2;
+                    }
+
                     if (runtime.seconds() > 15.0)
                     {
+                        leftFrontDrive.setPower(0.0);
+                        rightFrontDrive.setPower(0.0);
+                        leftBackDrive.setPower(0.0);
+                        rightBackDrive.setPower(0.0);
                         scissorDrive.setPower(0.0);
+                    }
+                    break;
+
+                case 2: // move arm to basket position
+
+                    armPositionCmd = 2;
+                    if (armController.atBasketPos) {
+                        armPositionCmd = 0; // reset command
                         autoOpModeState = 3;
                     }
                     break;
@@ -176,28 +205,20 @@ public class AutoOpModeB1 extends LinearOpMode {
                     }
 
                     // arm
-                    armAutoCmd = 1;
+                    armPositionCmd = 1;
                     if (armController.atHomePos && scissorLoSensor.isPressed()) {
-                        armAutoCmd = 0; // reset command
+                        armPositionCmd = 0; // reset command
                         autoOpModeState = 5;
                     }
                     break;
 
             }
 
-            // stop if distance reached
-            distance = (startingTicks - currentTicks) * inPerTick;
-            if (distance > maxDistanceInches) {
-                leftFrontDrive.setPower(0.0);
-                rightFrontDrive.setPower(0.0);
-                leftBackDrive.setPower(0.0);
-                rightBackDrive.setPower(0.0);
-            }
 
             //------------------------------------------------------------------------------------------------
             // run arm controller every cycle
             //------------------------------------------------------------------------------------------------
-            armController.update(runtime, gamepad1, gamepad2, armAutoCmd);
+            armController.update(runtime, gamepad1, gamepad2, armPositionCmd);
 
             //------------------------------------------------------------------------------------------------
             // Update Telemetry

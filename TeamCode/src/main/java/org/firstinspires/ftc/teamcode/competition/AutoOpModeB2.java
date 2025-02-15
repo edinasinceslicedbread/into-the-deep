@@ -18,7 +18,7 @@ public class AutoOpModeB2 extends LinearOpMode {
     // config variables
     double inPerTick = 0.026;
     double maxDistanceInches = 24.0;
-    int scissorTicksMax = 4500;
+    int scissorTicksMax = 7900;
 
     // elapsed time
     private final ElapsedTime runtime = new ElapsedTime();
