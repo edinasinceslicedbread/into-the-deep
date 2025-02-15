@@ -17,7 +17,9 @@ public class AutoOpModeB1 extends LinearOpMode {
 
     // config variables
     double inPerTick = 0.026;
-    double maxDistanceInches = 18.0;
+    double maxDistanceInches = 48.0;
+    double turnDistanceInches = 18.0;
+    double finalDistanceInches = 8.0;
     int scissorTicksMax = 7900;
 
     // elapsed time
@@ -81,6 +83,7 @@ public class AutoOpModeB1 extends LinearOpMode {
 
         // other variables
         int autoOpModeState = 0;
+        double startingTime = 0.0;
         double startingTicks = 0.0;
         double drivenDistance = 0.0;
         int armPositionCmd = 0;
@@ -108,10 +111,10 @@ public class AutoOpModeB1 extends LinearOpMode {
         while (opModeIsActive()) {
 
             double lf = leftFrontDrive.getCurrentPosition();
-            double rf = rightFrontDrive.getCurrentPosition();
             double lb = leftBackDrive.getCurrentPosition();
+            double rf = rightFrontDrive.getCurrentPosition();
             double rb = rightBackDrive.getCurrentPosition();
-            double currentTicks = (lf + rf + lb + rb) / 4;
+            double currentTicks = (lf + lb) / 2;
 
             //------------------------------------------------------------------------------------------------
             // state machine
@@ -127,15 +130,14 @@ public class AutoOpModeB1 extends LinearOpMode {
                     if (runtime.seconds() > 1.0) {
 
                         // start scissor
-                        scissorDrive.setPower(0.6);
+                        scissorDrive.setPower(0.65);
 
                         // start wheel motors
-                        if (runtime.seconds() > 2.0)
-                        {
-                            leftFrontDrive.setPower(-0.20);
-                            rightFrontDrive.setPower(-0.20);
-                            rightBackDrive.setPower(-0.20);
-                            leftBackDrive.setPower(-0.20);
+                        if (runtime.seconds() > 2.0) {
+                            leftFrontDrive.setPower(-0.25);
+                            rightFrontDrive.setPower(-0.25);
+                            rightBackDrive.setPower(-0.25);
+                            leftBackDrive.setPower(-0.25);
                             startingTicks = currentTicks;
 
                             // next state
@@ -149,27 +151,30 @@ public class AutoOpModeB1 extends LinearOpMode {
                 case 1: // wait for positions
 
                     // power scissor drive up until position or timeout
-                   if (scissorDrive.getCurrentPosition() > scissorTicksMax) {
+                    if (scissorDrive.getCurrentPosition() > scissorTicksMax || scissorDone) {
                         scissorDrive.setPower(0.0);
                         scissorDone = true;
                     }
 
                     // stop if distance reached
                     drivenDistance = (startingTicks - currentTicks) * inPerTick;
-                    if (drivenDistance > maxDistanceInches) {
+                    if (drivenDistance > (maxDistanceInches - turnDistanceInches) && !wheelsDone) {
+                        rightFrontDrive.setPower(0.25);
+                        rightBackDrive.setPower(0.25);
+                    }
+                    if (drivenDistance > maxDistanceInches || wheelsDone) {
                         leftFrontDrive.setPower(0.0);
-                        rightFrontDrive.setPower(0.0);
                         leftBackDrive.setPower(0.0);
+                        rightFrontDrive.setPower(0.0);
                         rightBackDrive.setPower(0.0);
                         wheelsDone = true;
                     }
 
-                   if (wheelsDone && scissorDone) {
-                       autoOpModeState = 2;
+                    if (wheelsDone && scissorDone) {
+                        autoOpModeState = 2;
                     }
 
-                    if (runtime.seconds() > 15.0)
-                    {
+                    if (runtime.seconds() > 15.0) {
                         leftFrontDrive.setPower(0.0);
                         rightFrontDrive.setPower(0.0);
                         leftBackDrive.setPower(0.0);
@@ -183,23 +188,54 @@ public class AutoOpModeB1 extends LinearOpMode {
                     armPositionCmd = 2;
                     if (armController.atBasketPos) {
                         armPositionCmd = 0; // reset command
+                        startingTicks = currentTicks;
+                        leftFrontDrive.setPower(-0.25);
+                        rightFrontDrive.setPower(-0.25);
+                        rightBackDrive.setPower(-0.25);
+                        leftBackDrive.setPower(-0.25);
                         autoOpModeState = 3;
                     }
                     break;
 
-                case 3: // open claw
+                case 3: // move forward again
 
                     // close claw and wait a couple seconds
-                    clawServo.setPosition(clawOpenPosition);
-                    if (runtime.seconds() > 1.0) {
+                    drivenDistance = (startingTicks - currentTicks) * inPerTick;
+                    if (drivenDistance > finalDistanceInches) {
+                        leftFrontDrive.setPower(0.0);
+                        leftBackDrive.setPower(0.0);
+                        rightFrontDrive.setPower(0.0);
+                        rightBackDrive.setPower(0.0);
+                        startingTime = runtime.seconds();
                         autoOpModeState = 4;
                     }
                     break;
 
-                case 4: // move both arm and scissor to home position
+                case 4: // open claw
+
+                    // close claw and wait a couple seconds
+                    clawServo.setPosition(clawOpenPosition);
+                    if (runtime.seconds() - startingTime > 1.0) {
+                        leftFrontDrive.setPower(0.25);
+                        rightFrontDrive.setPower(0.25);
+                        rightBackDrive.setPower(0.25);
+                        leftBackDrive.setPower(0.25);
+                        if (runtime.seconds() - startingTime > 2.0) {
+                            leftFrontDrive.setPower(0.0);
+                            rightFrontDrive.setPower(0.0);
+                            rightBackDrive.setPower(0.0);
+                            leftBackDrive.setPower(0.0);
+                            autoOpModeState = 5;
+                        }
+                    }
+                    break;
+
+                case 5: // move both arm and scissor to home position
 
                     // scissor
-                    scissorDrive.setPower(-0.25);
+                    if (runtime.seconds() - startingTime > 3.0) {
+                        scissorDrive.setPower(-0.4);
+                    }
                     if (scissorLoSensor.isPressed()) {
                         scissorDrive.setPower(0.0);
                     }
@@ -208,7 +244,7 @@ public class AutoOpModeB1 extends LinearOpMode {
                     armPositionCmd = 1;
                     if (armController.atHomePos && scissorLoSensor.isPressed()) {
                         armPositionCmd = 0; // reset command
-                        autoOpModeState = 5;
+                        autoOpModeState = 6;
                     }
                     break;
 

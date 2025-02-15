@@ -241,7 +241,7 @@ public class TeleOpModeD extends LinearOpMode {
             }
 
             // upper limit position override
-            if (scissorPower > 0.0 && scissorTicksActual > 6600.0) {
+            if (scissorPower > 0.0 && scissorTicksActual > 7900.0) {
                 scissorPower = 0;
             }
 
